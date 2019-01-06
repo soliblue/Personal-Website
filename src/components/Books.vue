@@ -2,7 +2,7 @@
 <div class="animated fadeIn">
   <div>
     <div class="back">
-      <router-link to='/'> Back </router-link>
+      <router-link to='/home'> Back </router-link>
     </div>
     <div class="content">
       <div v-for="book in books" class="book" :key="book.id" @click="toggle_selected_book(book)">

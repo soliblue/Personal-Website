@@ -12,7 +12,6 @@
   },
   "dependencies": {
     "vue": "^2.5.2",
-    "vue-animejs": "^1.0.2",
     "vue-router": "^3.0.1"
   },
   "devDependencies": {

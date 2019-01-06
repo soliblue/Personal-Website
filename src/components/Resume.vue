@@ -2,7 +2,7 @@
   <div class="animated fadeIn">
     <div>
       <div class="back">
-        <router-link to='/'> Back </router-link>
+        <router-link to='/home'> Back </router-link>
       </div>
       <div class="download">
         <a  href='https://soliman.life/as_resume.pdf'> Download </a>

@@ -2,49 +2,50 @@
 <div>
   <div class="animated fadeIn">
     <div class="content">
-      <div class="subtitle">
-        <span class="blue">A</span>
-        <span class="red">h</span>
-        <span class="yellow">m</span>
-        <span class="green">e</span>
-        <span >d</span>
+      <div class="first-name">
+        <span>A</span>
+        <span>h</span>
+        <span>m</span>
+        <span>e</span>
+        <span>d</span>
       </div>
-      <div class="title m-b-md hvr-pulse">
+      <div class="family-name">
         SOLIMAN
       </div>
       <div v-if="display_social" class="animated fadeIn">
         <a href="https://github.com/AhmedSoli" target="_blank">
-          <img src="../assets/github.png" class="logo" >
+          <img src="../assets/github.png" class="social-links" >
         </a>
         <a href="https://www.linkedin.com/in/asoliman96/" target="_blank">
-          <img src="../assets/linkedin.png" class="logo" >
+          <img src="../assets/linkedin.png" class="social-links" >
         </a>
       </div>
       <div v-if="display_contact" class="animated fadeIn" style="padding-bottom:5vh">
         <a href="mailto:asoliman96@gmail.com">asoliman96@gmail.com</a>
       </div>
-      <div class="links">
-        <router-link to="/resume" class="mobile-block hvr-blue">Resume</router-link>
+      <div class="nav-links">
+        <router-link to="/resume">Resume</router-link>
         &nbsp;
-        <a class="mobile-block hvr-red" @click="display_social = !display_social">Social</a>
+        <a @click="display_social = !display_social">Social</a>
         &nbsp;
-        <router-link to="/quotes" class="mobile-block hvr-yellow">Quotes</router-link>
+        <router-link to="/quotes">Quotes</router-link>
         &nbsp;
-        <router-link to="/books" class="mobile-block hvr-green">Books</router-link>
+        <router-link to="/books">Books</router-link>
         &nbsp;
-        <a  class="mobile-block hvr-black" @click="display_contact = !display_contact">Contact</a>
-
+        <a @click="display_contact = !display_contact">Contact</a>
       </div>
     </div>
-    <pre id="style-text" style="height:30vh;overflow-y: scroll;"></pre>
-    <a href=""></a>
-    <router-link to="/home">Skip Animation </router-link>
+    <pre id="style-text" class="css-code" style="height:40vh;overflow-y: scroll;"><br></pre>
+    <div class="controls">
+      <a href="/">Restart Animation</a>
+      <router-link to="/home">Skip</router-link>
+    </div>
   </div>
 </div>
 </template>
 <script defer>
 export default {
-  name: 'Home',
+  name: 'BuildHome',
   data() {
     return {
       display_social: false,
@@ -55,7 +56,7 @@ export default {
     build_page() {
       var openComment, styles, time, writeStyleChar, writeStyles;
 
-      styles = "/* \n * hmmmm\n *\n *\n *\n *\n *\n *\n *\n * what is wrong with this thing?\n *\n *\n *\n *\n *\n *\n *\n * looks weird \n *\n *\n *\n *\n *\n *\n *\n * let us make it right\n * \n *\n *\n *\n *\n * \n * Confused? Watch!\n *\n *\n *\n *\n */\npre { \n  margin-left: auto;\n  margin-right: auto;\n  width: 50%;\n  background-color: #313744; \n  color: #a6c3d4;\n}\n/* \n *  \n *\n * WOW! Seems to be working.\n * \n *\n *\n * Let's make this code more readable.\n *\n * Colors based on Base16 Ocean Dark.\n */\npre {\n  transition: left 500ms;\n  padding: 24px 12px;\n  box-sizing: border-box;\n  box-shadow: 0px 4px 0px 2px rgba(0,0,0,0.1);\n}\npre em:not(.comment) { font-style: normal; }\n.comment       { color: #707e84; }\n.selector      { color: #c66c75; }\n.selector .key { color: #c66c75; }\n.key           { color: #c7ccd4; }\n.value         { color: #d5927b; }\n/* \n *\n *\n * How about we also center the content.\n *\n *\n *\n */\n.content {\n  text-align: center;\n  padding-top:20px;\n}\n/* \n *\n *\n * Now we make my family name bigger.\n *\n *\n *\n */\n.title { font-size: 60px; }\n/* \n *\n *\n * And add some colors to my first name\n *\n *\n */\n.yellow { color:#fdbd00; }\n.blue { color:#3e82f7; }\n.red { color:#ed412d; }\n.green { color:#2da94f; }\n/* \n *\n *\n * and style the links\n *\n *\n *\n */\n.links>a {\n    color: #636b6f;\n    padding: 0 25px;\n    font-size: 12px;\n    font-weight: 600;\n    letter-spacing: .1rem;\n    text-decoration: none;\n    text-transform: uppercase;\n}\n.hvr-blue, .hvr-red, .hvr-yellow, .hvr-green, .hvr-black  {\n  border-bottom-style: solid;\n}\n.hvr-red { border-bottom-color: rgb(237, 65, 45,0.5); }\n.hvr-yellow { border-bottom-color: rgb(253, 189, 0,0.5);}\n.hvr-green { border-bottom-color: rgb(45, 169, 79,0.5);}\n.hvr-black { border-bottom-color: rgb(0, 0, 0,0.5);}\n.hvr-blue {border-bottom-color: rgba(62, 130, 247, 0.5);}\n/* \n *\n * Wahoo!         \n *\n *\n *\n *\n *\n *\n *\n * We did it!       \n *\n *\n *\n *\n *\n *\n *\n * I mean *I* did it, but you know, whatever...\n *\n *\n *\n *\n *\n * \n *\n * See you later!\n *  \n *\n *\n *\n *\n */";
+      styles = "/* \n * \n * hmmmm                                               \n *                                             \n * What is wrong with this page?                                              \n *\n * Looks weird!                                              \n *\n * Let's make it right.                                               \n *\n * We will write styling code in this little box.                                               \n *\n * and then inject it directly into the browser.                                             \n * \n * Confused? Watch!                                              \n *\n */\n* {\n  -webkit-transition: all 1s;\n}\n.css-code { \n  width: 50%;\n  color: #a6c3d4;\n  background-color: #313744; \n  padding: 24px 12px;\n  box-shadow: 0px 4px 0px 2px rgba(0,0,0,0.1);\n  margin-right: auto;\n  margin-left: auto;\n  box-sizing: border-box;\n}                                              \n/* \n *  \n * WOW! Seems to be working.                                              \n *\n * We moved the box to the center.                                             \n *\n * and added some colors to it.                                             \n *\n * How about we also make it more readable?                                             \n *\n */\n.css-code em:not(.comment) { font-style: normal; }\n.comment       { color: #707e84; }\n.selector      { color: #c66c75; }\n.selector .key { color: #c66c75; }\n.key           { color: #c7ccd4; }\n.value         { color: #d5927b; }                                              \n/* \n *\n * Seems good enough for me.                                              \n *\n * Now we center the main content.                                              \n *\n */\n.content {\n  text-align: center;\n  padding-top:20px;\n}                                              \n/* \n *\n * Then we make my family name bigger.                                             \n *\n*/\n.family-name { font-size: 60px; }                                              \n/* \n *\n * Next we add some colors to my first name.                                           \n *\n */\n.first-name > span:nth-child(1) { color:#3e82f7; }\n.first-name > span:nth-child(2) { color:#ed412d; }\n.first-name > span:nth-child(3) { color:#fdbd00; }\n.first-name > span:nth-child(4) { color:#2da94f; }                                              \n/* \n *\n * Finally we style the links.                                            \n *\n*/\n.nav-links > a {\n  color: #636b6f;\n  padding: 0 25px;\n  font-size: 12px;\n  font-weight: 600;\n  letter-spacing: .1rem;\n  text-decoration: none;\n  text-transform: uppercase;\n  border-bottom-style: solid;\n}                                                \n.nav-links > a:nth-child(1) { border-bottom-color:#3e82f775; }\n.nav-links > a:nth-child(2) { border-bottom-color:#ed412d75; }\n.nav-links > a:nth-child(3) { border-bottom-color:#fdbd0075; }\n.nav-links > a:nth-child(4) { border-bottom-color:#2da94f75; }                                               \n.controls {\n  text-align: center;\n}\n/* \n *\n * Woohoo!                                              \n *\n * We did it!                                              \n *\n * I hope you enjoyed this!                                              \n *\n * The code is based on Jake Albaugh work\n *\n * and colors are based on Base16 Ocean Dark.                                              \n *\n * Check out the rest of the website to get to know me!                                                  \n *\n * Talk to you later!                                              \n * \n */";
 
       openComment = false;
 
@@ -115,40 +116,19 @@ export default {
     }
 }
 
-.logo {
+.social-links {
   height:50px;
-  padding:2em;
+  padding:1em;
 }
 
-path {
-  fill: none;
-  stroke: black;
-  stroke-width: 4;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.svg {
-  margin-left:auto;
-  margin-right:auto;
-}
-
-.hvr-black:hover, .hvr-black:focus, .hvr-black:active {
-  background-color:black;
-  color:white;
-  -webkit-transition-duration: 0.3s;
-  transition-duration: 0.3s;
-  cursor: pointer;
-}
-
-.hvr-blue:hover, .hvr-blue:focus, .hvr-blue:active{
+.nav-links > a:nth-child(1):hover, .nav-links > a:nth-child(1):focus, .nav-links > a:nth-child(1):active{
   background-color:#3e82f7;
   color: white;
   -webkit-transition-duration: 0.3s;
   transition-duration: 0.3s;
 }
 
-.hvr-red:hover, .hvr-red:focus, .hvr-red:active{
+.nav-links > a:nth-child(2):hover, .nav-links > a:nth-child(2):focus, .nav-links > a:nth-child(2):active{
   background-color:#ed412d;
   color:white;
   -webkit-transition-duration: 0.3s;
@@ -156,7 +136,7 @@ path {
   cursor: pointer;
 }
 
-.hvr-yellow:hover, .hvr-yellow:focus, .hvr-yellow:active{
+.nav-links > a:nth-child(3):hover, .nav-links > a:nth-child(3):focus, .nav-links > a:nth-child(3):active{
   background-color:#fdbd00;
   color:white;
   -webkit-transition-duration: 0.3s;
@@ -164,11 +144,19 @@ path {
 }
 
 
-.hvr-green:hover, .hvr-green:focus, .hvr-green:active{
+.nav-links > a:nth-child(4):hover, .nav-links > a:nth-child(4):focus, .nav-links > a:nth-child(4):active{
   background-color:#2da94f;
   color:white;
   -webkit-transition-duration: 0.3s;
   transition-duration: 0.3s;
+}
+
+.nav-links > a:nth-child(5):hover, .nav-links > a:nth-child(5):focus, .nav-links > a:nth-child(5):active {
+  background-color:black;
+  color:white;
+  -webkit-transition-duration: 0.3s;
+  transition-duration: 0.3s;
+  cursor: pointer;
 }
 
 </style>
