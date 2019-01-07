@@ -16,6 +16,7 @@
             <div v-html='experience.description'></div>
           </div>
         </div>
+        <div class="seperator"></div>
         <div class="skills" style="display:inline-block">
           <h3>Skills</h3>
           <div v-for="skillset in skillsets" :key="skillset.id" style="display:inline-block;padding-right:5vw">
@@ -87,7 +88,7 @@ export default {
           end: 'August 2017',
           description: '<ul><li>Develop a new canteen management system for the institute <a href="https://docs.google.com/presentation/d/1eDMoDx2g4zO0AooP44z3U_AfLL0B1LrxmwDFOtDTltA/edit?usp=sharing">Pictures</a> <a href="https://github.com/AhmedSoli/Convenience-System">Code</a><ul><li><strong>Backend</strong> Laravel (PHP framework), SQL</li><li><strong>Frontend</strong> Javascript, CSS, HTML, Bootstrap3 and jQuery</li><li>The projects is structured following MVC principles and RESTful API guidelines</li></ul></li><li>Improve systems responsible for managing everyday tasks at the institutesuch as printing/reading PDF files and tracking the work time of instituteemployees.</li></ul>',
         },
-        { title: 'Soware Developer/Data Scientist',
+        { title: 'Software Developer/Data Scientist',
           employer: 'RWTH Aachen University, Chair of Communication and Distributed Systems',
           location: 'Aachen, Germany',
           start: 'January 2018',
@@ -101,6 +102,13 @@ export default {
           end: 'Present',
           description: '<ul><li>Develop web crawlers to mine text from news websites and other sources.</li><li>Generating word embeddings from the crawled corpus using Tensorflow and word2vec </li><li>Studying and comparing the generated word embeddings</li><li> Develop the chair\'s official website <a href="http://cssh.rwth-aachen.de/">View</a></li></ul>',
         },
+        { title: 'Founder',
+          employer: 'Naga7ni',
+          location: 'Cairo, Egypt',
+          start: 'December 2015',
+          end: 'November 2016',
+          description: '<ul>  <li><strong>Idea: </strong> The idea behind naga7ni was to create an online platform where all students needs in Egypt are met. If someone was trying to sell old textbooks, looking for a tutor, having questions regarding any school subject Naga7ni was the right place to turn to. We wanted to make all scholastic endeavors easily overcome by just a click of a button. Sadly due to me not being in Egypt and still having a lot of things to learn we had to shut down the website and close all operations. However, it was one of the most challenging, educational and fun periods of my life.</li>  <li><strong>Responsibilities: </strong>   <ul>      <li>Creating the website using PHP, SQL, CSS, HTML and Javascript. I taught myself everything using websites such as <a href="https://www.w3schools.com/">w3schools</a> and <a href="https://www.udacity.com/">udacity</a></li>     <li>Using <a href="https://www.facebook.com/business/ads">Facebook Ads</a> and <a href="https://ads.google.com/home/">Google Adwords</a> to attract more people to our page on <a href="https://www.facebook.com/">Facebook</a> and to the Website. The Strategy was mainly targeting students attending selected schools.</li>     <li>Using <a href="https://www.facebook.com/business/ads">Facebook Ads</a> and <a href="https://ads.google.com/home/">Google Adwords</a> to attract tutors to our website. The strategy was mainly targeting newly graduated teachers and teacher assistants.</li>      <li>Hiring people to help me with design, managing the Facebook Page and calling tutors on the phones to encourage them to sign up.</li>    </ul> </li></ul>',
+        },
       ],
       educations: [
         { degree: 'Bachelor of Science', field: 'Computer Science', start: 'October 2014', end: 'August 2018', university: 'RWTH Aachen', courses: ['Data Structures and Algorithms', 'Computability and Complexity', 'Software Technology', 'Web Technology','Programming','Designing of Interactive Systems', 'Data Communication and Security', 'System Programming', 'Introduction into Artifical Intelligence', 'Linear Algebra', 'Discrete Structures', 'Analysis for Computer Scientists', 'Numerical Mathematics'] },
@@ -112,7 +120,7 @@ export default {
         { title: 'Data Science', skills: [{ title: 'pandas', level: 80 }, { title: 'sklearn', level: 80 }, { title: 'matplotlib', level: 80 }, { title: 'seaborn', level: 80 }, { title: 'hadoop', level: 60 }, { title: 'spark', level: 60 },{ title: 'gcloud', level: 60 },], },
       ],
       languages: [{ name: 'Arabic', level: 'Native' }, { name: 'German', level: 'Fluent' }, { name: 'English', level: 'Fluent' }],
-      hackathons: [{ name: 'Goole Hashcode 2016', code: 'https://github.com/AhmedSoli/Hashcode-2016-Qualifications'},{ name: 'Goole Hashcode 2017', code: 'https://github.com/AhmedSoli/Google-Hashcode-2017-Qualifications'},{ name: 'Microsoft Azure Deutschland HACKATHON 2016'},{ name: 'Bonding Hackathon 2017'}],
+      hackathons: [{ name: 'Goole Hashcode 2016', code: 'https://github.com/AhmedSoli/Hashcode-2016-Qualifications'},{ name: 'Goole Hashcode 2017', code: 'https://github.com/AhmedSoli/Google-Hashcode-2017-Qualifications'},{ name: 'Microsoft Azure Deutschland HACKATHON 2016'},{ name: 'Bonding Hackathon 2017'},{ name: 'Jodel - Act with AC.E' }],
       volunteers: [{ title: 'Software Developer', organisation: 'IT4KIDS', description: 'IT4KIDS is a non-profit organization, which aims to improve the way computer science is taught in German schools. Currently, we operate in more than 10 schools in the area of Aachen'}, { title: 'Event Organiser', organisation: 'CISV Egypt', description: 'Celebrating Peace one day in Egypt by organizing an event where we raise awareness about peace around the world. The event was attended by more than 900 people.'},],
     };
   },
@@ -152,14 +160,18 @@ export default {
 }
 
 .content {
-  padding-top:70px;
+  padding:5vw;
+  margin: 50px auto 0 auto;
   text-align: left;
-  margin-left:auto;
-  margin-right: auto;
   max-width: 1000px;
+  border: solid;
 }
 
 .language {
   display: inline-block;
+}
+
+.seperator {
+  border-top: solid;
 }
 </style>

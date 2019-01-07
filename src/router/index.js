@@ -5,6 +5,8 @@ import Quotes from '@/components/Quotes';
 import Books from '@/components/Books';
 import Resume from '@/components/Resume';
 import BuildHome from '@/components/BuildHome';
+import IWantMore from '@/components/IWantMore';
+
 
 
 Vue.use(Router);
@@ -16,6 +18,11 @@ export default new Router({
       path: '/',
       name: 'BuildHome',
       component: BuildHome,
+    },
+    {
+      path: '/more',
+      name: 'IWantMore',
+      component: IWantMore,
     },
     {
       path: '/home',

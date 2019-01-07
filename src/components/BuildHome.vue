@@ -39,6 +39,9 @@
     <div class="controls">
       <a href="/">Restart Animation</a>
       <router-link to="/home">Skip</router-link>
+      <div>
+        <router-link to="/more" class="i-want-more">I want more</router-link>
+      </div>
     </div>
   </div>
 </div>
@@ -56,7 +59,7 @@ export default {
     build_page() {
       var openComment, styles, time, writeStyleChar, writeStyles;
 
-      styles = "/* \n * \n * hmmmm                                               \n *                                             \n * What is wrong with this page?                                              \n *\n * Looks weird!                                              \n *\n * Let's make it right.                                               \n *\n * We will write styling code in this little box.                                               \n *\n * and then inject it directly into the browser.                                             \n * \n * Confused? Watch!                                              \n *\n */\n* {\n  -webkit-transition: all 1s;\n}\n.css-code { \n  width: 50%;\n  color: #a6c3d4;\n  background-color: #313744; \n  padding: 24px 12px;\n  box-shadow: 0px 4px 0px 2px rgba(0,0,0,0.1);\n  margin-right: auto;\n  margin-left: auto;\n  box-sizing: border-box;\n}                                              \n/* \n *  \n * WOW! Seems to be working.                                              \n *\n * We moved the box to the center.                                             \n *\n * and added some colors to it.                                             \n *\n * How about we also make it more readable?                                             \n *\n */\n.css-code em:not(.comment) { font-style: normal; }\n.comment       { color: #707e84; }\n.selector      { color: #c66c75; }\n.selector .key { color: #c66c75; }\n.key           { color: #c7ccd4; }\n.value         { color: #d5927b; }                                              \n/* \n *\n * Seems good enough for me.                                              \n *\n * Now we center the main content.                                              \n *\n */\n.content {\n  text-align: center;\n  padding-top:20px;\n}                                              \n/* \n *\n * Then we make my family name bigger.                                             \n *\n*/\n.family-name { font-size: 60px; }                                              \n/* \n *\n * Next we add some colors to my first name.                                           \n *\n */\n.first-name > span:nth-child(1) { color:#3e82f7; }\n.first-name > span:nth-child(2) { color:#ed412d; }\n.first-name > span:nth-child(3) { color:#fdbd00; }\n.first-name > span:nth-child(4) { color:#2da94f; }                                              \n/* \n *\n * Finally we style the links.                                            \n *\n*/\n.nav-links > a {\n  color: #636b6f;\n  padding: 0 25px;\n  font-size: 12px;\n  font-weight: 600;\n  letter-spacing: .1rem;\n  text-decoration: none;\n  text-transform: uppercase;\n  border-bottom-style: solid;\n}                                                \n.nav-links > a:nth-child(1) { border-bottom-color:#3e82f775; }\n.nav-links > a:nth-child(2) { border-bottom-color:#ed412d75; }\n.nav-links > a:nth-child(3) { border-bottom-color:#fdbd0075; }\n.nav-links > a:nth-child(4) { border-bottom-color:#2da94f75; }                                               \n.controls {\n  text-align: center;\n}\n/* \n *\n * Woohoo!                                              \n *\n * We did it!                                              \n *\n * I hope you enjoyed this!                                              \n *\n * The code is based on Jake Albaugh work\n *\n * and colors are based on Base16 Ocean Dark.                                              \n *\n * Check out the rest of the website to get to know me!                                                  \n *\n * Talk to you later!                                              \n * \n */";
+      styles = "/* \n * \n * hmmmm                                               \n * \n * What is wrong with this page?                                              \n *\n * Looks weird!                                              \n *\n * Let's make it right.                                               \n *\n * We will write styling code in this little box                                                \n *\n * and then inject it directly into the browser.                                             \n * \n * Confused? Watch!                                              \n *\n */\n\n* {\n  -webkit-transition: all 1s;\n}\n\n/* \n * \n * Hmmm, well this did not do much.                                              \n *\n *\n */\n\n.css-code { \n  box-sizing: border-box;\n  color: #a6c3d4;\n  background-color: #313744; \n  padding: 24px 12px;\n  box-shadow: 0px 4px 0px 2px rgba(0,0,0,0.1);\n  margin-right: auto;\n  margin-left: auto;\n  width:100%;\n}  \n\n.css-code { width: 75%;}                                                  \n\n/* \n *  \n * WOW! Now it seems to be working.                                              \n *\n * We moved our little box to the center                                             \n *\n * and added some colors to it.                                             \n *\n * How about we also make this code more readable?                                            \n *\n */\n\n.css-code em:not(.comment) { font-style: normal; }\n.comment       { color: #707e84; }\n.selector      { color: #c66c75; }\n.selector .key { color: #c66c75; }\n.key           { color: #c7ccd4; }\n.value         { color: #d5927b; }                                            \n\n/* \n *\n * Looks good enough for me.                                              \n *\n * Now we center the main content.                                              \n *\n */\n\n .content {\n  text-align: center;\n  padding-top:20px;\n}                                             \n\n/* \n *\n * Then we make my family name bigger.                                             \n *\n */\n\n.family-name { font-size: 60px; }                                            \n\n/* \n *\n * Next we add some colors to my first name.                                           \n *\n */\n\n.first-name > span:nth-child(1) { color:#3e82f7; }\n.first-name > span:nth-child(2) { color:#ed412d; }\n.first-name > span:nth-child(3) { color:#fdbd00; }\n.first-name > span:nth-child(4) { color:#2da94f; }                                             \n\n/* \n *\n * Lastly we style the links.                                            \n *\n */\n\n.nav-links > a {\n  color: #636b6f;\n  padding: 0 25px; \n  font-size: 12px;\n  font-weight: 600;\n  letter-spacing: .1rem;\n  text-decoration: none;\n  text-transform: uppercase;\n  border-bottom-style: solid;\n} \n\n.nav-links > a:nth-child(1) { border-bottom-color:#3e82f775; }\n.nav-links > a:nth-child(2) { border-bottom-color:#ed412d75; }\n.nav-links > a:nth-child(3) { border-bottom-color:#fdbd0075; }\n.nav-links > a:nth-child(4) { border-bottom-color:#2da94f75; }\n\n.controls {\n  text-align: center;\n}\n\n/* \n *\n * Woohoo!                                              \n *\n * We did it!                                              \n *\n * I hope you enjoyed this!                                              \n *\n * A button will now appear below.                                              \n *\n */\n\n.i-want-more {\n display:block !important;\n}\n\n/*\n * It will take you to the next part.                                              \n *\n * There you will be more in control.                                              \n *\n * You will be able to change the color of the page,                                               \n *\n * add your name at the top and more!                                             \n *\n * Check it out!                                             \n *\n * Some of the code is based on Jake Albaugh work                                              \n *\n * and colors are based on Base16 Ocean Dark.\n *\n * Talk to you later!                                              \n * \n */";
 
       openComment = false;
 
@@ -93,7 +96,7 @@ export default {
           return setTimeout((function() {
             return writeStyles(message, index);
           }), 20);
-        }
+        } 
       };
       
       // starting it off
@@ -101,6 +104,7 @@ export default {
     },
   },
   mounted() {
+    $('.i-want-more').toggle();
     this.build_page();
   }
 };
@@ -109,12 +113,12 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 
-@media only screen and (max-width: 500px) {
+@media only screen and (max-width: 600px) {
     pre {
-      font-size: 10px;
-      width: 90% !important;
+      font-size: 2.5vw;
     }
 }
+
 
 .social-links {
   height:50px;

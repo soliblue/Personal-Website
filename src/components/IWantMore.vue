@@ -35,7 +35,7 @@
         <a @click="display_contact = !display_contact">Contact</a>
       </div>
     </div>
-    <pre id="home-style-text" class="css-code" style="height: 40vh; overflow-y: scroll;"><em class="comment">/* 
+    <pre id="more-style-text" class="css-code" style="height: 40vh; overflow-y: scroll;"><em class="comment">/* 
  * 
  * hmmmm                                               
  * 
@@ -190,32 +190,151 @@
  */</em></pre>
     <div class="controls">
       <a href="/">Restart Animation</a>
-      <div>
-        <router-link to="/more" class="i-want-more">I want more</router-link>
+    </div>
+    <div class="animated fadeIn">
+      <div id="modal-background-color" class="modal">
+
+      <!-- Modal content -->
+      <div class="modal-content">
+        <h3>What should the background color of the page be?</h3>
+        <div>
+          <div @click="set_choice('mintcream',1)" style="width:40%;display:inline-block;background-color:mintcream;color:black;cursor:pointer;padding:10px">
+            Mintcream
+          </div>
+          <div @click="set_choice('cornsilk',1)" style="width:40%;display:inline-block;background-color:cornsilk;color:black;cursor:pointer;padding:10px;">
+            Cornsilk
+          </div>
+        </div>
       </div>
+
+    </div>
+    <div id="modal-family-name" class="modal">
+
+      <!-- Modal content -->
+      <div class="modal-content">
+        <h3>How big should my family name be?</h3>
+        <div>
+          <div v-for="size in ['10px','30px','50px','70px','90px']" :style="'cursor: pointer;font-size: ' + size" @click='set_choice(size,2)'>
+            Text
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+     <div id="modal-change-names" class="modal">
+
+      <!-- Modal content -->
+      <div class="modal-content">
+        <h3>Choose new names to be displayed</h3>
+        <div>
+          First Name:
+          <input type="text" id="first-name">
+          Family Name:
+          <input type="text" id="family-name">
+          <a @click="set_names()" href="#">Done</a>
+        </div>
+      </div>
+
+    </div>
     </div>
   </div>
 </div>
 </template>
-<script>
+<script defer>
 export default {
-  name: 'Home',
+  name: 'IWantMore',
   data() {
     return {
       display_social: false,
       display_contact: false,
     };
   },
+  methods: {
+    i_want_more(pos) {
+      var openComment, styles, time, writeStyleChar, writeStyles;
+
+      styles = ["\n/* \n * \n * Seems like you enjoyed it.                                               \n *\n * This part will be a little bit different.                                              \n *\n * You will be more in control.                                           \n *\n * Let's start                                             \n *                                             \n *\n */\nbody {\n  background-color: ",";\n}\n/* \n *  \n * Amazing!                                             \n *\n * Good choice!                                             \n *\n * Now we choose a font size for my family name                                             \n *\n */\n.family-name {\n  font-size: ",";\n}\n/* \n * \n * You know what?                                              \n *                                             \n * Let's change my name completely!                                               \n *\n * You can replace it with your name.                                              \n *\n * Or whatever you'd like                                                                                             \n *\n */\n ","\n /* \n * \n * I hope you did not choose something funny!                                            \n *                                             \n * Well that's it for now.                                               \n *\n *\n * Talk to you later!                                                   \n *\n */\n"];
+
+      if (pos >= styles.length){
+        return;
+      }
+
+      openComment = false;
+
+      writeStyleChar = function(which) {
+        // begin wrapping open comments
+        if (which === '/' && openComment === false) {
+          openComment = true;
+          styles = $('#more-style-text').html() + which;
+        } else if (which === '/' && openComment === true) {
+          openComment = false;
+          styles = $('#more-style-text').html().replace(/(\/[^\/]*\*)$/, '<em class="comment">$1/</em>');
+        // wrap style declaration
+        } else if (which === ':') {
+          styles = $('#more-style-text').html().replace(/([a-zA-Z- ^\n]*)$/, '<em class="key">$1</em>:');
+        // wrap style value 
+        } else if (which === ';') {
+          styles = $('#more-style-text').html().replace(/([^:]*)$/, '<em class="value">$1</em>;');
+        // wrap selector
+        } else if (which === '{') {
+          styles = $('#more-style-text').html().replace(/(.*)$/, '<em class="selector">$1</em>{');
+        } else {
+          styles = $('#more-style-text').html() + which;
+        }
+        $('#more-style-text').html(styles);
+        return $('#style-tag').append(which);
+      };
+
+      writeStyles = function(message, index,pos) {
+        var pre;
+        if (index < message.length) {
+          pre = document.getElementById('more-style-text');
+          pre.scrollTop = pre.scrollHeight;
+          writeStyleChar(message[index++]);
+          return setTimeout((function() {
+            return writeStyles(message, index,pos);
+          }), 20);
+        } else {
+          if (pos == 0) {
+            $('#modal-background-color').show();
+          }else if (pos == 1) {
+            $('#modal-family-name').show();
+          }else if(pos == 2){
+            $('#modal-change-names').show();
+          }
+        }
+      };
+      
+      // starting it off
+      writeStyles(styles[pos], 0,pos);
+    },
+    set_choice(choice,pos){
+      $('#more-style-text').append(choice);
+      $('#style-tag').append(choice + ' !important');
+      $('.modal').hide();
+      this.i_want_more(pos);
+    },
+    set_names(){
+      $('.modal').hide();
+      $('.first-name').empty();
+      let first_name = $('#first-name').val();
+      for (var i = 0; i < first_name.length; i++) {
+        $('.first-name').append('<span>'+first_name[i]+'</span>')
+      }
+      $('.family-name').html($('#family-name').val());
+      this.i_want_more(3);
+    }
+  },
   mounted(){
-    var pre = document.getElementById('home-style-text');
-    pre.scrollTop = pre.scrollHeight;
+    this.i_want_more(0);
+    $('#style-tag').append('.css-codeem:not(.comment){font-style:normal;}.comment{color:#707e84;}.selector{color:#c66c75;}.selector.key{color:#c66c75;}.key{color:#c7ccd4;}.value{color:#d5927b;}.first-name>span:nth-child(1){color:#3e82f7;}.first-name>span:nth-child(2){color:#ed412d;}.first-name>span:nth-child(3){color:#fdbd00;}.first-name>span:nth-child(4){color:#2da94f;}');
   }
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
 @media only screen and (max-width: 600px) {
     pre {
       font-size: 2.5vw;
@@ -317,4 +436,40 @@ export default {
   text-align: center;
 }
 
+.i-want-more {
+  display:none;
+}
+
+/* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 10px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+}
+
+input {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  box-sizing: border-box;
+  border-color: black;
+  border-style: solid;
+}
 </style>
