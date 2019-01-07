@@ -34,6 +34,7 @@
             
           </div>
         </div>
+        <div class="seperator"></div>
         <div class="languages">
           <h3>Languages</h3>
             <div v-for="language in languages" class="language">
@@ -41,6 +42,7 @@
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             </div>
         </div>
+        <div class="seperator"></div>
         <div class="educations">
           <h3>Education</h3>
           <div v-for="education in educations" :key="education.id">
@@ -57,13 +59,15 @@
             <br>
           </div>
         </div>
+        <div class="seperator"></div>
         <div class="volunteers">
           <h3>Extra-curricular</h3>
           <div v-for="volunteer in volunteers" :key="volunteer.id">
             <strong>{{volunteer.title}} @</strong> {{volunteer.organisation}}
-            <p> {{volunteer.description}} </p>
+            <div v-html="volunteer.description"></div>
           </div>
         </div>
+        <div class="seperator"></div>
         <div class="hackathons">
           <h3>Hackathons</h3>
           <div v-for="hackathon in hackathons" :key="hackathon.id">
@@ -121,7 +125,7 @@ export default {
       ],
       languages: [{ name: 'Arabic', level: 'Native' }, { name: 'German', level: 'Fluent' }, { name: 'English', level: 'Fluent' }],
       hackathons: [{ name: 'Goole Hashcode 2016', code: 'https://github.com/AhmedSoli/Hashcode-2016-Qualifications'},{ name: 'Goole Hashcode 2017', code: 'https://github.com/AhmedSoli/Google-Hashcode-2017-Qualifications'},{ name: 'Microsoft Azure Deutschland HACKATHON 2016'},{ name: 'Bonding Hackathon 2017'},{ name: 'Jodel - Act with AC.E' }],
-      volunteers: [{ title: 'Software Developer', organisation: 'IT4KIDS', description: 'IT4KIDS is a non-profit organization, which aims to improve the way computer science is taught in German schools. Currently, we operate in more than 10 schools in the area of Aachen'}, { title: 'Event Organiser', organisation: 'CISV Egypt', description: 'Celebrating Peace one day in Egypt by organizing an event where we raise awareness about peace around the world. The event was attended by more than 900 people.'},],
+      volunteers: [{ title: 'Software Developer', organisation: 'IT4KIDS', description: 'IT4KIDS is a non-profit organization, which aims to improve the way computer science is taught in German schools. Currently, we operate in more than 10 schools in the area of Aachen. I was responsible for creating the <a href="https://www.it-for-kids.org/">Website</a> <a href="https://github.com/AhmedSoli/new.it-for-kids.org">(Code)</a> but they changed a lot since I left.'}, { title: 'Event Organiser', organisation: 'CISV Egypt', description: 'Celebrating Peace one day in Egypt by organizing an event where we raise awareness about peace around the world. The event was attended by more than 900 people.'},],
     };
   },
 };
@@ -152,7 +156,7 @@ export default {
 }
 
 .experience {
-  padding: 2vh;
+  padding-top: 3vh;
 }
 
 .download {
@@ -167,11 +171,17 @@ export default {
   border: solid;
 }
 
+h3 {
+  text-decoration: underline;
+}
+
 .language {
   display: inline-block;
 }
 
 .seperator {
   border-top: solid;
+  width: 100%;
+  margin: 2vh 0 2vh 0;
 }
 </style>
