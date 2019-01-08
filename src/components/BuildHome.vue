@@ -2,16 +2,16 @@
 <div>
   <div class="animated fadeIn">
     <div class="content">
-      <div class="first-name">
+      <h2 class="first-name">
         <span>A</span>
         <span>h</span>
         <span>m</span>
         <span>e</span>
         <span>d</span>
-      </div>
-      <div class="family-name">
+      </h2>
+      <h1 class="family-name">
         SOLIMAN
-      </div>
+      </h1>
       <div v-if="display_social" class="animated fadeIn">
         <a href="https://github.com/AhmedSoli" target="_blank">
           <img src="../assets/github.png" class="social-links" >
@@ -34,13 +34,13 @@
         &nbsp;
         <a @click="display_contact = !display_contact">Contact</a>
       </div>
-    </div>
-    <pre id="style-text" class="css-code" style="height:40vh;overflow-y: scroll;"><br></pre>
-    <div class="controls">
-      <a href="/">Restart Animation</a>
-      <router-link to="/home">Skip</router-link>
-      <div>
-        <router-link to="/more" class="i-want-more">I want more</router-link>
+      <pre id="style-text" class="css-code" style="height:40vh;overflow-y: scroll;"><br></pre>
+      <div class="controls">
+        <a href="/">Restart Animation</a>
+        <router-link to="/home">Skip</router-link>
+        <div>
+          <router-link to="/more" class="i-want-more">I want more</router-link>
+        </div>
       </div>
     </div>
   </div>
@@ -119,6 +119,16 @@ export default {
     }
 }
 
+pre {
+  width:100%;
+  margin-right: auto;
+  margin-left: auto;
+  box-sizing: border-box;
+  text-align: left;
+}
+
+.css-code em:not(.comment) { font-style: normal; }
+
 
 .social-links {
   height:50px;
@@ -161,6 +171,10 @@ export default {
   -webkit-transition-duration: 0.3s;
   transition-duration: 0.3s;
   cursor: pointer;
+}
+
+h1,h2 {
+  margin: 0px;
 }
 
 </style>

@@ -8,6 +8,7 @@
         <a  href='https://soliman.life/as_resume.pdf'> Download </a>
       </div>
       <div class="content">
+        <h1>Resume</h1>
         <div class="experiences">
           <h3>Experience</h3>
           <div v-for="experience in experiences" :key="experience.id" class="experience">

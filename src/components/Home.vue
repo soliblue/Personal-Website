@@ -2,16 +2,16 @@
 <div>
   <div class="animated fadeIn">
     <div class="content">
-      <div class="first-name">
+      <h2 class="first-name">
         <span>A</span>
         <span>h</span>
         <span>m</span>
         <span>e</span>
         <span>d</span>
-      </div>
-      <div class="family-name">
+      </h2>
+      <h1 class="family-name">
         SOLIMAN
-      </div>
+      </h1>
       <div v-if="display_social" class="animated fadeIn">
         <a href="https://github.com/AhmedSoli" target="_blank">
           <img src="../assets/github.png" class="social-links" >
@@ -315,6 +315,10 @@ export default {
 
 .controls {
   text-align: center;
+}
+
+h1,h2 {
+  margin: 0px;
 }
 
 </style>

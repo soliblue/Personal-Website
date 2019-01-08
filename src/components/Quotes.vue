@@ -5,6 +5,7 @@
         <router-link to='/home'> Back </router-link>
       </div>
       <div class="content">
+        <h1>Favorite Quotes</h1>
         <div v-for="quote in quotes" class="quote" :key="quote.id">
           <p class="center">{{quote.message}}</p>
           <p> - {{quote.author}}</p>

@@ -5,6 +5,7 @@
       <router-link to='/home'> Back </router-link>
     </div>
     <div class="content">
+      <h1>Favorite Books</h1>
       <div v-for="book in books" class="book" :key="book.id" @click="toggle_selected_book(book)">
         <div v-if="selected_book != book" class="animated fadeIn">
           <span><strong>{{book.title}}</strong></span>
