@@ -9,7 +9,7 @@
         <span>e</span>
         <span>d</span>
       </h2>
-      <h1 class="family-name">
+      <h1 class="last-name">
         SOLIMAN
       </h1>
       <div v-if="display_social" class="animated fadeIn">
@@ -34,8 +34,10 @@
         &nbsp;
         <a @click="display_contact = !display_contact">Contact</a>
       </div>
-    </div>
-    <pre id="more-style-text" class="css-code" style="height: 40vh; overflow-y: scroll;"><em class="comment">/* 
+      <br>
+      <pre id="more-style-text" class="css-code" style="height: 40vh; overflow-y: scroll;"><em class="comment">/* 
+ * 
+ * ⚠  ⚠  Over here!  ⚠  ⚠                                                
  * 
  * hmmmm                                               
  * 
@@ -45,13 +47,13 @@
  *
  * Let's make it right.                                               
  *
- * We will write styling code in this little box                                                
+ * We will write styling code in this box                                                
  *
  * and then inject it directly into the browser.                                             
  * 
  * Confused? Watch!                                              
  *
- */</em>
+*/</em>
 
 <em class="selector">* </em>{<em class="key">
   -webkit-transition</em>:<em class="value"> all 1s</em>;
@@ -61,40 +63,32 @@
  * 
  * Hmmm, well this did not do much.                                              
  *
- *
- */</em>
+*/</em>
 
 <em class="selector">.css-code </em>{<em class="key"> 
-  box-sizing</em>:<em class="value"> border-box</em>;<em class="key">
   color</em>:<em class="value"> #a6c3d4</em>;<em class="key">
-  background-color</em>:<em class="value"> #313744</em>;<em class="key"> 
+  background</em>:<em class="value"> #313744</em>;<em class="key"> 
   padding</em>:<em class="value"> 24px 12px</em>;<em class="key">
   box-shadow</em>:<em class="value"> 0px 4px 0px 2px rgba(0,0,0,0.1)</em>;<em class="key">
-  margin-right</em>:<em class="value"> auto</em>;<em class="key">
-  margin-left</em>:<em class="value"> auto</em>;<em class="key">
-  width</em>:<em class="value">100%</em>;
-}  
-
-<em class="selector">.css-code </em>{<em class="key"> width</em>:<em class="value"> 75%</em>;}                                                  
+  width</em>:<em class="value">75%</em>;
+}
 
 <em class="comment">/* 
  *  
  * WOW! Now it seems to be working.                                              
  *
- * We moved our little box to the center                                             
+ * We moved our box to the center                                             
  *
  * and added some colors to it.                                             
  *
  * How about we also make this code more readable?                                            
  *
- */</em>
+*/</em>
 
-<em class="selector">.<em class="key">css-code em</em>:not(.comment) </em>{<em class="key"> font-style</em>:<em class="value"> normal</em>; }
 <em class="selector">.comment       </em>{<em class="key"> color</em>:<em class="value"> #707e84</em>; }
 <em class="selector">.selector      </em>{<em class="key"> color</em>:<em class="value"> #c66c75</em>; }
-<em class="selector">.selector .key </em>{<em class="key"> color</em>:<em class="value"> #c66c75</em>; }
 <em class="selector">.key           </em>{<em class="key"> color</em>:<em class="value"> #c7ccd4</em>; }
-<em class="selector">.value         </em>{<em class="key"> color</em>:<em class="value"> #d5927b</em>; }                                            
+<em class="selector">.value         </em>{<em class="key"> color</em>:<em class="value"> #d5927b</em>; }   
 
 <em class="comment">/* 
  *
@@ -102,31 +96,32 @@
  *
  * Now we center the main content.                                              
  *
- */</em>
+*/</em>
 
-<em class="selector"> .content </em>{<em class="key">
-  text-align</em>:<em class="value"> center</em>;<em class="key">
-  padding-top</em>:<em class="value">20px</em>;
+<em class="selector">.content </em>{<em class="key">
+   text-align</em>:<em class="value"> center</em>;<em class="key">
+   padding-top</em>:<em class="value">20px</em>;
 }                                             
-
+ 
 <em class="comment">/* 
  *
- * Then we make my family name bigger.                                             
+ * Then we make my last name bigger.                                             
  *
- */</em>
+*/</em>
 
-<em class="selector">.family-name </em>{<em class="key"> font-size</em>:<em class="value"> 60px</em>; }                                            
+
+<em class="selector">.last-name </em>{<em class="key"> font-size</em>:<em class="value"> 60px</em>; }
 
 <em class="comment">/* 
  *
  * Next we add some colors to my first name.                                           
  *
- */</em>
+*/</em>
 
 <em class="selector">.first-name &gt;<em class="key"> span</em>:nth-child(1) </em>{<em class="key"> color</em>:<em class="value">#3e82f7</em>; }
 <em class="selector">.first-name &gt;<em class="key"> span</em>:nth-child(2) </em>{<em class="key"> color</em>:<em class="value">#ed412d</em>; }
 <em class="selector">.first-name &gt;<em class="key"> span</em>:nth-child(3) </em>{<em class="key"> color</em>:<em class="value">#fdbd00</em>; }
-<em class="selector">.first-name &gt;<em class="key"> span</em>:nth-child(4) </em>{<em class="key"> color</em>:<em class="value">#2da94f</em>; }                                             
+<em class="selector">.first-name &gt;<em class="key"> span</em>:nth-child(4) </em>{<em class="key"> color</em>:<em class="value">#2da94f</em>; }  
 
 <em class="comment">/* 
  *
@@ -149,10 +144,6 @@
 <em class="selector">.nav-links &gt;<em class="key"> a</em>:nth-child(2) </em>{<em class="key"> border-bottom-color</em>:<em class="value">#ed412d75</em>; }
 <em class="selector">.nav-links &gt;<em class="key"> a</em>:nth-child(3) </em>{<em class="key"> border-bottom-color</em>:<em class="value">#fdbd0075</em>; }
 <em class="selector">.nav-links &gt;<em class="key"> a</em>:nth-child(4) </em>{<em class="key"> border-bottom-color</em>:<em class="value">#2da94f75</em>; }
-
-<em class="selector">.controls </em>{<em class="key">
-  text-align</em>:<em class="value"> center</em>;
-}
 
 <em class="comment">/* 
  *
@@ -188,8 +179,9 @@
  * Talk to you later!                                              
  * 
  */</em></pre>
-    <div class="controls">
-      <a href="/">Restart Animation</a>
+      <div class="controls">
+        <a href="/">Restart Animation</a>
+      </div>
     </div>
     <div class="animated fadeIn">
       <div id="modal-background-color" class="modal">
@@ -208,11 +200,11 @@
       </div>
 
     </div>
-    <div id="modal-family-name" class="modal">
+    <div id="modal-last-name" class="modal">
 
       <!-- Modal content -->
       <div class="modal-content">
-        <h3>How big should my family name be?</h3>
+        <h3>How big should my last name be?</h3>
         <div>
           <div v-for="size in ['10px','30px','50px','70px','90px']" :style="'cursor: pointer;font-size: ' + size" @click='set_choice(size,2)'>
             Text
@@ -230,8 +222,8 @@
         <div>
           First Name:
           <input type="text" id="first-name">
-          Family Name:
-          <input type="text" id="family-name">
+          last Name:
+          <input type="text" id="last-name">
           <a @click="set_names()" href="#">Done</a>
         </div>
       </div>
@@ -254,7 +246,7 @@ export default {
     i_want_more(pos) {
       var openComment, styles, time, writeStyleChar, writeStyles;
 
-      styles = ["\n/* \n * \n * Seems like you enjoyed it.                                               \n *\n * This part will be a little bit different.                                              \n *\n * You will be more in control.                                           \n *\n * Let's start                                             \n *                                             \n *\n */\nbody {\n  background-color: ",";\n}\n/* \n *  \n * Amazing!                                             \n *\n * Good choice!                                             \n *\n * Now we choose a font size for my family name                                             \n *\n */\n.family-name {\n  font-size: ",";\n}\n/* \n * \n * You know what?                                              \n *                                             \n * Let's change my name completely!                                               \n *\n * You can replace it with your name.                                              \n *\n * Or whatever you'd like                                                                                             \n *\n */\n ","\n /* \n * \n * I hope you did not choose something funny!                                            \n *                                             \n * Well that's it for now.                                               \n *\n *\n * Talk to you later!                                                   \n *\n */\n"];
+      styles = ["\n/* \n * \n * Seems like you enjoyed it.                                               \n *\n * This part will be a bit different.                                              \n *\n * You will be more in control.                                           \n *\n * Let's start                                             \n *                                             \n *\n */\nbody {\n  background-color: ",";\n}\n/* \n *  \n * Amazing!                                             \n *\n * Good choice!                                             \n *\n * Now we choose a font size for my last name                                             \n *\n */\n.last-name {\n  font-size: ",";\n}\n/* \n * \n * You know what?                                              \n *                                             \n * Let's change my name completely!                                               \n *\n * You can replace it with your name.                                              \n *\n * Or whatever you'd like                                                                                             \n *\n */\n ","\n /* \n * \n * I hope you did not choose something funny!                                            \n *                                             \n * Well that's it for now.                                               \n *\n *\n * Talk to you later!                                                   \n *\n */\n"];
 
       if (pos >= styles.length){
         return;
@@ -294,12 +286,12 @@ export default {
           writeStyleChar(message[index++]);
           return setTimeout((function() {
             return writeStyles(message, index,pos);
-          }), 20);
+          }), 17);
         } else {
           if (pos == 0) {
             $('#modal-background-color').show();
           }else if (pos == 1) {
-            $('#modal-family-name').show();
+            $('#modal-last-name').show();
           }else if(pos == 2){
             $('#modal-change-names').show();
           }
@@ -322,7 +314,7 @@ export default {
       for (var i = 0; i < first_name.length; i++) {
         $('.first-name').append('<span>'+first_name[i]+'</span>')
       }
-      $('.family-name').html($('#family-name').val());
+      $('.last-name').html($('#last-name').val());
       this.i_want_more(3);
     }
   },
@@ -413,7 +405,7 @@ h1,h2 {
   padding-top:20px;
 }
 
-.family-name { font-size: 60px; }                                              
+.last-name { font-size: 60px; }                                              
 
 
 .first-name > span:nth-child(1) { color:#3e82f7; }
