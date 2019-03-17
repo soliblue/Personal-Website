@@ -105,7 +105,7 @@ export default {
           location: 'Aachen, Germany',
           start: 'July 2018',
           end: 'Present',
-          description: '<ul><li>Develop web crawlers to mine text from news websites and other sources.</li><li>Generating word embeddings from the crawled corpus using Tensorflow and word2vec </li><li>Studying and comparing the generated word embeddings</li><li> Develop the chair\'s official website <a href="http://cssh.rwth-aachen.de/">View</a></li></ul>',
+          description: '<ul><li>Develop web crawlers to mine text from news websites and other sources.</li><li>Generating word embeddings from the crawled corpus using Tensorflow and word2vec </li><li>Studying and comparing the generated word embeddings</li><li> Develop the chair\'s official website <a href="http://cssh.rwth-aachen.de/">View</a></li><li> Develop the Computational Social Systems Master Program website <a href="http://computationalsocialsystems.rwth-aachen.de">View</a></li></ul>',
         },
         { title: 'Founder',
           employer: 'Naga7ni',
