@@ -5,7 +5,7 @@
         <router-link to='/home'> Back </router-link>
       </div>
       <div class="content">
-        <h1>Favorite Quotes</h1>
+        <h1 class="header">Favorite Quotes</h1>
         <div v-for="quote in quotes" class="quote" :key="quote.id">
           <p class="center">{{quote.message}}</p>
           <p> - {{quote.author}}</p>
@@ -75,5 +75,9 @@ export default {
 
 .content {
   padding-top:50px;
+}
+
+.header {
+  text-align: center;
 }
 </style>
