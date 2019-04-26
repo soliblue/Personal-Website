@@ -1,12 +1,12 @@
 <template>
   <div class="animated fadeIn">
     <div>
-      <div class="back">
-        <router-link to='/home'> Back </router-link>
+      <div >
+        <router-link to='/home' class="back"> Back </router-link>
       </div>
-      <div class="download">
+      <!-- <div class="download">
         <a  href='https://soliman.life/as_resume.pdf'> Download </a>
-      </div>
+      </div> -->
       <div class="content">
         <h1>Resume</h1>
         <div class="experiences">
@@ -86,26 +86,33 @@ export default {
   data() {
     return {
       experiences: [
+        { title: 'Web Developer/Student Research Assistant',
+          employer: 'RWTH Aachen University, Chair of Computational Social Sciences and Humanities',
+          location: 'Aachen, Germany',
+          start: 'July 2018',
+          end: 'Present',
+          description: '<ul><li>Analyze political communities on <a href="https://www.reddit.com/">Reddit</a>.</li><li>Develop web crawlers to mine text from news websites and other sources.</li><li>Generating word embeddings from the crawled corpus using Tensorflow and word2vec </li><li>Studying and comparing the generated word embeddings</li><li> Develop the chair\'s website <a href="http://cssh.rwth-aachen.de/">View</a></li><li> Plan and develop the Computational Social Systems Master Program website <a href="http://computationalsocialsystems.rwth-aachen.de">View</a></li></ul>',
+        },
+        { title: 'Data Scientist',
+          employer: 'Polarstern Education',
+          location: 'Aachen, Germany',
+          start: 'January 2019',
+          end: 'Present',
+          description: '<ul><li>Optimize the learning experience through data analysis.</li><li>Develop machine learning models to predict the odds of users buying a certificate.</li><li>Develop extensions for <a href="https://open.edx.org/">Open Edx</a> which assist the data aquisition process.</li></ul>',
+        },
+        { title: 'Software Developer/Student Research Assistant',
+          employer: 'RWTH Aachen University, Chair of Communication and Distributed Systems',
+          location: 'Aachen, Germany',
+          start: 'January 2018',
+          end: 'December 2018',
+          description: '<ul><li>Study and analyze data collected from the Jodel Social Network in Saudi Arabia to have a better understanding of who the users are, why they use the application and how locality and anonymity affects conservative communities.</li><li>Develop the necessary tools to easily and rapidly filter through tens of millions of messages posted on the Jodel Social Network and classify them into predefined categories. <a href="https://docs.google.com/presentation/d/1C5VaqDmdxP5JPPS1HGjx-j1cYFuctcwGGDDqIL4FxPw/edit">Pictures</a></li><li>Develop the necessary tools to easily and rapidly calculate new features from the collected data for machine learning projects. The system developed now runs on a machine with 512 GB of RAM and 64 virtual processors and makes use of all its resources. <a href="https://docs.google.com/presentation/d/1A6RO9DnrYmWc5xg50ZOpsFFXjlWR4quymECU4qI8n0U/edit">Pictures</a></li></ul><ul style="list-style-type:square"><li>All tools are developed to aid other students doing their bachelor and masters thesis at RWTH Aachen.</li><li><strong>Technologies</strong> Laravel, MongoDB, MariaDB, Vue.js, Bootstrap4, Javascript, Parallel, Python</li></ul>',
+        },
         { title: 'Software Developer',
           employer: 'RWTH Aachen University, Chair for Electrochemical Energy Conversion and Storage Technologies',
           location: 'Aachen, Germany',
           start: 'August 2016',
           end: 'August 2017',
           description: '<ul><li>Develop a new canteen management system for the institute <a href="https://docs.google.com/presentation/d/1eDMoDx2g4zO0AooP44z3U_AfLL0B1LrxmwDFOtDTltA/edit?usp=sharing">Pictures</a> <a href="https://github.com/AhmedSoli/Convenience-System">Code</a><ul><li><strong>Backend</strong> Laravel (PHP framework), SQL</li><li><strong>Frontend</strong> Javascript, CSS, HTML, Bootstrap3 and jQuery</li><li>The projects is structured following MVC principles and RESTful API guidelines</li></ul></li><li>Improve systems responsible for managing everyday tasks at the institutesuch as printing/reading PDF files and tracking the work time of instituteemployees.</li></ul>',
-        },
-        { title: 'Software Developer/Data Scientist',
-          employer: 'RWTH Aachen University, Chair of Communication and Distributed Systems',
-          location: 'Aachen, Germany',
-          start: 'January 2018',
-          end: 'Present',
-          description: '<ul><li>Study and analyze data collected from the Jodel Social Network in Saudi Arabia to have a better understanding of who the users are, why they use the application and how locality and anonymity affects conservative communities.</li><li>Develop the necessary tools to easily and rapidly filter through tens of millions of messages posted on the Jodel Social Network and classify them into predefined categories. <a href="https://docs.google.com/presentation/d/1C5VaqDmdxP5JPPS1HGjx-j1cYFuctcwGGDDqIL4FxPw/edit">Pictures</a></li><li>Develop the necessary tools to easily and rapidly calculate new features from the collected data for machine learning projects. The system developed now runs on a machine with 512 GB of RAM and 64 virtual processors and makes use of all its resources. <a href="https://docs.google.com/presentation/d/1A6RO9DnrYmWc5xg50ZOpsFFXjlWR4quymECU4qI8n0U/edit">Pictures</a></li></ul><ul style="list-style-type:square"><li>All tools are developed to aid other students doing their bachelor and masters thesis at RWTH Aachen.</li><li><strong>Technologies</strong> Laravel, MongoDB, MariaDB, Vue.js, Bootstrap4, Javascript, Parallel, Python</li></ul>',
-        },
-        { title: 'Web Developer/Research Assistant',
-          employer: 'RWTH Aachen University, Chair of Computational Social Sciences and Humanities',
-          location: 'Aachen, Germany',
-          start: 'July 2018',
-          end: 'Present',
-          description: '<ul><li>Develop web crawlers to mine text from news websites and other sources.</li><li>Generating word embeddings from the crawled corpus using Tensorflow and word2vec </li><li>Studying and comparing the generated word embeddings</li><li> Develop the chair\'s official website <a href="http://cssh.rwth-aachen.de/">View</a></li><li> Develop the Computational Social Systems Master Program website <a href="http://computationalsocialsystems.rwth-aachen.de">View</a></li></ul>',
         },
         { title: 'Founder',
           employer: 'Naga7ni',
@@ -125,7 +132,14 @@ export default {
         { title: 'Data Science', skills: [{ title: 'pandas', level: 80 }, { title: 'sklearn', level: 80 }, { title: 'matplotlib', level: 80 }, { title: 'seaborn', level: 80 }, { title: 'hadoop', level: 60 }, { title: 'spark', level: 60 },{ title: 'gcloud', level: 60 },], },
       ],
       languages: [{ name: 'Arabic', level: 'Native' }, { name: 'German', level: 'Fluent' }, { name: 'English', level: 'Fluent' }],
-      hackathons: [{ name: 'Goole Hashcode 2016', code: 'https://github.com/AhmedSoli/Hashcode-2016-Qualifications'},{ name: 'Goole Hashcode 2017', code: 'https://github.com/AhmedSoli/Google-Hashcode-2017-Qualifications'},{ name: 'Microsoft Azure Deutschland HACKATHON 2016'},{ name: 'Bonding Hackathon 2017'},{ name: 'Jodel - Act with AC.E' }],
+      hackathons: [
+        { name: 'Goole Hashcode 2019', code: 'https://github.com/AhmedSoli/Hashcode-2019'},
+        { name: 'Jodel - Act with AC.E 2018' },
+        { name: 'Goole Hashcode 2017', code: 'https://github.com/AhmedSoli/Google-Hashcode-2017-Qualifications'},
+        { name: 'Bonding Hackathon 2017'},
+        { name: 'Goole Hashcode 2016', code: 'https://github.com/AhmedSoli/Hashcode-2016-Qualifications'},
+        { name: 'Microsoft Azure Deutschland HACKATHON 2016'},
+      ],
       volunteers: [{ title: 'Software Developer', organisation: 'IT4KIDS', description: 'IT4KIDS is a non-profit organization, which aims to improve the way computer science is taught in German schools. Currently, we operate in more than 10 schools in the area of Aachen. I was responsible for creating the <a href="https://www.it-for-kids.org/">Website</a> <a href="https://github.com/AhmedSoli/new.it-for-kids.org">(Code)</a> but they changed a lot since I left.'}, { title: 'Event Organiser', organisation: 'CISV Egypt', description: 'Celebrating Peace one day in Egypt by organizing an event where we raise awareness about peace around the world. The event was attended by more than 900 people.'},],
     };
   },

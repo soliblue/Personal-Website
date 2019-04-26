@@ -1,8 +1,8 @@
 <template>
   <div class="animated fadeIn">
     <div>
-      <div class="back">
-        <router-link to='/home'> Back </router-link>
+      <div>
+        <router-link to='/home' class="back"> Back </router-link>
       </div>
       <div class="content">
         <h1 class="header">Favorite Quotes</h1>

@@ -96,7 +96,7 @@ export default {
           writeStyleChar(message[index++]);
           return setTimeout((function() {
             return writeStyles(message, index);
-          }), 17);
+          }), 0);
         } 
       };
       
