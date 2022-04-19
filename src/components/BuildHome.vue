@@ -75,7 +75,7 @@ export default {
         // wrap style declaration
         } else if (which === ':') {
           styles = $('#style-text').html().replace(/([a-zA-Z- ^\n]*)$/, '<em class="key">$1</em>:');
-        // wrap style value 
+        // wrap style value
         } else if (which === ';') {
           styles = $('#style-text').html().replace(/([^:]*)$/, '<em class="value">$1</em>;');
         // wrap selector
@@ -96,10 +96,10 @@ export default {
           writeStyleChar(message[index++]);
           return setTimeout((function() {
             return writeStyles(message, index);
-          }), 0);
-        } 
+          }), 5);
+        }
       };
-      
+
       // starting it off
       writeStyles(styles, 0);
     },

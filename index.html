@@ -1,57 +1,73 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-132227346-1"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
 
-      gtag('config', 'UA-132227346-1');
-    </script>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css"
+    integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+  <link rel="apple-touch-icon" sizes="180x180" href="/static/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon/favicon-16x16.png">
+  <link rel="manifest" href="/static/favicon/site.webmanifest">
+  <link rel="mask-icon" href="/static/favicon/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="theme-color" content="#ffffff">
+  <meta property="og:image" content="/static/og-image.jpeg">
+  <meta property="og:image:width" content="279">
+  <meta property="og:image:height" content="279">
+  <meta property="og:title" content="Ahmed Soliman's Personal Website (Resume)">
+  <meta property="og:description"
+    content="Interactive website desplaying my resume, past projects, favorite books and quotes.">
+  <meta property="og:url" content="https://soliman.life">
+  <meta name="google-site-verification" content="XWpxp373C4cIzixnGl9mzmENOcdB74xRSWCbRJTFmHw" />
+  <meta name="description"
+    content="Interactive website desplaying my resume, past projects, favorite books and quotes." />
+  <meta name="keywords" content="Software Developer, Web Developer, Data Scientist, Personal Website, Resume" />
+  <title>Ahmed Soliman's Personal Website (Resume)</title>
+</head>
 
+<body style="zoom:0.9;">
+  <div id="app"></div>
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.11/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.11/firebase-analytics.js";
 
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
-    <link rel="apple-touch-icon" sizes="180x180" href="/static/favicon/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon/favicon-16x16.png">
-    <link rel="manifest" href="/static/favicon/site.webmanifest">
-    <link rel="mask-icon" href="/static/favicon/safari-pinned-tab.svg" color="#5bbad5">
-    <meta name="msapplication-TileColor" content="#ffffff">
-    <meta name="theme-color" content="#ffffff">
-    <meta property="og:image" content="/static/og-image.jpeg">
-    <meta property="og:image:width" content="279">
-    <meta property="og:image:height" content="279">
-    <meta property="og:title" content="Ahmed Soliman's Personal Website (Resume)">
-    <meta property="og:description" content="Interactive website desplaying my resume, past projects, favorite books and quotes.">
-    <meta property="og:url" content="https://soliman.life">
-    <meta name="google-site-verification" content="XWpxp373C4cIzixnGl9mzmENOcdB74xRSWCbRJTFmHw" />   
-    <meta name="description" content="Interactive website desplaying my resume, past projects, favorite books and quotes." />
-    <meta name="keywords" content="Software Developer, Web Developer, Data Scientist, Personal Website, Resume" />
-    <title>Ahmed Soliman's Personal Website (Resume)</title>
-  </head>
-  <body style="zoom:0.9;">
-    <div id="app"></div>
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="crossorigin="anonymous"></script>
-    <!-- built files will be auto injected -->
-    
-    <style id="style-tag">
+    const firebaseConfig = {
+      apiKey: "AIzaSyDLHUurvF1ouQNJoBUUQ-gyKPf3q4Nlpxw",
+      authDomain: "personal-website-e63ac.firebaseapp.com",
+      projectId: "personal-website-e63ac",
+      storageBucket: "personal-website-e63ac.appspot.com",
+      messagingSenderId: "771751095859",
+      appId: "1:771751095859:web:563fd92900fa042d407d46",
+      measurementId: "G-GHDVWLS7V0"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+  </script>
+
+  <style id="style-tag">
     * {
-        -webkit-transition: all 1s;
+      -webkit-transition: all 1s;
     }
+
     pre {
-      width:100%;
+      width: 100%;
       margin-right: auto;
       margin-left: auto;
       box-sizing: border-box;
       text-align: left;
       font-weight: 700;
     }
-    pre em:not(.comment) { font-style: normal; }
-</style>
-  </body>
+
+    pre em:not(.comment) {
+      font-style: normal;
+    }
+  </style>
+</body>
+
 </html>
