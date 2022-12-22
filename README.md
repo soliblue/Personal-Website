@@ -1,8 +1,7 @@
-# soliman.life
+# Vue.js Personal Website
 
-> Personal Website
+This repository contains the source code for a personal website developed using Vue.js. The website was created as a learning project to explore the capabilities of this popular JavaScript framework. The website is hosted at https://soliman.life and showcases some of the skills and techniques I have learned while working with Vue.js.
 
-## Build Setup
 
 ``` bash
 # install dependencies
