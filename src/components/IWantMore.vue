@@ -13,7 +13,7 @@
         SOLIMAN
       </h1>
       <div v-if="display_social" class="animated fadeIn">
-        <a href="https://github.com/AhmedSoli" target="_blank">
+        <a href="https://github.com/solimann-eth" target="_blank">
           <img src="../assets/github.png" class="social-links" >
         </a>
         <a href="https://www.linkedin.com/in/asoliman96/" target="_blank">
@@ -35,23 +35,23 @@
         <a @click="display_contact = !display_contact">Contact</a>
       </div>
       <br>
-      <pre id="more-style-text" class="css-code" style="height: 40vh; overflow-y: scroll;"><em class="comment">/* 
- * 
- * ⚠  ⚠  Over here!  ⚠  ⚠                                                
- * 
- * hmmmm                                               
- * 
- * What is wrong with this page?                                              
+      <pre id="more-style-text" class="css-code" style="height: 40vh; overflow-y: scroll;"><em class="comment">/*
  *
- * Looks weird!                                              
+ * ⚠  ⚠  Over here!  ⚠  ⚠
  *
- * Let's make it right.                                               
+ * hmmmm
  *
- * We will write styling code in this box                                                
+ * What is wrong with this page?
  *
- * and then inject it directly into the browser.                                             
- * 
- * Confused? Watch!                                              
+ * Looks weird!
+ *
+ * Let's make it right.
+ *
+ * We will write styling code in this box
+ *
+ * and then inject it directly into the browser.
+ *
+ * Confused? Watch!
  *
 */</em>
 
@@ -59,101 +59,101 @@
   -webkit-transition</em>:<em class="value"> all 1s</em>;
 }
 
-<em class="comment">/* 
- * 
- * Hmmm, well this did not do much.                                              
+<em class="comment">/*
+ *
+ * Hmmm, well this did not do much.
  *
 */</em>
 
-<em class="selector">.css-code </em>{<em class="key"> 
+<em class="selector">.css-code </em>{<em class="key">
   color</em>:<em class="value"> #a6c3d4</em>;<em class="key">
-  background</em>:<em class="value"> #313744</em>;<em class="key"> 
+  background</em>:<em class="value"> #313744</em>;<em class="key">
   padding</em>:<em class="value"> 24px 12px</em>;<em class="key">
   box-shadow</em>:<em class="value"> 0px 4px 0px 2px rgba(0,0,0,0.1)</em>;<em class="key">
   width</em>:<em class="value">75%</em>;
 }
 
-<em class="comment">/* 
- *  
- * WOW! Now it seems to be working.                                              
+<em class="comment">/*
  *
- * We moved our box to the center                                             
+ * WOW! Now it seems to be working.
  *
- * and added some colors to it.                                             
+ * We moved our box to the center
  *
- * How about we also make this code more readable?                                            
+ * and added some colors to it.
+ *
+ * How about we also make this code more readable?
  *
 */</em>
 
 <em class="selector">.comment       </em>{<em class="key"> color</em>:<em class="value"> #707e84</em>; }
 <em class="selector">.selector      </em>{<em class="key"> color</em>:<em class="value"> #c66c75</em>; }
 <em class="selector">.key           </em>{<em class="key"> color</em>:<em class="value"> #c7ccd4</em>; }
-<em class="selector">.value         </em>{<em class="key"> color</em>:<em class="value"> #d5927b</em>; }   
+<em class="selector">.value         </em>{<em class="key"> color</em>:<em class="value"> #d5927b</em>; }
 
-<em class="comment">/* 
+<em class="comment">/*
  *
- * Looks good enough for me.                                              
+ * Looks good enough for me.
  *
- * Now we center the main content.                                              
+ * Now we center the main content.
  *
 */</em>
 
 <em class="selector">.content </em>{<em class="key">
    text-align</em>:<em class="value"> center</em>;<em class="key">
    padding-top</em>:<em class="value">20px</em>;
-}                                             
- 
-<em class="comment">/* 
+}
+
+<em class="comment">/*
  *
- * Then we make my last name bigger.                                             
+ * Then we make my last name bigger.
  *
 */</em>
 
 
 <em class="selector">.last-name </em>{<em class="key"> font-size</em>:<em class="value"> 60px</em>; }
 
-<em class="comment">/* 
+<em class="comment">/*
  *
- * Next we add some colors to my first name.                                           
+ * Next we add some colors to my first name.
  *
 */</em>
 
 <em class="selector">.first-name &gt;<em class="key"> span</em>:nth-child(1) </em>{<em class="key"> color</em>:<em class="value">#3e82f7</em>; }
 <em class="selector">.first-name &gt;<em class="key"> span</em>:nth-child(2) </em>{<em class="key"> color</em>:<em class="value">#ed412d</em>; }
 <em class="selector">.first-name &gt;<em class="key"> span</em>:nth-child(3) </em>{<em class="key"> color</em>:<em class="value">#fdbd00</em>; }
-<em class="selector">.first-name &gt;<em class="key"> span</em>:nth-child(4) </em>{<em class="key"> color</em>:<em class="value">#2da94f</em>; }  
+<em class="selector">.first-name &gt;<em class="key"> span</em>:nth-child(4) </em>{<em class="key"> color</em>:<em class="value">#2da94f</em>; }
 
-<em class="comment">/* 
+<em class="comment">/*
  *
- * Lastly we style the links.                                            
+ * Lastly we style the links.
  *
  */</em>
 
 <em class="selector">.nav-links &gt; a </em>{<em class="key">
   color</em>:<em class="value"> #636b6f</em>;<em class="key">
-  padding</em>:<em class="value"> 0 25px</em>;<em class="key"> 
+  padding</em>:<em class="value"> 0 25px</em>;<em class="key">
   font-size</em>:<em class="value"> 12px</em>;<em class="key">
   font-weight</em>:<em class="value"> 600</em>;<em class="key">
   letter-spacing</em>:<em class="value"> .1rem</em>;<em class="key">
   text-decoration</em>:<em class="value"> none</em>;<em class="key">
   text-transform</em>:<em class="value"> uppercase</em>;<em class="key">
   border-bottom-style</em>:<em class="value"> solid</em>;
-} 
+}
 
 <em class="selector">.nav-links &gt;<em class="key"> a</em>:nth-child(1) </em>{<em class="key"> border-bottom-color</em>:<em class="value">#3e82f775</em>; }
 <em class="selector">.nav-links &gt;<em class="key"> a</em>:nth-child(2) </em>{<em class="key"> border-bottom-color</em>:<em class="value">#ed412d75</em>; }
 <em class="selector">.nav-links &gt;<em class="key"> a</em>:nth-child(3) </em>{<em class="key"> border-bottom-color</em>:<em class="value">#fdbd0075</em>; }
 <em class="selector">.nav-links &gt;<em class="key"> a</em>:nth-child(4) </em>{<em class="key"> border-bottom-color</em>:<em class="value">#2da94f75</em>; }
 
-<em class="comment">/* 
+<em class="comment">/*
  *
- * Woohoo!                                              
+ * Woohoo!
  *
- * We did it!                                              
+ * We did it!
  *
- * I hope you enjoyed this!                                              
+ * I hope you enjoyed this!
  *
- * A button will now appear below.                                              
+ * A button will now appear below.
  *
  */</em>
 
@@ -162,22 +162,22 @@
 }
 
 <em class="comment">/*
- * It will take you to the next part.                                              
+ * It will take you to the next part.
  *
- * There you will be more in control.                                              
+ * There you will be more in control.
  *
- * You will be able to change the color of the page,                                               
+ * You will be able to change the color of the page,
  *
- * add your name at the top and more!                                             
+ * add your name at the top and more!
  *
- * Check it out!                                             
+ * Check it out!
  *
- * Some of the code is based on Jake Albaugh work                                              
+ * Some of the code is based on Jake Albaugh work
  *
  * and colors are based on Base16 Ocean Dark.
  *
- * Talk to you later!                                              
- * 
+ * Talk to you later!
+ *
  */</em></pre>
       <div class="controls">
         <a href="/">Restart Animation</a>
@@ -265,7 +265,7 @@ export default {
         // wrap style declaration
         } else if (which === ':') {
           styles = $('#more-style-text').html().replace(/([a-zA-Z- ^\n]*)$/, '<em class="key">$1</em>:');
-        // wrap style value 
+        // wrap style value
         } else if (which === ';') {
           styles = $('#more-style-text').html().replace(/([^:]*)$/, '<em class="value">$1</em>;');
         // wrap selector
@@ -297,7 +297,7 @@ export default {
           }
         }
       };
-      
+
       // starting it off
       writeStyles(styles[pos], 0,pos);
     },
@@ -382,16 +382,16 @@ h1,h2 {
 }
 
 
-.css-code { 
+.css-code {
   width: 75%;
   color: #a6c3d4;
-  background-color: #313744; 
+  background-color: #313744;
   padding: 24px 12px;
   box-shadow: 0px 4px 0px 2px rgba(0,0,0,0.1);
   margin-right: auto;
   margin-left: auto;
   box-sizing: border-box;
-}     
+}
 
 .css-code em:not(.comment) { font-style: normal; }
 .comment       { color: #707e84; }
@@ -405,13 +405,13 @@ h1,h2 {
   padding-top:20px;
 }
 
-.last-name { font-size: 60px; }                                              
+.last-name { font-size: 60px; }
 
 
 .first-name > span:nth-child(1) { color:#3e82f7; }
 .first-name > span:nth-child(2) { color:#ed412d; }
 .first-name > span:nth-child(3) { color:#fdbd00; }
-.first-name > span:nth-child(4) { color:#2da94f; } 
+.first-name > span:nth-child(4) { color:#2da94f; }
 
 .nav-links > a {
   color: #636b6f;
@@ -422,12 +422,12 @@ h1,h2 {
   text-decoration: none;
   text-transform: uppercase;
   border-bottom-style: solid;
-}        
+}
 
 .nav-links > a:nth-child(1) { border-bottom-color:#3e82f775; }
 .nav-links > a:nth-child(2) { border-bottom-color:#ed412d75; }
 .nav-links > a:nth-child(3) { border-bottom-color:#fdbd0075; }
-.nav-links > a:nth-child(4) { border-bottom-color:#2da94f75; }                                               
+.nav-links > a:nth-child(4) { border-bottom-color:#2da94f75; }
 
 .controls {
   text-align: center;

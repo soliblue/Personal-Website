@@ -1,0 +1,30 @@
+[
+  {
+    "year": "2022",
+    "title": "Piasso",
+    "url": "https://www.piasso.xyz",
+    "type": "Cross Platform Application",
+    "description": "I had the idea for Piasso at the beginning of December 2022. Within 2 weeks I had a working product live on the app store although I am only able to work on weekends. The app had 1 thousand user in the first weeks."
+  },
+  {
+    "year": "2022",
+    "title": "biddz",
+    "url": "https://www.biddz.io",
+    "type": "Cross Platform Application",
+    "description": "I was responsible for taking biddz from an idea in Michael's Höweler and Alex's Frank head to a real product being used by 10s of thousads of users. I conceptulized, designed and built the first version of the app. Then built a team of engineers, product manager and data analytics to continuiously improve the product."
+  },
+  {
+    "year": "2018",
+    "title": "Chair for Computational Social Sciences and Humanities",
+    "url": "https://computationalsocialsystems.rwth-aachen.de/",
+    "type": "Website Application",
+    "description": "As one of the founding members of the M.Sc. Computational Social Systems I was solely responsible for the conceptualisation, design and development of the website."
+  },
+  {
+    "year": "2017",
+    "title": "Chair for Computational Social Sciences and Humanities",
+    "url": "https://cssh.rwth-aachen.de/",
+    "type": "Website Application",
+    "description": "I was the 4th member to join the chair and was responsible for the conceptualisation, design and development of the website. In addition I also built various tools to automate the correction of the students' assignments."
+  }
+]
