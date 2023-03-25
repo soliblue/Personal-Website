@@ -13,7 +13,7 @@
         SOLIMAN
       </h1>
       <div v-if="display_social" class="animated fadeIn">
-        <a href="https://github.com/solimann-eth" target="_blank">
+        <a href="https://github.com/solimouse" target="_blank">
           <img src="../assets/github.png" class="social-links" >
         </a>
         <a href="https://www.linkedin.com/in/asoliman96/" target="_blank">

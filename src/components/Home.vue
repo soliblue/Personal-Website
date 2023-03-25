@@ -13,7 +13,7 @@
         SOLIMAN
       </h1>
       <div v-if="display_social" class="animated fadeIn">
-        <a href="https://github.com/solimann-eth" target="_blank">
+        <a href="https://github.com/solimouse" target="_blank">
           <img src="../assets/github.png" class="social-links" >
         </a>
         <a href="https://www.linkedin.com/in/asoliman96/" target="_blank">
@@ -22,7 +22,7 @@
         <a href="https://www.instagram.com/soli__/" target="_blank">
           <img src="../assets/instagram.png" class="social-links" >
         </a>
-        <a href="https://twitter.com/solimannnnnn" target="_blank">
+        <a href="https://twitter.com/_xSoli" target="_blank">
           <img src="../assets/twitter.png" class="social-links" >
         </a>
       </div>
