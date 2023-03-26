@@ -38,7 +38,7 @@
         &nbsp;
         <router-link to="/books">Books</router-link>
         &nbsp;
-        <a @click="display_contact = !display_contact">Contact</a>
+        <router-link to="/projects">Projects</router-link>
       </div>
       <br>
       <pre id="home-style-text" class="css-code" style="height: 40vh; overflow-y: scroll;"><em class="comment">/*
@@ -222,7 +222,7 @@ export default {
 
 
 .social-links {
-  height:50px;
+  height:25px;
   padding:1em;
 }
 

@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "title": "SongGPT",
+    "tags": ["music", "open-source", "openai", "react-native", "fastapi", "firebase"],
+    "description": "Experimental open-source project that explores the potential of Language Models in generating original and customizable musical compositions. You can read more about it on our GitHub page.",
+    "link": "https://songgpt.xyz/"
+  },
+  {
+    "id": 2,
+    "title": "Piasso",
+    "tags": ["text-to-image", "text-to-text", "openAI", "fastapi", "firebase", "react-native", "ios"],
+    "description": "The first text-to-image model that works in Arabic, German, Korean, and many other languages. Piasso also offers unique chat features, including personas and instant search, to enhance your productivity and creativity. Join us in exploring the endless possibilities of AI and creativity!",
+    "link": "https://piasso.xyz"
+  },
+  {
+    "id": 3,
+    "title": "Zima",
+    "tags": ["browser-extension", "openai", "open-source", "react"],
+    "description": "A browser extension that allows users to save and search through their OpenAI chat transcripts.",
+    "link": "https://github.com/SoliMouse/zima"
+  },
+  {
+    "id": 4,
+    "title": "biddz",
+    "tags": ["music", "technology", "community", "fastapi", "react-native"],
+    "description": "A platform for connecting artists and fans, fostering musicians' journeys and creating a unique community experience. We're building innovative products that push the boundaries of what's possible, including our share-to-support feature that lets fans purchase shares in an artist's streaming royalties, and our interactive ticketing system. Join us in building a future where artists and fans are connected and communities thrive.",
+    "link": "https://biddz.io"
+  }
+]
