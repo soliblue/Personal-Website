@@ -1,7 +1,7 @@
 <!-- eslint-disable max-len -->
 <template>
   <div>
-    <h2 class="first-name">
+    <h2 class="name">
       <span>S</span>
       <span>o</span>
       <span>l</span>

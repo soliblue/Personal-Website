@@ -63,9 +63,9 @@ export default {
   background-color: black;
 }
 
-.first-name > span:nth-child(1) { color: #3e82f7; }
-.first-name > span:nth-child(2) { color: #ed412d; }
-.first-name > span:nth-child(3) { color: #fdbd00; }
-.first-name > span:nth-child(4) { color: #2da94f; }
+.name > span:nth-child(1) { color: #3e82f7; }
+.name > span:nth-child(2) { color: #ed412d; }
+.name > span:nth-child(3) { color: #fdbd00; }
+.name > span:nth-child(4) { color: #2da94f; }
 
 </style>

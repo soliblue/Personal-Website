@@ -17,7 +17,7 @@
 
 <script>
 import UserInfo from '../components/UserInfo';
-import Conversation from '../components/Conversation';
+import Conversation from '../components/Conversation.js';
 
 export default {
   name: 'BuildHome',

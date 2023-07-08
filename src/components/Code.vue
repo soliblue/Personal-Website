@@ -73,10 +73,10 @@
  *
 */</em>
 
-<em class="selector">.first-name &gt;<em class="key"> span</em>:nth-child(1) </em>{<em class="key"> color</em>:<em class="value">#3e82f7</em>; }
-<em class="selector">.first-name &gt;<em class="key"> span</em>:nth-child(2) </em>{<em class="key"> color</em>:<em class="value">#ed412d</em>; }
-<em class="selector">.first-name &gt;<em class="key"> span</em>:nth-child(3) </em>{<em class="key"> color</em>:<em class="value">#fdbd00</em>; }
-<em class="selector">.first-name &gt;<em class="key"> span</em>:nth-child(4) </em>{<em class="key"> color</em>:<em class="value">#2da94f</em>; }
+<em class="selector">.name &gt;<em class="key"> span</em>:nth-child(1) </em>{<em class="key"> color</em>:<em class="value">#3e82f7</em>; }
+<em class="selector">.name &gt;<em class="key"> span</em>:nth-child(2) </em>{<em class="key"> color</em>:<em class="value">#ed412d</em>; }
+<em class="selector">.name &gt;<em class="key"> span</em>:nth-child(3) </em>{<em class="key"> color</em>:<em class="value">#fdbd00</em>; }
+<em class="selector">.name &gt;<em class="key"> span</em>:nth-child(4) </em>{<em class="key"> color</em>:<em class="value">#2da94f</em>; }
 
 <em class="comment">/*
  *
