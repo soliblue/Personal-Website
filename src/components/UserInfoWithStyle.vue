@@ -13,7 +13,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 
 .nav-links > a {
   color: #636b6f;

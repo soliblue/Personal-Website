@@ -2,7 +2,7 @@
 <div>
   <div class="animated fadeIn">
     <div class="content">
-      <UserInfo />
+      <UserInfoWithStyle />
       <br>
       <Code />
       <br>
@@ -15,13 +15,13 @@
 </template>
 
 <script>
-import UserInfo from '../components/UserInfo';
+import UserInfoWithStyle from '../components/UserInfoWithStyle';
 import Code from '../components/Code';
 
 export default {
   name: 'Home',
   components: {
-    UserInfo,
+    UserInfoWithStyle,
     Code,
   },
   mounted() {
