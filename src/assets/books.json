@@ -1,0 +1,65 @@
+[
+  {
+    "author": "David Deutsch",
+    "cover": "https://images.gr-assets.com/books/1311705051l/10483171.jpg",
+    "title": "The Beginning of Infinity",
+    "subtitle": "Explanations That Transform the World",
+    "summary": "Deutsch argues that all progress is derived from the human pursuit for explanations, making knowledge the 'beginning of infinity'."
+  },
+  {
+    "author": "Daniel N. Robinson",
+    "cover": "https://images.gr-assets.com/books/1477230035l/8524385.jpg",
+    "title": "Great Ideas of Psychology",
+    "subtitle": "Goergetown University",
+    "summary": "This course offers deep insights into human emotion, perception, and cognition, tracing the history of psychology from its roots in ancient times."
+  },
+  {
+    "author": "Daniel N. Robinson",
+    "cover": "https://images.gr-assets.com/books/1406842618l/661843.jpg",
+    "title": "The Great Ideas of Philosophy",
+    "subtitle": "Goergetown University",
+    "summary": "The book explores humanity's journey from certainty to doubt, sparking a 'Long Debate' on truth, values, justice, law, and civic life."
+  },
+  {
+    "author": "Grant Hardy",
+    "cover": "https://images.gr-assets.com/books/1476747674l/16117557.jpg",
+    "title": "Great Minds of the Eastern Intellectual Tradition",
+    "subtitle": "University of North Carolina",
+    "summary": "Hardy introduces influential Eastern philosophers and thinkers, mapping the development of Asian philosophy and spiritual systems."
+  },
+  {
+    "author": "Nassim Nicholas Taleb",
+    "cover": "https://images.gr-assets.com/books/1388180506l/38315.jpg",
+    "title": "Fooled by Randomness",
+    "subtitle": "The Hidden Role of Chance in Life and the Markets",
+    "summary": "Taleb explores the impact of randomness on markets and life, blending statistics, psychology, and philosophy."
+  },
+  {
+    "author": "Claude C. Hopkins",
+    "cover": "https://images.gr-assets.com/books/1348669116l/9827912.jpg",
+    "title": "My Life in Advertising",
+    "subtitle": "Father of Modern Advertising",
+    "summary": "Hopkins shares his experiences as the inventor of test marketing and coupon sampling."
+  },
+  {
+    "author": "Claude C. Hopkins",
+    "cover": "https://images.gr-assets.com/books/1348979119l/2621927.jpg",
+    "title": "Scientific Advertising",
+    "subtitle": "Father of Modern Advertising",
+    "summary": "Hopkins, known as the father of modern advertising, covers advertising laws, strategy, budgeting, and more."
+  },
+  {
+    "author": "Charles Duhigg",
+    "cover": "https://images.gr-assets.com/books/1545854312l/12609433.jpg",
+    "title": "The Power of Habit",
+    "subtitle": "Why We Do What We Do in Life and Business",
+    "summary": "Duhigg discusses the significant role habits play in our lives and provides tips for habit change at the personal and organizational levels."
+  },
+  {
+    "author": "Peter Thiel",
+    "cover": "https://images.gr-assets.com/books/1414347376l/18050143.jpg",
+    "title": "Zero to One",
+    "subtitle": "Notes on Startups, or How to Build The Future",
+    "summary": "Thiel shares insights on how companies can predict the future and ensure their startup's success."
+  }
+]

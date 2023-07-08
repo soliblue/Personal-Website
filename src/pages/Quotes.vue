@@ -20,7 +20,7 @@ export default {
   name: 'Quotes',
   data() {
     return {
-      quotes: require('../data/quotes.json'),
+      quotes: require('../assets/quotes.json'),
     };
   },
 };

@@ -29,29 +29,6 @@
           </div>
         </div>
         <div class="seperator"></div>
-        <div class="skills" style="display: inline-block">
-          <h3>Skills</h3>
-          <div
-            v-for="skillset in skillsets"
-            :key="skillset.id"
-            style="display: inline-block; padding-right: 5vw"
-          >
-            <strong>{{ skillset.title }}</strong>
-            <ul style="list-style-type: none">
-              <li v-for="skill in skillset.skills" :key="skill.id">
-                <i class="fas fa-battery-full" v-if="skill.level == 100"></i>
-                <i
-                  class="fas fa-battery-three-quarters"
-                  v-if="skill.level == 80"
-                ></i>
-                <i class="fas fa-battery-half" v-if="skill.level == 60"></i>
-
-                <span> {{ skill.title }} </span>
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div class="seperator"></div>
         <div class="languages">
           <h3>Languages</h3>
           <div class="language"  v-for="language in languages"  :key="language.name">
@@ -111,7 +88,7 @@
 <script>
 export default {
   name: 'Resume',
-  data: () => require('../data/resume.json'),
+  data: () => require('../assets/resume.json'),
 };
 </script>
 

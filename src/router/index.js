@@ -1,12 +1,11 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import Home from '@/components/Home';
-import Books from '@/components/Books';
-import Quotes from '@/components/Quotes';
-import Resume from '@/components/Resume';
-import Projects from '@/components/Projects';
-import BuildHome from '@/components/BuildHome';
-import IWantMore from '@/components/IWantMore';
+import Home from '@/pages/Home';
+import Books from '@/pages/Books';
+import Quotes from '@/pages/Quotes';
+import Resume from '@/pages/Resume';
+import Projects from '@/pages/Projects';
+import BuildHome from '@/pages/BuildHome';
 
 Vue.use(Router);
 
@@ -16,11 +15,6 @@ export default new Router({
       path: '/',
       name: 'BuildHome',
       component: BuildHome,
-    },
-    {
-      path: '/more',
-      name: 'IWantMore',
-      component: IWantMore,
     },
     {
       path: '/home',

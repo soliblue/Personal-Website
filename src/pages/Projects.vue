@@ -39,7 +39,7 @@ export default {
   data() {
     return {
       selectedTags: [],
-      projects: require('../data/projects.json'),
+      projects: require('../assets/projects.json'),
     };
   },
   computed: {

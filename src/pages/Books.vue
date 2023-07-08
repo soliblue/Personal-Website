@@ -37,7 +37,7 @@ export default {
   data() {
     return {
       selected_book: '',
-      books: require('../data/books.json'),
+      books: require('../assets/books.json'),
     };
   },
 };

@@ -1,0 +1,53 @@
+[
+  {
+    "title": "Piasso",
+    "year": "2022",
+    "type": "Cross Platform Application",
+    "tags": ["AI", "OpenAI", "ChatGPT", "FastAPI", "Firebase", "React Native", "iOS"],
+    "description": "In four weeks, I developed Piasso, the first AI application that generates images from text in various languages, including Arabic, German, and Spanish. The service, akin to a free ChatGPT, provides a prompt library and search function for users, particularly in regions like Egypt.",
+    "link": "https://piasso.ai"
+  },
+  {
+    "title": "SongGPT",
+    "tags": ["Music", "Open Source", "OpenAI", "React Native", "FastAPI", "Firebase"],
+    "description": "SongGPT is an experimental open-source project that leverages Language Models to generate original and customizable musical compositions.",
+    "link": "https://songgpt.xyz/"
+  },
+  {
+    "title": "biddz",
+    "year": "2022",
+    "type": "Cross Platform Application",
+    "tags": ["Music", "Blockchain", "iOS", "FastAPI", "React Native"],
+    "description": "biddz is a platform aimed at fostering a closer connection between music fans and artists. I transformed the idea into a product used by tens of thousands of users. I conceptualized, designed, and built the initial version, then assembled a team to continue enhancing the product.",
+    "link": "https://www.biddz.io"
+  },
+  {
+    "title": "M.Sc. Computational Social Systems",
+    "year": "2018",
+    "type": "Website Application",
+    "tags": ["Design", "Web Development", "Education"],
+    "description": "The M.Sc. Computational Social Systems program is a unique interdisciplinary course at the intersection of data science and humanities. As a founding member, I was solely responsible for conceptualising, designing, and developing the website.",
+    "link": "https://computationalsocialsystems.rwth-aachen.de/"
+  },
+  {
+    "title": "Chair for Computational Social Sciences and Humanities",
+    "year": "2017",
+    "type": "Website Application",
+    "tags": ["Design", "Web Development", "Education"],
+    "description": "The Chair for Computational Social Sciences and Humanities operates at the interface of data science and humanities, advancing research and education in these fields. As the 4th member to join the chair, I was responsible for the conceptualisation, design, and development of the website and also built various tools to automate the correction of student assignments.",
+    "link": "https://cssh.rwth-aachen.de/"
+  },
+  {
+    "title": "IT for Kids",
+    "type": "Website Application",
+    "tags": ["Design", "Web Development", "Education"],
+    "description": "IT for Kids is a non-profit education partner for primary schools, promoting digital literacy and programming skills. Its mission is to enable all children to learn programming from primary school age. As a student at the University, I was responsible for conceptualising, designing, and building the IT for Kids website.",
+    "link": "https://it-for-kids.org/"
+  },
+  {
+    "title": "Zima",
+    "tags": ["Browser Extension", "OpenAI", "Open Source", "React"],
+    "description": "Zima is a browser extension enabling users to save and search their OpenAI chat transcripts.",
+    "link": "https://github.com/SoliMouse/zima"
+  }
+]
