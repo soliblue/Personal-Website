@@ -1,11 +1,10 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import Home from '@/pages/Home';
-import Books from '@/pages/Books';
-import Quotes from '@/pages/Quotes';
-import Resume from '@/pages/Resume';
-import Projects from '@/pages/Projects';
-import BuildHome from '@/pages/BuildHome';
+import Home from '@/views/Home';
+import Pins from '@/views/Pins';
+import Resume from '@/views/Resume';
+import Projects from '@/views/Projects';
+import BuildHome from '@/views/BuildHome';
 
 Vue.use(Router);
 
@@ -22,19 +21,14 @@ export default new Router({
       component: Home,
     },
     {
-      path: '/quotes',
-      name: 'Quotes',
-      component: Quotes,
+      path: '/pins',
+      name: 'Pins',
+      component: Pins,
     },
     {
       path: '/projects',
       name: 'Projects',
       component: Projects,
-    },
-    {
-      path: '/books',
-      name: 'Books',
-      component: Books,
     },
     {
       path: '/resume',

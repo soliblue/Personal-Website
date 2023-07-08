@@ -51,17 +51,6 @@ export default {
   background-color: #fdbd00;
 }
 
-.nav-links > a:nth-child(4):hover,
-.nav-links > a:nth-child(4):focus,
-.nav-links > a:nth-child(4):active {
-  background-color: #2da94f;
-}
-
-.nav-links > a:nth-child(5):hover,
-.nav-links > a:nth-child(5):focus,
-.nav-links > a:nth-child(5):active {
-  background-color: black;
-}
 
 .name > span:nth-child(1) { color: #3e82f7; }
 .name > span:nth-child(2) { color: #ed412d; }

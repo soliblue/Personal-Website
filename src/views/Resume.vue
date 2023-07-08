@@ -4,9 +4,9 @@
       <div>
         <router-link to="/home" class="back"> Back </router-link>
       </div>
-      <!-- <div class="download">
-        <a  href='https://soliman.life/as_resume.pdf'> Download </a>
-      </div> -->
+      <br>
+      <br>
+      <br>
       <div class="content">
         <h1>Resume</h1>
         <div class="experiences">

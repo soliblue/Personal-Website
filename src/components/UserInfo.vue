@@ -24,9 +24,7 @@
     <div class="nav-links">
       <router-link to="/resume">Resume</router-link>
       &nbsp;
-      <router-link to="/quotes">Quotes</router-link>
-      &nbsp;
-      <router-link to="/books">Books</router-link>
+      <router-link to="/pins">Pins</router-link>
       &nbsp;
       <router-link to="/projects">Projects</router-link>
     </div>

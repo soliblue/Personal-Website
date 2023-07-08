@@ -98,7 +98,6 @@ export default `
 .nav-links > a:nth-child(1) { border-bottom-color:#3e82f775; }
 .nav-links > a:nth-child(2) { border-bottom-color:#ed412d75; }
 .nav-links > a:nth-child(3) { border-bottom-color:#fdbd0075; }
-.nav-links > a:nth-child(4) { border-bottom-color:#2da94f75; }
 
 /*
  *
