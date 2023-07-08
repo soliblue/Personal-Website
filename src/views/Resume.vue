@@ -8,7 +8,6 @@
       <br>
       <br>
       <div class="content">
-        <h1>Resume</h1>
         <div class="experiences">
           <h3>Experience</h3>
           <div
@@ -59,27 +58,6 @@
             <br />
           </div>
         </div>
-        <div class="seperator"></div>
-        <div class="volunteers">
-          <h3>Extra-curricular</h3>
-          <div v-for="volunteer in volunteers" :key="volunteer.id">
-            <strong>{{ volunteer.title }} @</strong>
-            {{ volunteer.organisation }}
-            <div v-html="volunteer.description"></div>
-          </div>
-        </div>
-        <div class="seperator"></div>
-        <div class="hackathons">
-          <h3>Hackathons</h3>
-          <div v-for="hackathon in hackathons" :key="hackathon.id">
-            <span
-              ><strong>{{ hackathon.name }}</strong></span
-            >
-            <span v-if="hackathon.code"
-              >(<a :href="hackathon.code">Code</a>)</span
-            >
-          </div>
-        </div>
       </div>
     </div>
   </div>
@@ -110,11 +88,6 @@ export default {
   color: white;
 }
 
-.experience:not(:last-child) {
-  border-bottom-style: solid;
-  border-bottom-width: 1px;
-}
-
 .experience {
   padding-top: 1vh;
   padding-bottom: 1vh;
@@ -136,9 +109,6 @@ export default {
   border: solid;
 }
 
-h3 {
-  text-decoration: underline;
-}
 
 .language {
   display: inline-block;
