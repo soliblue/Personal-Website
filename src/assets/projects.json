@@ -8,6 +8,14 @@
     "link": "https://piasso.ai"
   },
   {
+    "title": "Chair for Computational Social Sciences and Humanities",
+    "year": "2017",
+    "type": "Website Application",
+    "tags": ["Design", "Web Development", "Education"],
+    "description": "The group works on understanding social systems and modeling human behavior using computational methods. As the 4th member to join, I was responsible for the conceptualisation, design, and development of the website and also built various tools to automate the correction of student assignments.",
+    "link": "https://cssh.rwth-aachen.de/"
+  },
+  {
     "title": "SongGPT",
     "tags": ["Music", "Open Source", "OpenAI", "React Native", "FastAPI", "Firebase", "Prompt Engineering"],
     "description": "SongGPT is one of my favorite side projects. I explored the potential of LLMs to generate music compositions. I learned a-lot about prompt engineering, how one can use machines to geneate artificial sounds and designing good user experiences. The app allows users to generate a song from any text such peom, lyrics or a quote or by selecting a color using the picker.",
@@ -38,16 +46,8 @@
     "year": "2018",
     "type": "Website Application",
     "tags": ["Design", "Web Development", "Education"],
-    "description": "The M.Sc. Computational Social Systems program is a unique interdisciplinary course at the intersection of data science and humanities. As a founding member, I was solely responsible for conceptualising, designing, and developing the website.",
+    "description": "The M.Sc. Computational Social Systems program is a unique interdisciplinary course at the intersection of computer science, social sciences, cognitive sciences and ethics. I was solely responsible for conceptualising, designing, and developing the website.",
     "link": "https://computationalsocialsystems.rwth-aachen.de/"
-  },
-  {
-    "title": "Chair for Computational Social Sciences and Humanities",
-    "year": "2017",
-    "type": "Website Application",
-    "tags": ["Design", "Web Development", "Education"],
-    "description": "The Chair for Computational Social Sciences and Humanities operates at the interface of data science and humanities, advancing research and education in these fields. As the 4th member to join the chair, I was responsible for the conceptualisation, design, and development of the website and also built various tools to automate the correction of student assignments.",
-    "link": "https://cssh.rwth-aachen.de/"
   },
   {
     "title": "IT for Kids",
