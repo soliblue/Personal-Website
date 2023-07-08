@@ -8,7 +8,7 @@
       <span>i</span>
     </h2>
     <div class="animated fadeIn">
-      <a href="https://github.com/solimouse" target="_blank">
+      <a href="https://github.com/soliblue" target="_blank">
         <img src="../assets/github.png" class="social-links" >
       </a>
       <a href="https://www.linkedin.com/in/asoliman96/" target="_blank">
