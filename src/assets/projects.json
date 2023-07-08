@@ -4,21 +4,33 @@
     "year": "2022",
     "type": "Cross Platform Application",
     "tags": ["AI", "OpenAI", "ChatGPT", "FastAPI", "Firebase", "React Native", "iOS"],
-    "description": "In four weeks, I developed Piasso, the first AI application that generates images from text in various languages, including Arabic, German, and Spanish. The service, akin to a free ChatGPT, provides a prompt library and search function for users, particularly in regions like Egypt.",
+    "description": "In four weeks, I developed Piasso, the first AI application that generates images from text in various languages, including Arabic, German, and Spanish. I replicated ChatGPT's functionalities using the DaVinci model, and included unique additions like a prompt library and search feature. Piasso is my first iOS app that gets approved on the App Store and is being used by thousands of active users.",
     "link": "https://piasso.ai"
   },
   {
     "title": "SongGPT",
-    "tags": ["Music", "Open Source", "OpenAI", "React Native", "FastAPI", "Firebase"],
-    "description": "SongGPT is an experimental open-source project that leverages Language Models to generate original and customizable musical compositions.",
+    "tags": ["Music", "Open Source", "OpenAI", "React Native", "FastAPI", "Firebase", "Prompt Engineering"],
+    "description": "SongGPT is one of my favorite side projects. I explored the potential of LLMs to generate music compositions. I learned a-lot about prompt engineering, how one can use machines to geneate artificial sounds and designing good user experiences. The app allows users to generate a song from any text such peom, lyrics or a quote or by selecting a color using the picker.",
     "link": "https://songgpt.xyz/"
+  },
+  {
+    "title": "ChessGPT",
+    "year": "2023",
+    "tags": ["AI", "OpenAI", "Prompt Engineering"],
+    "description": "I built a chess app to play against ChatGPT. I used prompt engineering techniques to represent the board in a text format and interpreted the ChatGPT's response as a move on the chessboard. I did the project out of curiosity to explore the limitations of LLMs in reasoning."
+  },
+  {
+    "title": "AskVisionOS",
+    "year": "2023",
+    "tags": ["OpenAI", "OpenAI-Plugin", "Prompt Engineering"],
+    "description": "After Apple announced the Vision Pro, I got curious and watched all the videos about Vision OS. Then, I made a plugin using all that info from Apple to answer my own questions about Vision OS. Right now, it's just for my private use and I haven't released it yet."
   },
   {
     "title": "biddz",
     "year": "2022",
     "type": "Cross Platform Application",
     "tags": ["Music", "Blockchain", "iOS", "FastAPI", "React Native"],
-    "description": "biddz is a platform aimed at fostering a closer connection between music fans and artists. I transformed the idea into a product used by tens of thousands of users. I conceptualized, designed, and built the initial version, then assembled a team to continue enhancing the product.",
+    "description": "biddz is a platform aimed at fostering a closer connection between music fans and artists. I transformed the founders idea into a product used by tens of thousands of users. I conceptualized, designed, and built the initial version while assembling a team to continue enhancing the product.",
     "link": "https://www.biddz.io"
   },
   {
@@ -46,7 +58,7 @@
   },
   {
     "title": "Zima",
-    "tags": ["Browser Extension", "OpenAI", "Open Source", "React"],
+    "tags": ["Browser Extension", "Chrome-Plugin", "OpenAI", "Open Source", "React"],
     "description": "Zima is a browser extension enabling users to save and search their OpenAI chat transcripts.",
     "link": "https://github.com/soliblue/zima"
   }
