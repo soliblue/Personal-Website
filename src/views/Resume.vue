@@ -97,10 +97,6 @@ export default {
   text-decoration: none;
 }
 
-.download {
-  text-align: center;
-}
-
 .content {
   padding: 5vw;
   margin: 50px auto 0 auto;
@@ -108,7 +104,6 @@ export default {
   max-width: 1000px;
   border: solid;
 }
-
 
 .language {
   display: inline-block;

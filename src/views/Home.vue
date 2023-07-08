@@ -1,51 +1,17 @@
 <template>
-<div>
-  <div class="animated fadeIn">
-    <div class="content">
-      <UserInfoWithStyle />
-      <br>
-      <Code />
-      <br>
-      <div class="controls">
-        <a href="/">Restart Animation</a>
-      </div>
-    </div>
-  </div>
-</div>
+  <BaseHome />
 </template>
 
 <script>
-import UserInfoWithStyle from '../components/UserInfoWithStyle';
-import Code from '../components/Code';
+import StyleMixin from '../mixins/StyleMixin';
+import BaseHome from '../components/BaseHome';
 
 export default {
   name: 'Home',
-  components: {
-    UserInfoWithStyle,
-    Code,
-  },
+  mixins: [StyleMixin],
   mounted() {
-    const pre = document.getElementById('home-style-text');
-    pre.scrollTop = pre.scrollHeight;
+    this.processStyles(false);
   },
+  components: { BaseHome },
 };
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-
-.content {
-  text-align: center;
-  padding-top:20px;
-}
-
-
-.controls {
-  text-align: center;
-}
-
-h1,h2 {
-  margin: 0px;
-}
-
-</style>
