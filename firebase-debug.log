@@ -1,61 +1,30 @@
-[debug] [2023-07-08T07:58:36.532Z] ----------------------------------------------------------------------
-[debug] [2023-07-08T07:58:36.533Z] Command:       /Users/soli/.nvm/versions/node/v18.16.0/bin/node /Users/soli/.nvm/versions/node/v18.16.0/bin/firebase deploy
-[debug] [2023-07-08T07:58:36.533Z] CLI Version:   11.30.0
-[debug] [2023-07-08T07:58:36.533Z] Platform:      darwin
-[debug] [2023-07-08T07:58:36.533Z] Node Version:  v18.16.0
-[debug] [2023-07-08T07:58:36.534Z] Time:          Sat Jul 08 2023 09:58:36 GMT+0200 (Central European Summer Time)
-[debug] [2023-07-08T07:58:36.534Z] ----------------------------------------------------------------------
+[debug] [2023-07-08T09:15:34.916Z] ----------------------------------------------------------------------
+[debug] [2023-07-08T09:15:34.917Z] Command:       /Users/soli/.nvm/versions/node/v18.16.0/bin/node /Users/soli/.nvm/versions/node/v18.16.0/bin/firebase deploy
+[debug] [2023-07-08T09:15:34.917Z] CLI Version:   11.30.0
+[debug] [2023-07-08T09:15:34.917Z] Platform:      darwin
+[debug] [2023-07-08T09:15:34.917Z] Node Version:  v18.16.0
+[debug] [2023-07-08T09:15:34.918Z] Time:          Sat Jul 08 2023 11:15:34 GMT+0200 (Central European Summer Time)
+[debug] [2023-07-08T09:15:34.918Z] ----------------------------------------------------------------------
 [debug] 
-[debug] [2023-07-08T07:58:36.569Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
-[debug] [2023-07-08T07:58:36.570Z] > authorizing via signed-in user (asoliman96@gmail.com)
-[debug] [2023-07-08T07:58:36.570Z] [iam] checking project personal-website-e63ac for permissions ["firebase.projects.get","firebasehosting.sites.update"]
-[debug] [2023-07-08T07:58:36.571Z] > refreshing access token with scopes: []
-[debug] [2023-07-08T07:58:36.572Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
-[debug] [2023-07-08T07:58:36.572Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
-[debug] [2023-07-08T07:58:37.226Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
-[debug] [2023-07-08T07:58:37.227Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
-[debug] [2023-07-08T07:58:37.235Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/personal-website-e63ac:testIamPermissions [none]
-[debug] [2023-07-08T07:58:37.236Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/personal-website-e63ac:testIamPermissions x-goog-quota-user=projects/personal-website-e63ac
-[debug] [2023-07-08T07:58:37.236Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/personal-website-e63ac:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
-[debug] [2023-07-08T07:58:38.055Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/personal-website-e63ac:testIamPermissions 200
-[debug] [2023-07-08T07:58:38.055Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/personal-website-e63ac:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
-[debug] [2023-07-08T07:58:38.055Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/personal-website-e63ac [none]
-[debug] [2023-07-08T07:58:42.316Z] ----------------------------------------------------------------------
-[debug] [2023-07-08T07:58:42.317Z] Command:       /Users/soli/.nvm/versions/node/v18.16.0/bin/node /Users/soli/.nvm/versions/node/v18.16.0/bin/firebase deploy
-[debug] [2023-07-08T07:58:42.317Z] CLI Version:   11.30.0
-[debug] [2023-07-08T07:58:42.317Z] Platform:      darwin
-[debug] [2023-07-08T07:58:42.317Z] Node Version:  v18.16.0
-[debug] [2023-07-08T07:58:42.318Z] Time:          Sat Jul 08 2023 09:58:42 GMT+0200 (Central European Summer Time)
-[debug] [2023-07-08T07:58:42.318Z] ----------------------------------------------------------------------
-[debug] 
-[debug] [2023-07-08T07:58:42.352Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
-[debug] [2023-07-08T07:58:42.353Z] > authorizing via signed-in user (asoliman96@gmail.com)
-[debug] [2023-07-08T07:58:42.353Z] [iam] checking project personal-website-e63ac for permissions ["firebase.projects.get","firebasehosting.sites.update"]
-[debug] [2023-07-08T07:58:42.353Z] > refreshing access token with scopes: []
-[debug] [2023-07-08T07:58:42.354Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
-[debug] [2023-07-08T07:58:42.354Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
-[debug] [2023-07-08T07:58:42.502Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
-[debug] [2023-07-08T07:58:42.502Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
-[debug] [2023-07-08T07:58:42.510Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/personal-website-e63ac:testIamPermissions [none]
-[debug] [2023-07-08T07:58:42.510Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/personal-website-e63ac:testIamPermissions x-goog-quota-user=projects/personal-website-e63ac
-[debug] [2023-07-08T07:58:42.510Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/personal-website-e63ac:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
-[debug] [2023-07-08T07:58:43.276Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/personal-website-e63ac:testIamPermissions 200
-[debug] [2023-07-08T07:58:43.276Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/personal-website-e63ac:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
-[debug] [2023-07-08T07:58:43.277Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/personal-website-e63ac [none]
-[debug] [2023-07-08T07:58:43.545Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/personal-website-e63ac 200
-[debug] [2023-07-08T07:58:43.545Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/personal-website-e63ac {"projectId":"personal-website-e63ac","projectNumber":"771751095859","displayName":"Personal-Website","name":"projects/personal-website-e63ac","resources":{"hostingSite":"personal-website-e63ac"},"state":"ACTIVE","etag":"1_1075ae36-dc76-4b7f-8310-15dbabaa1fc8"}
+[debug] [2023-07-08T09:15:34.953Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2023-07-08T09:15:34.953Z] > authorizing via signed-in user (asoliman96@gmail.com)
+[debug] [2023-07-08T09:15:34.953Z] [iam] checking project personal-website-e63ac for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2023-07-08T09:15:34.954Z] > refreshing access token with scopes: []
+[debug] [2023-07-08T09:15:34.955Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2023-07-08T09:15:34.955Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2023-07-08T09:15:35.151Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2023-07-08T09:15:35.152Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2023-07-08T09:15:35.159Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/personal-website-e63ac:testIamPermissions [none]
+[debug] [2023-07-08T09:15:35.160Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/personal-website-e63ac:testIamPermissions x-goog-quota-user=projects/personal-website-e63ac
+[debug] [2023-07-08T09:15:35.160Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/personal-website-e63ac:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2023-07-08T09:15:35.913Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/personal-website-e63ac:testIamPermissions 200
+[debug] [2023-07-08T09:15:35.913Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/personal-website-e63ac:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2023-07-08T09:15:35.914Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/personal-website-e63ac [none]
+[debug] [2023-07-08T09:15:36.197Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/personal-website-e63ac 200
+[debug] [2023-07-08T09:15:36.197Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/personal-website-e63ac {"projectId":"personal-website-e63ac","projectNumber":"771751095859","displayName":"Soli's","name":"projects/personal-website-e63ac","resources":{"hostingSite":"personal-website-e63ac","storageBucket":"personal-website-e63ac.appspot.com","locationId":"europe-west"},"state":"ACTIVE","etag":"1_93619cfb-f7b6-446c-93b2-620590c8ec2c"}
 [info] 
 [info] === Deploying to 'personal-website-e63ac'...
 [info] 
 [info] i  deploying hosting 
-[debug] [2023-07-08T07:58:43.547Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/personal-website-e63ac/versions [none]
-[debug] [2023-07-08T07:58:43.547Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/personal-website-e63ac/versions {"status":"CREATED","labels":{"deployment-tool":"cli-firebase"}}
-[debug] [2023-07-08T07:58:44.714Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/personal-website-e63ac/versions 200
-[debug] [2023-07-08T07:58:44.715Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/personal-website-e63ac/versions {"name":"projects/771751095859/sites/personal-website-e63ac/versions/6d93ec943fcb54f1","status":"CREATED","config":{},"labels":{"deployment-tool":"cli-firebase"}}
-[info] i  hosting[personal-website-e63ac]: beginning deploy... 
-[info] i  hosting[personal-website-e63ac]: found 21 files in dist 
-[debug] [2023-07-08T07:58:44.723Z] [hosting] uploading with 200 concurrency
-[debug] [2023-07-08T07:58:44.820Z] [hosting] hash cache [ZGlzdA] stored for 21 files
-[debug] [2023-07-08T07:58:44.820Z] [hosting][hash queue][FINAL] {"max":91,"min":6,"avg":12.428571428571429,"active":0,"complete":21,"success":21,"errored":0,"retried":0,"total":21,"elapsed":95}
-[debug] [2023-07-08T07:58:44.821Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/771751095859/sites/personal-website-e63ac/versions/6d93ec943fcb54f1:populateFiles [none]
-[debug] [2023-07-08T07:58:44.821Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/771751095859/sites/personal-website-e63ac/versions/6d93ec943fcb54f1:populateFiles {"files":{"/index.html":"6f706d048d279f8b1ae9f75ab5976d3fe8eb3d3fd24b64a58cfc6458d6a8d8c4","/static/css/app.46e45beba37060f10bac93e220b102f2.css":"5afda01a79ef37c53472a706311535294ba77fe482e010ddabd176b919d1aedb","/static/og-image.jpeg":"a6491769944b505cfb135dffcfc9e8f46be7aaf7ef1c75f7e1169fa54e38f137","/static/css/app.46e45beba37060f10bac93e220b102f2.css.map":"f238c88d6f870b652a77ed247701b11b0039c49b44acef737aaed865c2397a43","/static/favicon/apple-touch-icon.png":"2f375c380550dfc3f6f668ea3477005949e3d557b2af49dfcb9d9ab2118373f2","/static/favicon/android-chrome-192x192.png":"b9f671c8ffdad1f47a6182eb0ab73643999257f885597727205c1aa6eaf92ec3","/static/favicon/browserconfig.xml":"0750e3233b48515b59dcbc5b36e64eafbeb9e346e083d5450cabcd5ae7b179f8","/static/favicon/favicon.png":"fd5494ed7201751fdc8d6e256de7d3327cb9c10dc743aa86426ab7212b158231","/static/favicon/safari-pinned-tab.svg":"90f6de36bf73024fa50d0b1aa185ac8e9928561a968d018d0f9ee678439b6059","/static/favicon/site.webmanifest":"8077602a41c2dd346601f2c34738371a2cc544c41c5d1cb8eb757c98b759bf7f","/static/js/manifest.2ae2e69a05c33dfc65f8.js":"3f771fa490335b2de2ae7615f79fd6b0609c03728f6d1884741069ae77344b74","/static/js/manifest.2ae2e69a05c33dfc65f8.js.map":"7a1827925d6a52071037460e736a3582e437ba1e518aa1d5ae5b25a6388ac41d","/static/js/app.3da0a7cf1fcfc73d5014.js":"76102a219058ab992b8aa223eb7996d464778826d700680861e80ad272ecfc3b","/static/img/twitter.212959f.png":"e871ed5edf5a38afdbcbf4741d7781e0d09adb443082b0358ee9d544d3daef0e","/static/js/app.3da0a7cf1fcfc73d5014.js.map":"53a1cca76e220218ecebb13e4c10ba86f6dc58757f476e59aff484cf7f37f5eb","/static/favicon/android-chrome-512x512.png":"eef53f136ee3fffea29a44d5304a95ad64646c92b585d181129b5f50efc22e2e","/static/img/instagram.4ac7ac8.png":"fe57531f3e2758cb2ba75d7e3c99f17f8bf159c1936f43fd81f302fa8abcae53","/static/js/vendor.923b74c6facc892de16e.js":"ec1a4839585ebdd7d8097f5add8fc53a4688698b8ad39f8bb542e97d8dee336a","/static/favicon/adaptive-icon.png":"46399fc7c2f7a3f99fb73250f1c3e48dfaf7431a6afa7023a9640da7d826beee","/static/favicon/icon.png":"46399fc7c2f7a3f99fb73250f1c3e48dfaf7431a6afa7023a9640da7d826beee","/static/js/vendor.923b74c6facc892de16e.js.map":"01ac4e25e4e7436a3d3c9de1660a67a622aaa7221d94a58c381a863c80ac850e"}}
+[debug] [2023-07-08T09:15:36.202Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/personal-website-e63ac/versions [none]
+[debug] [2023-07-08T09:15:36.202Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/personal-website-e63ac/versions {"status":"CREATED","labels":{"deployment-tool":"cli-firebase"}}
