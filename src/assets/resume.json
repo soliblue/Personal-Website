@@ -3,7 +3,7 @@
     {
       "title":"Founder",
       "employer":"Piasso",
-      "employer_url": "https://linktr.ee/piasso",
+      "employer_url": "https://piasso.ai",
       "location":"Cairo, Egypt",
       "start":"Dec 2022",
       "end":"Present"
@@ -53,105 +53,8 @@
         "degree":"Master of Science",
         "field":"Computer Science",
         "start":"October 2018",
-        "end":"Present",
+        "end":"September 2020",
         "university":"RWTH Aachen"
-     }
-  ],
-  "skillsets":[
-     {
-        "title":"Backend Development",
-        "skills":[
-           {
-              "title":"Python",
-              "level":100
-           },
-           {
-              "title":"Java",
-              "level":100
-           },
-           {
-              "title":"PHP",
-              "level":100
-           },
-           {
-              "title":"FastAPI / Django / Flask",
-              "level":100
-           },
-           {
-              "title":"Laravel",
-              "level":100
-           },
-           {
-              "title":"postgres",
-              "level":100
-           },
-           {
-              "title":"MongoDB",
-              "level":80
-           },
-           {
-              "title":"Redis",
-              "level":80
-           }
-        ]
-     },
-     {
-        "title":"Frontend Development",
-        "skills":[
-           {
-              "title":"Javascript",
-              "level":80
-           },
-           {
-              "title":"HTML / CSS",
-              "level":100
-           },
-           {
-              "title":"jQuery",
-              "level":80
-           },
-           {
-              "title":"Vue.js",
-              "level":80
-           },
-           {
-              "title":"React / React Native",
-              "level":100
-           },
-           {
-              "title":"Redux",
-              "level":80
-           },
-           {
-              "title":"React Query",
-              "level":80
-           }
-        ]
-     },
-     {
-        "title":"Data Science / Analytics",
-        "skills":[
-           {
-              "title":"SQL",
-              "level":100
-           },
-           {
-              "title":"pandas",
-              "level":100
-           },
-           {
-              "title":"sklearn",
-              "level":80
-           },
-           {
-              "title":"matplotlib",
-              "level":80
-           },
-           {
-              "title":"Google Sheets",
-              "level":100
-           }
-        ]
      }
   ],
   "languages":[
