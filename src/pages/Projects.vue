@@ -4,6 +4,8 @@
       <div>
         <router-link to="/home" class="back">Back</router-link>
       </div>
+      <br>
+      <br>
       <div class="content">
         <div class="filter-tags">
           <span
