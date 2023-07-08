@@ -85,18 +85,11 @@ export default {
   margin-left: auto;
   margin-right: auto;
   padding: 1em;
-  border-bottom: solid;
-  border-width: 1px;
-  border-color: black;
-}
-
-.project:last-child {
-  border-bottom: none;
 }
 
 .tag {
   display: inline-block;
-  background: black;
+  background: #fdbe008f;
   color: white;
   border-radius: 5px;
   padding: 0.2em 0.5em;
@@ -105,7 +98,7 @@ export default {
 }
 
 .tag.selected {
-  background: rgb(0, 116, 151);
+  background: #fdbd00;
 }
 
 .filter-tags {
@@ -120,7 +113,7 @@ export default {
 
 .back {
   position: absolute;
-  background:black;
+  background:#fdbd0075;
   color: white;
   padding: 1em;
 }
@@ -129,7 +122,7 @@ export default {
 .back:active,
 .back:focus {
   position: absolute;
-  background: black;
+  background: #fdbd00;
   color: white;
   padding: 1em;
   cursor: pointer;

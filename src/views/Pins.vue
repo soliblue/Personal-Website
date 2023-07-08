@@ -8,20 +8,24 @@
       <br>
       <div class="content">
         <h1 class="header">Pins</h1>
-        <div v-for="pin in pins" :key="pin.id" class="pin-card">
-          <div v-if="pin.type === 'quote'">
-            <p class="center">“{{pin.message}}”</p>
-            <p class="author"> - {{pin.author}}</p>
-          </div>
-          <div v-else class="animated fadeIn book-content">
-            <img :src="pin.cover" alt="Book Cover" class="cover">
-            <div class="book-detail">
-              <div><strong>{{pin.title}}</strong></div>
-              <div class="subtitle">{{pin.subtitle}}</div>
+        <br>
+        <div class="pin-card-container" v-for="pin in pins" :key="pin.id">
+          <div class="pin-card">
+            <div v-if="pin.type === 'quote'">
+              <p class="center">“{{pin.message}}”</p>
               <p class="author"> - {{pin.author}}</p>
+            </div>
+            <div v-else class="animated fadeIn book-content">
+              <img :src="pin.cover" alt="Book Cover" class="cover">
+              <div class="book-detail">
+                <div><strong>{{pin.title}}</strong></div>
+                <div class="subtitle">{{pin.subtitle}}</div>
+                <p class="author"> - {{pin.author}}</p>
+              </div>
             </div>
           </div>
         </div>
+
       </div>
     </div>
   </div>
@@ -52,15 +56,18 @@ export default {
 </script>
 
 <style scoped>
+.pin-card-container {
+  margin: auto;
+  padding: 4vh;
+}
 .pin-card {
   display: flex;
   flex-direction: column;
   align-items: center;
   max-width: 500px;
   margin: auto;
-  padding: 3vh;
+  padding: 4vh;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 2vh;
   font-size: 1.2em;
   background-color: #fff;
   transition: transform .75s; /* Animation */
@@ -77,7 +84,7 @@ export default {
 }
 
 .cover {
-  max-width: 50%;
+  max-width: 45%;
   height: auto;
   margin-right: 10px;
 }
@@ -112,13 +119,13 @@ export default {
 
 .back {
   position: absolute;
-  background: #fdbd00;
+  background: #ed412d75;
   color: white;
   padding: 1em;
 }
 
 .back:hover {
-  background: black;
+  background: #ed412d;
 }
 
 .content {
