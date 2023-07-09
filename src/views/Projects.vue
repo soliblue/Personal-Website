@@ -1,77 +1,52 @@
+<!-- eslint-disable no-unused-expressions -->
 <template>
   <div class="animated fadeIn">
-    <div>
-      <div>
-        <router-link to="/home" class="back">Back</router-link>
+      <BackButton backgroundColor="#fdbd00" />
+      <div class="filter-tags">
+        <span v-for="tag in allTags" :key="tag" class="tag" :class="{ selected: selectedTags.includes(tag) }" @click="toggleTag(tag)">
+          {{ tag }}
+        </span>
       </div>
-      <br>
-      <br>
-      <div class="content">
-        <div class="filter-tags">
-          <span
-            v-for="tag in allTags"
-            :key="tag"
-            class="tag"
-            :class="{ selected: isSelected(tag) }"
-            @click="toggleTag(tag)"
-          >
-            {{ tag }}
-          </span>
-        </div>
-        <div
-          v-for="project in filteredProjects"
-          class="project"
-          :key="project.id"
-        >
-          <h2>{{ project.title }}</h2>
-          <p>
-            <span class="tag" v-for="tag in project.tags" :key="tag">{{ tag }}</span>
-          </p>
-          <p>{{ project.description }}</p>
-          <a :href="project.link" target="_blank" rel="noopener noreferrer">{{ project.link }}</a>
-        </div>
+      <div v-for="project in filteredProjects" class="project" :key="project.id">
+        <h2>{{ project.title }}</h2>
+        <p><span class="tag" v-for="tag in project.tags" :key="tag">{{ tag }}</span></p>
+        <p>{{ project.description }}</p>
+        <a :href="project.link" target="_blank" rel="noopener noreferrer">{{ project.link }}</a>
       </div>
-    </div>
   </div>
 </template>
 
 <script>
+import projects from '../assets/projects.json';
+import BackButton from '../components/BackButton';
+
 export default {
   name: 'Projects',
+  components: {
+    BackButton,
+  },
   data() {
-    return {
-      selectedTags: [],
-      projects: require('../assets/projects.json'),
-    };
+    const allTags = [...new Set(projects.flatMap(project => project.tags))];
+    return { selectedTags: [], projects, allTags };
   },
   computed: {
-    allTags() {
-      const tagsSet = new Set();
-      this.projects.forEach(project => {
-        project.tags.forEach(tag => tagsSet.add(tag));
-      });
-      return Array.from(tagsSet);
-    },
     filteredProjects() {
-      if (!this.selectedTags.length) {
-        return this.projects;
-      }
-
-      return this.projects.filter(project =>
-        project.tags.some(tag => this.selectedTags.includes(tag)),
+      if (!this.selectedTags.length) return this.projects;
+      return this.projects.filter(
+        project => project.tags.some(
+          tag => this.selectedTags.includes(tag),
+        ),
       );
     },
   },
   methods: {
-    isSelected(tag) {
-      return this.selectedTags.includes(tag);
-    },
     toggleTag(tag) {
-      const index = this.selectedTags.indexOf(tag);
+      const { selectedTags } = this;
+      const index = selectedTags.indexOf(tag);
       if (index === -1) {
-        this.selectedTags.push(tag);
+        selectedTags.push(tag);
       } else {
-        this.selectedTags.splice(index, 1);
+        selectedTags.splice(index, 1);
       }
     },
   },
@@ -79,11 +54,9 @@ export default {
 </script>
 
 <style scoped>
-.project {
-  display: block;
+.project, .filter-tags {
   max-width: 500px;
-  margin-left: auto;
-  margin-right: auto;
+  margin: auto;
   padding: 1em;
 }
 
@@ -97,42 +70,5 @@ export default {
   cursor: pointer;
 }
 
-.tag.selected {
-  background: #fdbd00;
-}
-
-.filter-tags {
-  display: flex;
-  flex-wrap: wrap;
-  max-width: 500px;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 0.5em;
-  margin-bottom: 1em;
-}
-
-.back {
-  position: absolute;
-  background:#fdbd0075;
-  color: white;
-  padding: 1em;
-}
-
-.back:hover,
-.back:active,
-.back:focus {
-  position: absolute;
-  background: #fdbd00;
-  color: white;
-  padding: 1em;
-  cursor: pointer;
-}
-
-.content {
-  padding-top: 50px;
-}
-
-.header {
-  text-align: center;
-}
+.tag.selected { background: #fdbd00; }
 </style>
