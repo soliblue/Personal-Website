@@ -10,10 +10,10 @@
             <a :href="item.url">{{ item.subtitle }}</a>
           </div>
           <div class="information">
-            <span class="date-range">
+            <span class="gray-text">
               {{ item.start }} - {{ item.end }}
             </span>
-            <span class="location">
+            <span class="gray-text">
               {{ item.location }}
             </span>
           </div>
@@ -80,12 +80,8 @@ export default {
 
 .gray-text {
   color: gray;
-  margin-right: 2vh;
-}
-
-.date-range, .location {
   font-size: small;
-  color: gray;
+  margin-right: 2vh;
 }
 
 .information {
