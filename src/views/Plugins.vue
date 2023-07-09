@@ -1,31 +1,35 @@
 <template>
-  <div class="animated fadeIn">
+  <div class="animated fadeIn center">
     <BackButton backgroundColor="#1E90FF" />
-    <div class="search-input-container margin-auto">
-      <input type="text" v-model="searchTerm" placeholder="Search..." class="search-input">
-    </div>
-    <div class="padding-sm margin-auto" v-for="plugin in filteredPlugins" :key="plugin.id">
-      <div class="card padding-sm margin-auto animated fadeIn">
-        <div class="horizontal center">
-          <div class="horizontal center h-space-sm">
-            <img :src="plugin.logo_url" alt="Logo" class="logo">
-            <h4>{{plugin.name_for_human}}</h4>
+    <div class="max-width-500 margin-auto center">
+      <input type="text" v-model="searchTerm" placeholder="Search OpenAI Plugins" class="search-input">
+      <br>
+      <br>
+      <div class="padding-sm margin-auto" v-for="plugin in paginatedPlugins" :key="plugin.id">
+        <div class="card padding-sm margin-auto animated fadeIn">
+          <div class="horizontal center">
+            <div class="horizontal center h-space-sm">
+              <img :src="plugin.logo_url" alt="Logo" class="logo">
+              <h4>{{plugin.name_for_human}}</h4>
+            </div>
+            <label class="switch">
+              <input type="checkbox" v-model="plugin.showModelDescription">
+              <span class="slider"></span>
+            </label>
           </div>
-          <label class="switch">
-            <input type="checkbox" v-model="plugin.showModelDescription">
-            <span class="slider"></span>
-          </label>
-        </div>
-        <p>
-          {{plugin.showModelDescription ? plugin.description_for_model : plugin.description_for_human}}
-        </p>
-        <div class="h-space-sm">
-          <a :href="plugin.domain" target="_blank">Domain</a>
-          <a :href="plugin.contact_email" target="_blank">Email</a>
-          <a :href="plugin.legal_info_url" target="_blank">Legal</a>
+          <p>
+            {{plugin.showModelDescription ? plugin.description_for_model : plugin.description_for_human}}
+          </p>
+          <div class="h-space-sm">
+            <a :href="plugin.domain" target="_blank">Domain</a>
+            <a :href="plugin.contact_email" target="_blank">Email</a>
+            <a :href="plugin.legal_info_url" target="_blank">Legal</a>
+          </div>
         </div>
       </div>
+      <button @click="loadMore" v-if="hasMore" class="load-more-btn">Load More</button>
     </div>
+
   </div>
 </template>
 
@@ -41,33 +45,56 @@ export default {
   data() {
     return {
       plugins: plugins.map(plugin => ({ ...plugin, showModelDescription: false })),
-      searchTerm: ''
+      searchTerm: '',
+      perPage: 10,
+      page: 1,
     };
   },
   computed: {
     filteredPlugins() {
       const lowerCaseSearchTerm = this.searchTerm.toLowerCase();
-      return this.plugins.filter(plugin => {
+      return this.plugins.filter((plugin) => {
         return plugin.name_for_human.toLowerCase().includes(lowerCaseSearchTerm) ||
           plugin.description_for_human.toLowerCase().includes(lowerCaseSearchTerm) ||
-          (plugin.description_for_model && plugin.description_for_model.toLowerCase().includes(lowerCaseSearchTerm));
+          (plugin.description_for_model &&
+            plugin.description_for_model.toLowerCase().includes(lowerCaseSearchTerm));
       });
-    }
-  }
+    },
+    paginatedPlugins() {
+      return this.filteredPlugins.slice(0, this.page * this.perPage);
+    },
+    hasMore() {
+      return this.page * this.perPage < this.filteredPlugins.length;
+    },
+  },
+  methods: {
+    loadMore() {
+      this.page += 1;
+    },
+  },
 };
 </script>
 
+
 <style scoped>
-.search-input-container {
+.max-width-500 {
   max-width: 500px;
-  justify-content: center;
 }
 .search-input {
   width: 100%;
-  padding: 1vh;
+  padding: 1.5vh;
+  color: #2196F3;
   font-size: 1.5em;
   border-radius: 5px;
-  border: 1px solid #ccc;
+  border: 1px solid #ebebeb;
+}
+
+.search-input::placeholder {
+  color: rgb(186, 186, 186);
+}
+
+.search-input:focus::placeholder {
+  color: whitesmoke;
 }
 
 .padding-sm {
@@ -93,7 +120,6 @@ export default {
 
 .card {
   font-size: 1.2em;
-  max-width: 500px;
   transition: transform .75s;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
@@ -157,11 +183,30 @@ input:checked + .slider:before {
   transform: translateX(26px);
 }
 
-.slider.round {
+.slider {
   border-radius: 34px;
 }
 
-.slider.round:before {
+.slider:before {
   border-radius: 50%;
+}
+
+.load-more-btn {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-top: 20px;
+  background-color: #1E90FF;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  text-align: center;
+  font-size: 1.2em;
+  transition: background-color 0.3s ease;
+}
+
+.load-more-btn:hover {
+  background-color: #1c7cd6;
 }
 </style>
