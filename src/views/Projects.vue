@@ -1,7 +1,7 @@
 <!-- eslint-disable no-unused-expressions -->
 <template>
   <div class="animated fadeIn">
-      <BackButton backgroundColor="#fdbd00" />
+      <BackButton backgroundColor="#000080" />
       <div class="filter-tags">
         <span v-for="tag in allTags" :key="tag" class="tag" :class="{ selected: selectedTags.includes(tag) }" @click="toggleTag(tag)">
           {{ tag }}
@@ -62,7 +62,7 @@ export default {
 
 .tag {
   display: inline-block;
-  background: #fdbe008f;
+  background: #00008075;
   color: white;
   border-radius: 5px;
   padding: 0.2em 0.5em;
@@ -70,5 +70,5 @@ export default {
   cursor: pointer;
 }
 
-.tag.selected { background: #fdbd00; }
+.tag.selected { background: #000080; }
 </style>

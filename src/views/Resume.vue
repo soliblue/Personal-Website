@@ -1,6 +1,6 @@
 <template>
   <div class="animated fadeIn">
-    <BackButton backgroundColor="#3e82f7"/>
+    <BackButton backgroundColor="#87CEEB"/>
     <div class="content">
       <div v-for="(section, index) in sections" :key="index">
         <h3>{{ section.title }}</h3>
