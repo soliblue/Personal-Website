@@ -3,55 +3,38 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
    <url>
-
-      <loc>https://soliman.life/</loc>
+      <loc>https://soli.blue/</loc>
       <lastmod>2018-01-06</lastmod>
       <changefreq>monthly</changefreq>
       <priority>1.0</priority>
-
    </url>
 
    <url>
-
-      <loc>https://soliman.life/#/home</loc>
+      <loc>https://soli.blue/#/home</loc>
       <lastmod>2018-01-06</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.9</priority>
-
    </url>
 
    <url>
-
-      <loc>https://soliman.life/#/resume</loc>
+      <loc>https://soli.blue/#/resume</loc>
       <lastmod>2018-01-06</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.8</priority>
-
    </url>
 
    <url>
-
-      <loc>https://soliman.life/#/more</loc>
+      <loc>https://soli.blue/#/pins</loc>
       <lastmod>2018-01-06</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.7</priority>
    </url>
 
    <url>
-
-      <loc>https://soliman.life/#/books</loc>
+      <loc>https://soli.blue/#/projects</loc>
       <lastmod>2018-01-06</lastmod>
       <changefreq>monthly</changefreq>
-      <priority>0.7</priority>
-   </url>
-
-   <url>
-
-      <loc>https://soliman.life/#/quotes</loc>
-      <lastmod>2018-01-06</lastmod>
-      <changefreq>monthly</changefreq>
-      <priority>0.7</priority>
-
+      <priority>0.9</priority>
    </url>
 
 </urlset>
