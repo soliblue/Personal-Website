@@ -3,6 +3,7 @@ import Router from 'vue-router';
 import Home from '@/views/Home';
 import Pins from '@/views/Pins';
 import Resume from '@/views/Resume';
+import Plugins from '@/views/Plugins';
 import Projects from '@/views/Projects';
 import BuildHome from '@/views/BuildHome';
 
@@ -10,11 +11,7 @@ Vue.use(Router);
 
 export default new Router({
   routes: [
-    {
-      path: '/',
-      name: 'BuildHome',
-      component: BuildHome,
-    },
+
     {
       path: '/home',
       name: 'Home',
@@ -26,15 +23,24 @@ export default new Router({
       component: Pins,
     },
     {
+      path: '/resume',
+      name: 'Resume',
+      component: Resume,
+    },
+    {
+      path: '/plugins',
+      name: 'Plugins',
+      component: Plugins,
+    },
+    {
       path: '/projects',
       name: 'Projects',
       component: Projects,
     },
     {
-      path: '/resume',
-      name: 'Resume',
-      component: Resume,
+      path: '/',
+      name: 'BuildHome',
+      component: BuildHome,
     },
-
   ],
 });
