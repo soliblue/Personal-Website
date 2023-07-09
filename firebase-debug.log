@@ -1,0 +1,39 @@
+[debug] [2023-07-08T20:58:52.790Z] ----------------------------------------------------------------------
+[debug] [2023-07-08T20:58:52.790Z] Command:       /Users/soli/.nvm/versions/node/v18.16.0/bin/node /Users/soli/.nvm/versions/node/v18.16.0/bin/firebase deploy
+[debug] [2023-07-08T20:58:52.791Z] CLI Version:   11.30.0
+[debug] [2023-07-08T20:58:52.791Z] Platform:      darwin
+[debug] [2023-07-08T20:58:52.791Z] Node Version:  v18.16.0
+[debug] [2023-07-08T20:58:52.792Z] Time:          Sat Jul 08 2023 22:58:52 GMT+0200 (Central European Summer Time)
+[debug] [2023-07-08T20:58:52.792Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2023-07-08T20:58:52.827Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2023-07-08T20:58:52.828Z] > authorizing via signed-in user (asoliman96@gmail.com)
+[debug] [2023-07-08T20:58:52.828Z] [iam] checking project personal-website-e63ac for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2023-07-08T20:58:52.828Z] > refreshing access token with scopes: []
+[debug] [2023-07-08T20:58:52.829Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2023-07-08T20:58:52.829Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2023-07-08T20:58:53.109Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2023-07-08T20:58:53.109Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2023-07-08T20:58:53.119Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/personal-website-e63ac:testIamPermissions [none]
+[debug] [2023-07-08T20:58:53.119Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/personal-website-e63ac:testIamPermissions x-goog-quota-user=projects/personal-website-e63ac
+[debug] [2023-07-08T20:58:53.119Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/personal-website-e63ac:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2023-07-08T20:58:54.058Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/personal-website-e63ac:testIamPermissions 200
+[debug] [2023-07-08T20:58:54.059Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/personal-website-e63ac:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2023-07-08T20:58:54.059Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/personal-website-e63ac [none]
+[debug] [2023-07-08T20:58:54.432Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/personal-website-e63ac 200
+[debug] [2023-07-08T20:58:54.433Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/personal-website-e63ac {"projectId":"personal-website-e63ac","projectNumber":"771751095859","displayName":"Soli's","name":"projects/personal-website-e63ac","resources":{"hostingSite":"personal-website-e63ac","storageBucket":"personal-website-e63ac.appspot.com","locationId":"europe-west"},"state":"ACTIVE","etag":"1_93619cfb-f7b6-446c-93b2-620590c8ec2c"}
+[info] 
+[info] === Deploying to 'personal-website-e63ac'...
+[info] 
+[info] i  deploying hosting 
+[debug] [2023-07-08T20:58:54.435Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/personal-website-e63ac/versions [none]
+[debug] [2023-07-08T20:58:54.435Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/personal-website-e63ac/versions {"status":"CREATED","labels":{"deployment-tool":"cli-firebase"}}
+[debug] [2023-07-08T20:58:55.797Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/personal-website-e63ac/versions 200
+[debug] [2023-07-08T20:58:55.797Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/personal-website-e63ac/versions {"name":"projects/771751095859/sites/personal-website-e63ac/versions/4a1cc0c26779a634","status":"CREATED","config":{},"labels":{"deployment-tool":"cli-firebase"}}
+[info] i  hosting[personal-website-e63ac]: beginning deploy... 
+[info] i  hosting[personal-website-e63ac]: found 24 files in dist 
+[debug] [2023-07-08T20:58:55.807Z] [hosting] uploading with 200 concurrency
+[debug] [2023-07-08T20:58:55.908Z] [hosting] hash cache [ZGlzdA] stored for 24 files
+[debug] [2023-07-08T20:58:55.908Z] [hosting][hash queue][FINAL] {"max":94,"min":6,"avg":11.958333333333334,"active":0,"complete":24,"success":24,"errored":0,"retried":0,"total":24,"elapsed":98}
+[debug] [2023-07-08T20:58:55.909Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/771751095859/sites/personal-website-e63ac/versions/4a1cc0c26779a634:populateFiles [none]
+[debug] [2023-07-08T20:58:55.909Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/771751095859/sites/personal-website-e63ac/versions/4a1cc0c26779a634:populateFiles {"files":{"/index.html":"61ed1844d46a8ca1c026bb9f23e10343d0cbc8c1d55351cf0a9b1bc5a4d6098e","/static/favicon/android-chrome-192x192.png":"b9f671c8ffdad1f47a6182eb0ab73643999257f885597727205c1aa6eaf92ec3","/static/css/app.92941a124bc24f1142e766e99b87c1d8.css.map":"c3e6e5a1c12d8ee607322a7d81d7c8f8da11dfcefd88ec3bd1ec7ec3311cb758","/static/css/app.92941a124bc24f1142e766e99b87c1d8.css":"9c15d59114b51d62eeb23c2335daef243528ae13558e58e78ebc326b40e0c215","/static/favicon/apple-touch-icon.png":"2f375c380550dfc3f6f668ea3477005949e3d557b2af49dfcb9d9ab2118373f2","/static/favicon/browserconfig.xml":"0750e3233b48515b59dcbc5b36e64eafbeb9e346e083d5450cabcd5ae7b179f8","/static/favicon/favicon-16x16.png":"d755dccf8d1d9665f9046332c132b4639a279ea95049fc22f6f873f731d13061","/static/favicon/favicon-32x32.png":"fd5494ed7201751fdc8d6e256de7d3327cb9c10dc743aa86426ab7212b158231","/static/favicon/favicon.png":"fd5494ed7201751fdc8d6e256de7d3327cb9c10dc743aa86426ab7212b158231","/static/favicon/site.webmanifest":"8077602a41c2dd346601f2c34738371a2cc544c41c5d1cb8eb757c98b759bf7f","/static/favicon/favicon.ico":"2ff0e1cd37095863fd8e102c5f768f617e41c6fd847dc4a57cdf39937cbf84ea","/static/favicon/safari-pinned-tab.svg":"90f6de36bf73024fa50d0b1aa185ac8e9928561a968d018d0f9ee678439b6059","/static/js/manifest.2ae2e69a05c33dfc65f8.js":"3f771fa490335b2de2ae7615f79fd6b0609c03728f6d1884741069ae77344b74","/static/js/manifest.2ae2e69a05c33dfc65f8.js.map":"36c17aa3299d3917b01327b02c01021dae758c71595e9d56b391afec47f19c34","/static/js/app.9557e8c97a9514b1ad28.js":"fd052410096b2b677565703711c50e343eec9b342b0c1bdc47106091827e5d33","/static/og-image.jpeg":"d1e1438d18d89bd372e8de9294c8cf45f915d8abb347d0d51e103c0c95187c63","/static/img/twitter.212959f.png":"e871ed5edf5a38afdbcbf4741d7781e0d09adb443082b0358ee9d544d3daef0e","/static/js/app.9557e8c97a9514b1ad28.js.map":"93d1934546f3ab185d74a4cf94eedb6d4f7ffdda7e4afcc37cf4e46e1465b979","/static/favicon/android-chrome-512x512.png":"eef53f136ee3fffea29a44d5304a95ad64646c92b585d181129b5f50efc22e2e","/static/js/vendor.a9a7a9afd39ad5c28c25.js":"da05d651af29093c2282f1d6009a4b72b854b09f5cc1cd07c005495747b53e78","/static/img/instagram.4ac7ac8.png":"fe57531f3e2758cb2ba75d7e3c99f17f8bf159c1936f43fd81f302fa8abcae53","/static/favicon/adaptive-icon.png":"46399fc7c2f7a3f99fb73250f1c3e48dfaf7431a6afa7023a9640da7d826beee","/static/favicon/icon.png":"46399fc7c2f7a3f99fb73250f1c3e48dfaf7431a6afa7023a9640da7d826beee","/static/js/vendor.a9a7a9afd39ad5c28c25.js.map":"0e3bc1127f660aed523577de7f3252ce7a5055cab7ad290e861196f54258d100"}}
