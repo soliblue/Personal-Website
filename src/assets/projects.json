@@ -1,11 +1,19 @@
 [
   {
     "title": "Piasso",
-    "year": "2022",
+    "year": "2023",
     "type": "Cross Platform Application",
     "tags": ["AI", "OpenAI", "ChatGPT", "FastAPI", "Firebase", "React Native", "iOS"],
     "description": "In four weeks, I developed Piasso, the first AI application that generates images from text in several languages, including Arabic, German, and Spanish. I replicated ChatGPT's functionalities using the DaVinci model and included unique features such as a prompt library and a search function. Piasso is my first iOS app that has been approved on the App Store and is currently being used by thousands of active users.",
     "link": "https://piasso.ai"
+  },
+  {
+    "title": "biddz",
+    "year": "2022",
+    "type": "Cross Platform Application",
+    "tags": ["Music", "Blockchain", "FastAPI", "React Native"],
+    "description": "biddz is a platform aimed at fostering a closer connection between music fans and artists. I helped the founders transform the idea into a product used by tens of thousands of users. We conceptualized, designed, and built the initial version while assembling a team to continue enhancing the product.",
+    "link": "https://www.biddz.io"
   },
   {
     "title": "Chair for Computational Social Sciences and Humanities",
@@ -17,29 +25,29 @@
   },
   {
     "title": "SongGPT",
+    "year": "2023",
     "tags": ["Music", "Open Source", "OpenAI", "React Native", "FastAPI", "Firebase", "Prompt Engineering"],
     "description": "SongGPT is one of my favorite side projects. It allowed me to explore the potential of LLMs in generating music compositions. Through this project, I learned a lot about prompt engineering, machine-generated artificial sounds, and good user experience design. The app allows users to generate a song from any text, such as a poem, lyrics, or a quote, or by selecting a color using the picker.",
     "link": "https://songgpt.xyz/"
   },
   {
+    "title": "Custom BlueSky Client",
+    "year": "2023",
+    "tags": ["Open Source", "React Native", "BlueSky", "Social Network", "Prototype"],
+    "description": "Intrigued by the rise of BlueSky, I decided to build an early version of a custom iOS client to gain a deeper understanding of how the ATProto Protocol works. I also made the code available on my Github for education purposes.",
+    "link": "https://github.com/soliblue/BlueSky-Custom-Client"
+  },
+  {
     "title": "ChessGPT",
     "year": "2023",
-    "tags": ["AI", "OpenAI", "Prompt Engineering"],
+    "tags": ["AI", "OpenAI", "Prompt Engineering", "Prototype"],
     "description": "I built a chess app to play against ChatGPT. I used prompt engineering techniques to represent the board in a text format and interpreted ChatGPT's response as a move on the chessboard. I did the project out of curiosity to explore the limitations of LLMs in reasoning."
   },
   {
     "title": "AskVisionOS",
     "year": "2023",
-    "tags": ["OpenAI", "OpenAI-Plugin", "Prompt Engineering"],
+    "tags": ["OpenAI", "OpenAI-Plugin", "Prompt Engineering", "Prototype"],
     "description": "After Apple announced the Vision Pro, my curiosity led me to watch all the videos about Vision OS. I then developed a plugin using the information I gathered from Apple to answer my own questions about Vision OS. Right now, it's just for my private use and I haven't released it yet."
-  },
-  {
-    "title": "biddz",
-    "year": "2022",
-    "type": "Cross Platform Application",
-    "tags": ["Music", "Blockchain", "FastAPI", "React Native"],
-    "description": "biddz is a platform aimed at fostering a closer connection between music fans and artists. I helped the founders transform the idea into a product used by tens of thousands of users. We conceptualized, designed, and built the initial version while assembling a team to continue enhancing the product.",
-    "link": "https://www.biddz.io"
   },
   {
     "title": "M.Sc. Computational Social Systems",
@@ -51,6 +59,7 @@
   },
   {
     "title": "IT for Kids",
+    "year": "2017",
     "type": "Website Application",
     "tags": ["Design", "Web Development", "Education"],
     "description": "IT for Kids is a non-profit education partner for primary schools, promoting digital literacy and programming skills. Its mission is to enable all children to learn programming from primary school age. As a student at the University, I was responsible for conceptualising, designing, and building the IT for Kids website.",
@@ -58,7 +67,8 @@
   },
   {
     "title": "Zima",
-    "tags": ["Browser Extension", "Chrome-Plugin", "OpenAI", "Open Source", "React"],
+    "year": "2023",
+    "tags": ["Browser Extension", "Chrome-Plugin", "OpenAI", "Open Source", "React", "Prototype"],
     "description": "Zima is a browser extension enabling users to save and search their OpenAI chat transcripts.",
     "link": "https://github.com/soliblue/zima"
   }
