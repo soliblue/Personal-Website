@@ -9,7 +9,7 @@
       </div>
       <div v-for="project in filteredProjects" class="project" :key="project.id">
         <h2>{{ project.title }}</h2>
-        <p><span class="tag" v-for="tag in project.tags" :key="tag">{{ tag }}</span></p>
+        <p><span  class="tag" v-for="tag in project.tags" :class="{ selected: selectedTags.includes(tag) }" :key="tag" @click="toggleTag(tag)">{{ tag }}</span></p>
         <p>{{ project.description }}</p>
         <a :href="project.link" target="_blank" rel="noopener noreferrer">{{ project.link }}</a>
       </div>
