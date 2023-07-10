@@ -1,0 +1,94 @@
+[debug] [2023-07-09T22:38:42.671Z] ----------------------------------------------------------------------
+[debug] [2023-07-09T22:38:42.672Z] Command:       /Users/soli/.nvm/versions/node/v18.16.0/bin/node /Users/soli/.nvm/versions/node/v18.16.0/bin/firebase deploy
+[debug] [2023-07-09T22:38:42.672Z] CLI Version:   11.30.0
+[debug] [2023-07-09T22:38:42.672Z] Platform:      darwin
+[debug] [2023-07-09T22:38:42.672Z] Node Version:  v18.16.0
+[debug] [2023-07-09T22:38:42.673Z] Time:          Mon Jul 10 2023 00:38:42 GMT+0200 (Central European Summer Time)
+[debug] [2023-07-09T22:38:42.674Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2023-07-09T22:38:42.709Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2023-07-09T22:38:42.709Z] > authorizing via signed-in user (asoliman96@gmail.com)
+[debug] [2023-07-09T22:38:42.709Z] [iam] checking project personal-website-e63ac for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2023-07-09T22:38:42.710Z] > refreshing access token with scopes: []
+[debug] [2023-07-09T22:38:42.711Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2023-07-09T22:38:42.711Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2023-07-09T22:38:42.890Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2023-07-09T22:38:42.891Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2023-07-09T22:38:42.900Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/personal-website-e63ac:testIamPermissions [none]
+[debug] [2023-07-09T22:38:42.900Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/personal-website-e63ac:testIamPermissions x-goog-quota-user=projects/personal-website-e63ac
+[debug] [2023-07-09T22:38:42.900Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/personal-website-e63ac:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2023-07-09T22:38:43.858Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/personal-website-e63ac:testIamPermissions 200
+[debug] [2023-07-09T22:38:43.858Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/personal-website-e63ac:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2023-07-09T22:38:43.859Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/personal-website-e63ac [none]
+[debug] [2023-07-09T22:38:44.189Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/personal-website-e63ac 200
+[debug] [2023-07-09T22:38:44.189Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/personal-website-e63ac {"projectId":"personal-website-e63ac","projectNumber":"771751095859","displayName":"Soli's","name":"projects/personal-website-e63ac","resources":{"hostingSite":"personal-website-e63ac","storageBucket":"personal-website-e63ac.appspot.com","locationId":"europe-west"},"state":"ACTIVE","etag":"1_a71a23f3-0960-4499-ab9a-8857935063a0"}
+[info] 
+[info] === Deploying to 'personal-website-e63ac'...
+[info] 
+[info] i  deploying hosting 
+[debug] [2023-07-09T22:38:44.191Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/personal-website-e63ac/versions [none]
+[debug] [2023-07-09T22:38:44.191Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/personal-website-e63ac/versions {"status":"CREATED","labels":{"deployment-tool":"cli-firebase"}}
+[debug] [2023-07-09T22:38:45.329Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/personal-website-e63ac/versions 200
+[debug] [2023-07-09T22:38:45.329Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/personal-website-e63ac/versions {"name":"projects/771751095859/sites/personal-website-e63ac/versions/ae0b9f024915e865","status":"CREATED","config":{},"labels":{"deployment-tool":"cli-firebase"}}
+[info] i  hosting[personal-website-e63ac]: beginning deploy... 
+[info] i  hosting[personal-website-e63ac]: found 24 files in dist 
+[debug] [2023-07-09T22:38:45.338Z] [hosting] uploading with 200 concurrency
+[debug] [2023-07-09T22:38:45.429Z] [hosting] hash cache [ZGlzdA] stored for 24 files
+[debug] [2023-07-09T22:38:45.429Z] [hosting][hash queue][FINAL] {"max":85,"min":6,"avg":14.541666666666666,"active":0,"complete":24,"success":24,"errored":0,"retried":0,"total":24,"elapsed":89}
+[debug] [2023-07-09T22:38:45.429Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/771751095859/sites/personal-website-e63ac/versions/ae0b9f024915e865:populateFiles [none]
+[debug] [2023-07-09T22:38:45.429Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/771751095859/sites/personal-website-e63ac/versions/ae0b9f024915e865:populateFiles {"files":{"/static/css/app.ada540b15ddaa4a65f044bb9c2587528.css":"e656b121ee264bb7549541b39631e758bf987c0a76e2176829352e098e464847","/index.html":"225265347aa92928c572867b5b07d64018d950b73c7649efd65a7e0f4e3587c0","/static/css/app.ada540b15ddaa4a65f044bb9c2587528.css.map":"b67034d85e66e4f8832867adf5aeab6ce0b622d7fb725d5eacecd35e73ab9b80","/static/favicon/android-chrome-192x192.png":"b9f671c8ffdad1f47a6182eb0ab73643999257f885597727205c1aa6eaf92ec3","/static/favicon/apple-touch-icon.png":"2f375c380550dfc3f6f668ea3477005949e3d557b2af49dfcb9d9ab2118373f2","/static/favicon/favicon-16x16.png":"d755dccf8d1d9665f9046332c132b4639a279ea95049fc22f6f873f731d13061","/static/favicon/favicon-32x32.png":"fd5494ed7201751fdc8d6e256de7d3327cb9c10dc743aa86426ab7212b158231","/static/favicon/browserconfig.xml":"0750e3233b48515b59dcbc5b36e64eafbeb9e346e083d5450cabcd5ae7b179f8","/static/favicon/favicon.png":"fd5494ed7201751fdc8d6e256de7d3327cb9c10dc743aa86426ab7212b158231","/static/favicon/site.webmanifest":"8077602a41c2dd346601f2c34738371a2cc544c41c5d1cb8eb757c98b759bf7f","/static/favicon/safari-pinned-tab.svg":"90f6de36bf73024fa50d0b1aa185ac8e9928561a968d018d0f9ee678439b6059","/static/favicon/favicon.ico":"2ff0e1cd37095863fd8e102c5f768f617e41c6fd847dc4a57cdf39937cbf84ea","/static/js/manifest.2ae2e69a05c33dfc65f8.js":"3f771fa490335b2de2ae7615f79fd6b0609c03728f6d1884741069ae77344b74","/static/js/manifest.2ae2e69a05c33dfc65f8.js.map":"41982f89236114ec0b9ee34f59157a8ed7171053004ec43217a59fa5246c44c6","/static/og-image.jpeg":"d1e1438d18d89bd372e8de9294c8cf45f915d8abb347d0d51e103c0c95187c63","/static/img/twitter.212959f.png":"e871ed5edf5a38afdbcbf4741d7781e0d09adb443082b0358ee9d544d3daef0e","/static/favicon/android-chrome-512x512.png":"eef53f136ee3fffea29a44d5304a95ad64646c92b585d181129b5f50efc22e2e","/static/js/vendor.a9a7a9afd39ad5c28c25.js":"da05d651af29093c2282f1d6009a4b72b854b09f5cc1cd07c005495747b53e78","/static/img/instagram.4ac7ac8.png":"fe57531f3e2758cb2ba75d7e3c99f17f8bf159c1936f43fd81f302fa8abcae53","/static/favicon/adaptive-icon.png":"46399fc7c2f7a3f99fb73250f1c3e48dfaf7431a6afa7023a9640da7d826beee","/static/favicon/icon.png":"46399fc7c2f7a3f99fb73250f1c3e48dfaf7431a6afa7023a9640da7d826beee","/static/js/app.2b556f7553103cd7e2bf.js":"e7a92dfec8506cb78906e6e29b897a5d186fd477fef11b26c8372a18d5fe238c","/static/js/app.2b556f7553103cd7e2bf.js.map":"0d911eb3f96c9c1b0cee3dcd44a2c4c7c7e5c178511474dd18f7503084517700","/static/js/vendor.a9a7a9afd39ad5c28c25.js.map":"0e3bc1127f660aed523577de7f3252ce7a5055cab7ad290e861196f54258d100"}}
+[debug] [2023-07-09T22:38:46.368Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/771751095859/sites/personal-website-e63ac/versions/ae0b9f024915e865:populateFiles 200
+[debug] [2023-07-09T22:38:46.368Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/771751095859/sites/personal-website-e63ac/versions/ae0b9f024915e865:populateFiles {"uploadRequiredHashes":["41982f89236114ec0b9ee34f59157a8ed7171053004ec43217a59fa5246c44c6","e7a92dfec8506cb78906e6e29b897a5d186fd477fef11b26c8372a18d5fe238c","e656b121ee264bb7549541b39631e758bf987c0a76e2176829352e098e464847","0d911eb3f96c9c1b0cee3dcd44a2c4c7c7e5c178511474dd18f7503084517700","225265347aa92928c572867b5b07d64018d950b73c7649efd65a7e0f4e3587c0","b67034d85e66e4f8832867adf5aeab6ce0b622d7fb725d5eacecd35e73ab9b80"],"uploadUrl":"https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/ae0b9f024915e865/files"}
+[debug] [2023-07-09T22:38:46.369Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/ae0b9f024915e865/files/41982f89236114ec0b9ee34f59157a8ed7171053004ec43217a59fa5246c44c6 [none]
+[debug] [2023-07-09T22:38:46.369Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/ae0b9f024915e865/files/41982f89236114ec0b9ee34f59157a8ed7171053004ec43217a59fa5246c44c6 [stream]
+[debug] [2023-07-09T22:38:46.370Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/ae0b9f024915e865/files/e7a92dfec8506cb78906e6e29b897a5d186fd477fef11b26c8372a18d5fe238c [none]
+[debug] [2023-07-09T22:38:46.370Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/ae0b9f024915e865/files/e7a92dfec8506cb78906e6e29b897a5d186fd477fef11b26c8372a18d5fe238c [stream]
+[debug] [2023-07-09T22:38:46.371Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/ae0b9f024915e865/files/e656b121ee264bb7549541b39631e758bf987c0a76e2176829352e098e464847 [none]
+[debug] [2023-07-09T22:38:46.371Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/ae0b9f024915e865/files/e656b121ee264bb7549541b39631e758bf987c0a76e2176829352e098e464847 [stream]
+[debug] [2023-07-09T22:38:46.372Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/ae0b9f024915e865/files/0d911eb3f96c9c1b0cee3dcd44a2c4c7c7e5c178511474dd18f7503084517700 [none]
+[debug] [2023-07-09T22:38:46.372Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/ae0b9f024915e865/files/0d911eb3f96c9c1b0cee3dcd44a2c4c7c7e5c178511474dd18f7503084517700 [stream]
+[debug] [2023-07-09T22:38:46.373Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/ae0b9f024915e865/files/225265347aa92928c572867b5b07d64018d950b73c7649efd65a7e0f4e3587c0 [none]
+[debug] [2023-07-09T22:38:46.373Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/ae0b9f024915e865/files/225265347aa92928c572867b5b07d64018d950b73c7649efd65a7e0f4e3587c0 [stream]
+[debug] [2023-07-09T22:38:46.374Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/ae0b9f024915e865/files/b67034d85e66e4f8832867adf5aeab6ce0b622d7fb725d5eacecd35e73ab9b80 [none]
+[debug] [2023-07-09T22:38:46.374Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/ae0b9f024915e865/files/b67034d85e66e4f8832867adf5aeab6ce0b622d7fb725d5eacecd35e73ab9b80 [stream]
+[debug] [2023-07-09T22:38:46.375Z] [hosting][populate queue][FINAL] {"max":942,"min":942,"avg":942,"active":0,"complete":1,"success":1,"errored":0,"retried":0,"total":1,"elapsed":948}
+[debug] [2023-07-09T22:38:46.375Z] [hosting] uploads queued: 6
+[debug] [2023-07-09T22:38:47.848Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/ae0b9f024915e865/files/b67034d85e66e4f8832867adf5aeab6ce0b622d7fb725d5eacecd35e73ab9b80 200
+[debug] [2023-07-09T22:38:47.848Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/ae0b9f024915e865/files/b67034d85e66e4f8832867adf5aeab6ce0b622d7fb725d5eacecd35e73ab9b80 [stream]
+[debug] [2023-07-09T22:38:47.857Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/ae0b9f024915e865/files/e656b121ee264bb7549541b39631e758bf987c0a76e2176829352e098e464847 200
+[debug] [2023-07-09T22:38:47.858Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/ae0b9f024915e865/files/e656b121ee264bb7549541b39631e758bf987c0a76e2176829352e098e464847 [stream]
+[debug] [2023-07-09T22:38:47.875Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/ae0b9f024915e865/files/41982f89236114ec0b9ee34f59157a8ed7171053004ec43217a59fa5246c44c6 200
+[debug] [2023-07-09T22:38:47.876Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/ae0b9f024915e865/files/41982f89236114ec0b9ee34f59157a8ed7171053004ec43217a59fa5246c44c6 [stream]
+[debug] [2023-07-09T22:38:48.104Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/ae0b9f024915e865/files/225265347aa92928c572867b5b07d64018d950b73c7649efd65a7e0f4e3587c0 200
+[debug] [2023-07-09T22:38:48.104Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/ae0b9f024915e865/files/225265347aa92928c572867b5b07d64018d950b73c7649efd65a7e0f4e3587c0 [stream]
+[debug] [2023-07-09T22:38:49.027Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/ae0b9f024915e865/files/0d911eb3f96c9c1b0cee3dcd44a2c4c7c7e5c178511474dd18f7503084517700 200
+[debug] [2023-07-09T22:38:49.027Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/ae0b9f024915e865/files/0d911eb3f96c9c1b0cee3dcd44a2c4c7c7e5c178511474dd18f7503084517700 [stream]
+[debug] [2023-07-09T22:38:49.027Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/ae0b9f024915e865/files/e7a92dfec8506cb78906e6e29b897a5d186fd477fef11b26c8372a18d5fe238c 200
+[debug] [2023-07-09T22:38:49.027Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/ae0b9f024915e865/files/e7a92dfec8506cb78906e6e29b897a5d186fd477fef11b26c8372a18d5fe238c [stream]
+[debug] [2023-07-09T22:38:49.028Z] [hosting][upload queue][FINAL] {"max":2658,"min":1479,"avg":1921.1666666666667,"active":0,"complete":6,"success":6,"errored":0,"retried":0,"total":6,"elapsed":2660}
+[info] ✔  hosting[personal-website-e63ac]: file upload complete 
+[debug] [2023-07-09T22:38:49.028Z] [hosting] deploy completed after 3698ms
+[debug] [2023-07-09T22:38:49.028Z] [
+  {
+    "config": {
+      "public": "dist",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "site": "personal-website-e63ac"
+    },
+    "version": "projects/771751095859/sites/personal-website-e63ac/versions/ae0b9f024915e865"
+  }
+]
+[info] i  hosting[personal-website-e63ac]: finalizing version... 
+[debug] [2023-07-09T22:38:49.029Z] >>> [apiv2][query] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/personal-website-e63ac/versions/ae0b9f024915e865 updateMask=status%2Cconfig
+[debug] [2023-07-09T22:38:49.029Z] >>> [apiv2][body] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/personal-website-e63ac/versions/ae0b9f024915e865 {"status":"FINALIZED","config":{}}
+[debug] [2023-07-09T22:38:49.901Z] <<< [apiv2][status] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/personal-website-e63ac/versions/ae0b9f024915e865 200
+[debug] [2023-07-09T22:38:49.901Z] <<< [apiv2][body] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/personal-website-e63ac/versions/ae0b9f024915e865 {"name":"projects/771751095859/sites/personal-website-e63ac/versions/ae0b9f024915e865","status":"FINALIZED","config":{},"labels":{"deployment-tool":"cli-firebase"},"createTime":"2023-07-09T22:38:45.023413Z","createUser":{"email":"asoliman96@gmail.com"},"finalizeTime":"2023-07-09T22:38:49.839605Z","finalizeUser":{"email":"asoliman96@gmail.com"}}
+[debug] [2023-07-09T22:38:49.901Z] [hosting] finalized version for personal-website-e63ac:[object Object]
+[info] ✔  hosting[personal-website-e63ac]: version finalized 
+[info] i  hosting[personal-website-e63ac]: releasing new version... 
+[debug] [2023-07-09T22:38:49.902Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/personal-website-e63ac/channels/live/releases versionName=projects%2F771751095859%2Fsites%2Fpersonal-website-e63ac%2Fversions%2Fae0b9f024915e865
+[debug] [2023-07-09T22:38:49.902Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/personal-website-e63ac/channels/live/releases {}

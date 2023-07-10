@@ -1,7 +1,14 @@
 # Vue.js Personal Website
 
-This repository contains the source code for a personal website developed using Vue.js. The website was created as a learning project to explore the capabilities of this popular JavaScript framework. The website is hosted at https://soliman.life and showcases some of the skills and techniques I have learned while working with Vue.js.
+Welcome to the repository for my personal website, hosted at https://soli.blue. This website serves as a space where I share my projects and experiences. It's developed using Vue.js, a popular JavaScript framework.
 
+## About the Website
+
+The website showcases a variety of projects I've worked on, ranging from AI applications to web development and data analysis. Each project is a testament to my passion for learning and discovery, and the joy I find in answering intriguing questions through technology.
+
+## Running the Website Locally
+
+If you'd like to run the website locally, follow these steps:
 
 ``` bash
 # install dependencies
@@ -15,6 +22,3 @@ npm run build
 
 # build for production and view the bundle analyzer report
 npm run build --report
-```
-
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
