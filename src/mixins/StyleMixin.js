@@ -116,6 +116,11 @@ const styles = `
 `;
 
 export default {
+  data() {
+    return {
+      animationTimeout: null,
+    };
+  },
   methods: {
     processStyles(animation = false) {
       let processedStyles = '';
@@ -142,24 +147,27 @@ export default {
         document.getElementById('style-tag').appendChild(document.createTextNode(char));
       };
 
+      const writeStyles = (message, index = 0) => {
+        if (index < message.length) {
+          document.getElementById('style-text').scrollTop = document.getElementById('style-text').scrollHeight;
+          writeStyleChar(message[index++]);
+
+          this.animationTimeout = setTimeout(() => {
+            writeStyles(message, index);
+          }, 10);
+        }
+      };
+
       if (animation) {
-        const writeStyles = (message, index = 0) => {
-          if (index < message.length) {
-            document.getElementById('style-text').scrollTop = document.getElementById('style-text').scrollHeight;
-            writeStyleChar(message[index++]);
-
-            setTimeout(() => {
-              writeStyles(message, index);
-            }, 10);
-          }
-        };
-
         writeStyles(styles);
       } else {
         for (let i = 0; i < styles.length; i++) {
           writeStyleChar(styles[i]);
         }
       }
+    },
+    stopAnimation() {
+      clearTimeout(this.animationTimeout);
     },
   },
 };

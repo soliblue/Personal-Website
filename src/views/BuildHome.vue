@@ -10,7 +10,14 @@ export default {
   name: 'BuildHome',
   mixins: [StyleMixin],
   mounted() {
-    this.processStyles(true);
+    if (performance.navigation.type === performance.navigation.TYPE_RELOAD) {
+      this.processStyles(true);
+    } else {
+      location.reload();
+    }
+  },
+  beforeDestroy() {
+    this.stopAnimation();
   },
   components: { BaseHome },
 };

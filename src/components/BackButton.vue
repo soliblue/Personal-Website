@@ -1,6 +1,6 @@
 <template>
   <div>
-    <router-link to="/home" class="back" :style="{ backgroundColor: backgroundColor }">
+    <router-link to="/" class="back" :style="{ backgroundColor: backgroundColor }">
       Back
     </router-link>
     <br>

@@ -25,16 +25,16 @@
       <div class="nav-links">
         <router-link to="/resume">Resume</router-link>
         &nbsp;
-        <router-link to="/pins">Pins</router-link>
-        &nbsp;
         <router-link to="/projects">Projects</router-link>
+        &nbsp;
+        <router-link to="/pins">Pins</router-link>
       </div>
       <br>
       <pre id="style-text" class="css-code" />
       <br>
       <div class="controls">
-        <a href="/">Restart Animation</a>
-        <router-link to="/home">Skip</router-link>
+        <a href="/#/animation">Play Animation</a>
+        <router-link to="/">Skip</router-link>
       </div>
     </div>
 </template>

@@ -13,7 +13,7 @@ export default new Router({
   routes: [
 
     {
-      path: '/home',
+      path: '/',
       name: 'Home',
       component: Home,
     },
@@ -38,7 +38,7 @@ export default new Router({
       component: Projects,
     },
     {
-      path: '/',
+      path: '/animation',
       name: 'BuildHome',
       component: BuildHome,
     },
