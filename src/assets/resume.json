@@ -4,6 +4,7 @@
         "title":"Chief Technology Officer",
         "subtitle":"biddz",
         "url": "https://biddz.io",
+        "logo": "biddz.png",
         "location":"Berlin, Germany",
         "start":"Sep 2021",
         "end":"Present"
@@ -12,6 +13,7 @@
         "title":"DACH Marketplace Operations Manager",
         "subtitle":"Uber",
         "url": "https://uber.com",
+        "logo": "uber.jpeg",
         "location":"Berlin, Germany",
         "start":"Sep 2019",
         "end":"Aug 2021"
@@ -19,6 +21,7 @@
      {
         "title":"Research Assistant",
         "subtitle":"RWTH Aachen, Chair for Computational Social Sciences",
+        "logo": "rwth.png",
         "url": "https://cssh.rwth-aachen.de/",
         "location":"Aachen, Germany",
         "start":"Sep 2017",
@@ -27,6 +30,7 @@
      {
         "title":"Data Scientist",
         "subtitle":"Polarstern Education",
+        "logo": "polarstern.png",
         "url": "https://polarstern-education.com/",
         "location":"Aachen, Germany",
         "start":"Dec 2018",
@@ -37,6 +41,7 @@
      {
         "title":"Bachelor of Science - Computer Science",
         "subtitle":"RWTH Aachen University",
+        "logo": "rwth.png",
         "url": "https://www.rwth-aachen.de/",
         "location":"Aachen, Germany",
         "start":"October 2014",
@@ -45,6 +50,7 @@
      {
         "title":"Master of Science - Computer Science",
         "subtitle":"RWTH Aachen University",
+        "logo": "rwth.png",
         "url": "https://www.rwth-aachen.de/",
         "location":"Aachen, Germany",
         "start":"October 2018",
