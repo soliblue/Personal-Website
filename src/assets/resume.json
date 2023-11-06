@@ -1,74 +1,78 @@
 {
-  "experience":[
-     {
-        "title":"Chief Technology Officer",
-        "subtitle":"biddz",
-        "url": "https://biddz.io",
-        "logo": "biddz.png",
-        "location":"Berlin, Germany",
-        "start":"Sep 2021",
-        "end":"Present"
-     },
-     {
-        "title":"DACH Marketplace Operations Manager",
-        "subtitle":"Uber",
-        "url": "https://uber.com",
-        "logo": "uber.jpeg",
-        "location":"Berlin, Germany",
-        "start":"Sep 2019",
-        "end":"Aug 2021"
-     },
-     {
-        "title":"Research Assistant",
-        "subtitle":"RWTH Aachen, Chair for Computational Social Sciences",
-        "logo": "rwth.png",
-        "url": "https://cssh.rwth-aachen.de/",
-        "location":"Aachen, Germany",
-        "start":"Sep 2017",
-        "end":"Aug 2019"
-     },
-     {
-        "title":"Data Scientist",
-        "subtitle":"Polarstern Education",
-        "logo": "polarstern.png",
-        "url": "https://polarstern-education.com/",
-        "location":"Aachen, Germany",
-        "start":"Dec 2018",
-        "end":"Aug 2019"
-     }
+  "experience": [
+    {
+      "title": "Chief Technology Officer",
+      "subtitle": "biddz",
+      "url": "https://biddz.io",
+      "logo": "biddz.png",
+      "location": "Berlin, Germany",
+      "start": "Sep 2021",
+      "end": "Present"
+    },
+    {
+      "title": "DACH Marketplace Operations Manager",
+      "subtitle": "Uber",
+      "url": "https://uber.com",
+      "logo": "uber.jpeg",
+      "location": "Berlin, Germany",
+      "start": "Sep 2019",
+      "end": "Aug 2021"
+    },
+    {
+      "title": "Research Assistant",
+      "subtitle": "RWTH Aachen, Chair for Computational Social Sciences",
+      "logo": "rwth.png",
+      "url": "https://cssh.rwth-aachen.de/",
+      "location": "Aachen, Germany",
+      "start": "Sep 2017",
+      "end": "Aug 2019"
+    },
+    {
+      "title": "Data Scientist",
+      "subtitle": "Polarstern Education",
+      "logo": "polarstern.png",
+      "url": "https://polarstern-education.com/",
+      "location": "Aachen, Germany",
+      "start": "Dec 2018",
+      "end": "Aug 2019"
+    }
   ],
-  "education":[
-     {
-        "title":"Bachelor of Science - Computer Science",
-        "subtitle":"RWTH Aachen University",
-        "logo": "rwth.png",
-        "url": "https://www.rwth-aachen.de/",
-        "location":"Aachen, Germany",
-        "start":"October 2014",
-        "end":"August 2018"
-     },
-     {
-        "title":"Master of Science - Computer Science",
-        "subtitle":"RWTH Aachen University",
-        "logo": "rwth.png",
-        "url": "https://www.rwth-aachen.de/",
-        "location":"Aachen, Germany",
-        "start":"October 2018",
-        "end":"Present"
-     }
+  "education": [
+    {
+      "title": "Bachelor of Science - Computer Science",
+      "subtitle": "RWTH Aachen University",
+      "logo": "rwth.png",
+      "url": "https://www.rwth-aachen.de/",
+      "location": "Aachen, Germany",
+      "start": "October 2014",
+      "end": "August 2018"
+    },
+    {
+      "title": "Master of Science - Computer Science",
+      "subtitle": "RWTH Aachen University",
+      "logo": "rwth.png",
+      "url": "https://www.rwth-aachen.de/",
+      "location": "Aachen, Germany",
+      "start": "October 2018",
+      "end": "Present"
+    }
   ],
-  "languages":[
-     {
-        "name":"Arabic",
-        "level":"Native"
-     },
-     {
-        "name":"German",
-        "level":"Fluent"
-     },
-     {
-        "name":"English",
-        "level":"Fluent"
-     }
+  "languages": [
+    {
+      "name": "Arabic",
+      "level": "Native"
+    },
+    {
+      "name": "German",
+      "level": "Fluent"
+    },
+    {
+      "name": "English",
+      "level": "Fluent"
+    },
+    {
+      "name": "Spanish",
+      "level": "B1"
+    }
   ]
 }

@@ -1,5 +1,13 @@
 [
   {
+    "title": "happy - Birthdays Reminder App",
+    "year": "2023",
+    "type": "iOS Application",
+    "tags": ["SwiftUI", "iOS", "Apple Widgets", "Apple Watch"],
+    "description": "Like many, I once relied on Facebook to remind me of friends' birthdays. But as time went on and my usage of Facebook diminished, I found myself missing out on these special occasions. Alternative solutions like calendars, reminders and apps didn't quite capture the simplicity I was looking for. That sparked an idea: Why not craft an app tailored for this very need? Thus, happy was born.",
+    "link": "https://apple.co/3FJD3eX"
+  },
+  {
     "title": "Piasso",
     "year": "2023",
     "type": "Cross Platform Application",
