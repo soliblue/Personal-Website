@@ -12,4 +12,8 @@ new Vue({
   router,
   components: { App },
   template: '<App/>',
+  mounted() {
+    // Emit the event that the prerendering is waiting for
+    document.dispatchEvent(new Event('render-event'));
+  },
 });
