@@ -11,8 +11,8 @@
         <a href="https://github.com/soliblue" target="_blank">
           <img src="../assets/github.png" class="social-links" >
         </a>
-        <a href="https://www.linkedin.com/in/asoliman96/" target="_blank">
-          <img src="../assets/linkedin.png" class="social-links" >
+        <a href="https://manifold.markets/Soli" target="_blank">
+          <img src="../assets/manifold.png" class="social-links" >
         </a>
         <a href="https://www.instagram.com/soli__/" target="_blank">
           <img src="../assets/instagram.png" class="social-links" >
