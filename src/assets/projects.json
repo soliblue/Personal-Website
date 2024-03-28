@@ -8,6 +8,13 @@
     "link": "https://apple.co/3FJD3eX"
   },
   {
+    "title": "SongGPT",
+    "year": "2023",
+    "tags": ["Music", "Open Source", "OpenAI", "React Native", "FastAPI", "Firebase", "Prompt Engineering"],
+    "description": "SongGPT is one of my favorite side projects. It allowed me to explore the potential of LLMs in generating music compositions. Through this project, I learned a lot about prompt engineering, machine-generated artificial sounds, and good user experience design. The app allows users to generate a song from any text, such as a poem, lyrics, or a quote, or by selecting a color using the picker.",
+    "link": "https://songgpt.soli.blue/"
+  },
+  {
     "title": "Piasso",
     "year": "2023",
     "type": "Cross Platform Application",
@@ -30,13 +37,6 @@
     "tags": ["Design", "Web Development", "Education"],
     "description": "The group works on understanding social systems and modeling human behavior using computational methods. As the 4th member to join, I was responsible for the conceptualisation, design, and development of the website and also built various tools to automate the correction of student assignments.",
     "link": "https://cssh.rwth-aachen.de/"
-  },
-  {
-    "title": "SongGPT",
-    "year": "2023",
-    "tags": ["Music", "Open Source", "OpenAI", "React Native", "FastAPI", "Firebase", "Prompt Engineering"],
-    "description": "SongGPT is one of my favorite side projects. It allowed me to explore the potential of LLMs in generating music compositions. Through this project, I learned a lot about prompt engineering, machine-generated artificial sounds, and good user experience design. The app allows users to generate a song from any text, such as a poem, lyrics, or a quote, or by selecting a color using the picker.",
-    "link": "https://songgpt.xyz/"
   },
   {
     "title": "Custom BlueSky Client",

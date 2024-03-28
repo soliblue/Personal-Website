@@ -14,6 +14,9 @@
         <a href="https://manifold.markets/Soli" target="_blank">
           <img src="../assets/manifold.png" class="social-links" >
         </a>
+        <a href="https://www.pinterest.com/SoliPins" target="_blank">
+          <img src="../assets/pinterest.png" class="social-links" >
+        </a>
         <a href="https://www.instagram.com/soli__/" target="_blank">
           <img src="../assets/instagram.png" class="social-links" >
         </a>
