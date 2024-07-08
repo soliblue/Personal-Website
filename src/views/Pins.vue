@@ -54,7 +54,7 @@ export default {
 }
 
 .cover {
-  width: 150px;
+  width: 75px;
   margin-right: 20px;
 }
 
