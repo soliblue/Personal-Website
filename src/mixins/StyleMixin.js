@@ -3,40 +3,37 @@
 const styles = `
 /*
  * hi there!
- *
  * this page looks weird, doesn't it?
- *
  * let's fix it while I tell you a bit about myself...
  *
 */
 
 * {
- -webkit-transition: all 1s;
- transition: all 1s;
- will-change: auto;
+  -webkit-transition: all 1s;
+  transition: all 1s;
+  will-change: auto;
 }
 
 /*
- * this didn't do much, did it?
- *
- * well, i'm soli. born and raised in egypt.
- *
+ * this didn't do much...
+ * well, i'm soli, born and raised in egypt
  * i moved to germany in 2014 to study computer science
  *
 */
 
 .css-code {
- color: #a6c3d4;
- background: #1e2838;
- padding: 24px 12px;
- box-shadow: 0px 4px 0px 2px rgba(0,0,0,0.1);
- width: min(75%, 750px);
+  color: #a6c3d4;
+  background: #1e2838;
+  padding: 24px 12px;
+  box-shadow: 0px 4px 0px 2px rgba(0,0,0,0.1);
+  width: min(75%, 750px);
 }
 
 /*
  * nice, this seems to be working
+ * i worked in academia, uber, startups and now..
+ * i am in exploration mode
  *
- * i worked in academia, uber, startups and now i am in exploration mode
  *
  * let's make this code more readable
  *
@@ -45,19 +42,17 @@ const styles = `
 .comment { color: #5d8aa8; }
 .selector { color: #6495ed; }
 .key { color: #87ceeb; }
-.value { color: #4682b4; }
+.value { color: #ffffff; }
 
 /*
  * if i had to pick one thing i'm good at,
- *
- * it would probably be building mvps for startups.
- *
+ * it would probably be building mvps for startups
  *
 */
 
 .content {
- text-align: center;
- padding-top: 20px;
+  text-align: center;
+  padding-top: 20px;
 }
 
 /*
@@ -71,21 +66,19 @@ const styles = `
 .name > span:nth-child(4) { color: #000080; }
 
 /*
- * outside of work, i love my family, friends and sports.
+ * outside of work, i love my family, friends and sports
  *
- * lastly we style those links.
- *
- */
+*/
 
 .nav-links > a {
- color: #a6c3d4;
- padding: 0 25px;
- font-size: 12px;
- font-weight: 600;
- letter-spacing: .1rem;
- text-decoration: none;
- text-transform: uppercase;
- border-bottom-style: solid;
+  color: #a6c3d4;
+  padding: 0 25px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .1rem;
+  text-decoration: none;
+  text-transform: uppercase;
+  border-bottom-style: solid;
 }
 
 .nav-links > a:nth-child(1) { border-bottom-color: #87ceeb; }
@@ -94,10 +87,8 @@ const styles = `
 
 /*
  * there you have it!
- *
- * a bit about me, and a styled page.
- *
- * hope you enjoyed this....
+ * a bit about me, and a styled page
+ * hope you enjoyed this...
  *
  */
 `;
@@ -138,9 +129,19 @@ export default {
         if (index < message.length) {
           document.getElementById('style-text').scrollTop = document.getElementById('style-text').scrollHeight;
           writeStyleChar(message[index++]);
-          this.animationTimeout = setTimeout(() => {
-            writeStyles(message, index);
-          }, 25);
+
+          // Check if we're in a comment and at the end of a line
+          if (openComment && (message[index] === '\n' || index === message.length)) {
+            // If it's the end of a comment line, pause for a second
+            this.animationTimeout = setTimeout(() => {
+              writeStyles(message, index);
+            }, 500);
+          } else {
+            // Otherwise, continue with the normal speed
+            this.animationTimeout = setTimeout(() => {
+              writeStyles(message, index);
+            }, 15);
+          }
         }
       };
 
