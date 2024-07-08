@@ -1,7 +1,7 @@
 <template>
   <div class="content">
       <h2 class="name">
-        <span>S</span>
+        <span>s</span>
         <span>o</span>
         <span>l</span>
         <span>i</span>
@@ -20,18 +20,18 @@
       </div>
       <br>
       <div class="nav-links">
-        <router-link to="/resume">Resume</router-link>
+        <router-link to="/resume">resume</router-link>
         &nbsp;
-        <router-link to="/projects">Side Projects</router-link>
+        <router-link to="/projects">side-projects</router-link>
         &nbsp;
-        <router-link to="/pins">Pins</router-link>
+        <router-link to="/pins">pins</router-link>
       </div>
       <br>
       <pre id="style-text" class="css-code" />
       <br>
       <div class="controls">
-        <a href="/#/animation">Play Animation</a>
-        <router-link to="/">Skip</router-link>
+        <a href="/#/animation">play</a>
+        <router-link to="/">skip</router-link>
       </div>
     </div>
 </template>

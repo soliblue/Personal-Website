@@ -38,30 +38,18 @@ export default {
 <style scoped>
 .pin-card-container {
   margin: auto;
-  padding: 3vh;
+  padding: 1em;
 }
 
 .pin-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   max-width: 500px;
   margin: auto;
-  padding: 3vh;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  font-size: 1.2em;
-  background-color: #fff;
-  transition: transform .75s;
-}
-
-.pin-card:hover {
-  transform: scale(1.05);
+  padding: 1em;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .book-content {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
   width: 100%;
 }
 

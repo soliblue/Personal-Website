@@ -39,7 +39,7 @@ const styles = `
  *
 */
 
-.comment { color: #5d8aa8; }
+.comment { color: #bebebe; }
 .selector { color: #6495ed; }
 .key { color: #87ceeb; }
 .value { color: #ffffff; }
@@ -77,7 +77,6 @@ const styles = `
   font-weight: 600;
   letter-spacing: .1rem;
   text-decoration: none;
-  text-transform: uppercase;
   border-bottom-style: solid;
 }
 
