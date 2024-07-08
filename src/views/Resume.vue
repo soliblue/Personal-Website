@@ -40,7 +40,7 @@ export default {
   data() {
     return {
       sections: [
-        { title: 'Experience', items: resume.experience },
+        { title: 'Work', items: resume.experience },
         { title: 'Education', items: resume.education },
       ],
       languages: resume.languages,
@@ -62,10 +62,9 @@ export default {
 
 .content {
   padding: 5vw;
-  border: solid;
   text-align: left;
-  max-width: 1000px;
-  margin: 50px auto 0 auto;
+  max-width: 750px;
+  margin: 0px auto 0 auto;
 }
 
 .language {
@@ -73,7 +72,7 @@ export default {
 }
 
 .seperator {
-  border-top: solid;
+  border-top: solid 1px;
   width: 100%;
   margin: 2vh 0 2vh 0;
 }

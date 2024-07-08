@@ -6,11 +6,6 @@
       I enjoy coding on my nights & weekends. I build stuff for fun or to learn how to use a library or language. Most, if not all, of the projects here should be seen as fun prototypes that sometimes made it a bit further than that.
     </p>
   </div>
-    <!-- <div class="filter-tags">
-      <span v-for="tag in allTags" :key="tag" class="tag" :class="{ selected: selectedTags.includes(tag) }" @click="toggleTag(tag)">
-        {{ tag }}
-      </span>
-    </div> -->
     <div v-for="project in filteredProjects" class="project" :key="project.id">
       <h2>{{ project.title }}</h2>
       <p>
@@ -63,7 +58,7 @@ export default {
 
 <style scoped>
 .disclaimer {
-  max-width: 500px;
+  max-width: 750px;
   margin: auto;
   padding: 0.5em 0.5em 0.5em 1em;
   text-align: left;
@@ -72,7 +67,7 @@ export default {
 }
 
 .project, .filter-tags {
-  max-width: 500px;
+  max-width: 750px;
   margin: auto;
   padding: 1em;
 }
