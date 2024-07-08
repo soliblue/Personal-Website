@@ -1,120 +1,108 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-plusplus */
-
 const styles = `
 /*
+ * hi there!
  *
- * ⚠  ⚠  Over here!  ⚠  ⚠
+ * this page looks weird, doesn't it?
  *
- * hmmmm
- *
- * What is wrong with this page?
- *
- * Looks weird!
- *
- * Let's make it right.
- *
- * We will write styling code in this box
- *
- * and then inject it directly into the browser.
- *
- * Confused? Watch!
+ * let's fix it while I tell you a bit about myself...
  *
 */
 
 * {
-  -webkit-transition: all 1s;
+ -webkit-transition: all 1s;
+ transition: all 1s;
+ will-change: auto;
 }
 
 /*
+ * this didn't do much, did it?
  *
- * Hmm, well that didn't seem to do much.
+ * well, i'm soli. born and raised in egypt.
+ *
+ * i moved to germany in 2014 to study computer science
  *
 */
 
 .css-code {
-  color: #a6c3d4;
-  background: #313744;
-  padding: 24px 12px;
-  box-shadow: 0px 4px 0px 2px rgba(0,0,0,0.1);
-  width:min(75%,750px);
+ color: #a6c3d4;
+ background: #1e2838;
+ padding: 24px 12px;
+ box-shadow: 0px 4px 0px 2px rgba(0,0,0,0.1);
+ width: min(75%, 750px);
 }
 
 /*
+ * nice, this seems to be working
  *
- * WOW! Now it seems to be working.
+ * i worked in academia, uber, startups and now i am in exploration mode
  *
- * We moved our box to the center
- *
- * and added some colors to it.
- *
- * How about making this code more readable now?
+ * let's make this code more readable
  *
 */
 
-.comment       { color: #707e84; }
-.selector      { color: #c66c75; }
-.key           { color: #c7ccd4; }
-.value         { color: #d5927b; }
+.comment { color: #5d8aa8; }
+.selector { color: #6495ed; }
+.key { color: #87ceeb; }
+.value { color: #4682b4; }
 
 /*
+ * if i had to pick one thing i'm good at,
  *
- * Looks good enough for me.
+ * it would probably be building mvps for startups.
  *
- * Now, let's center the main content.
  *
 */
 
 .content {
-   text-align: center;
-   padding-top:20px;
+ text-align: center;
+ padding-top: 20px;
 }
 
 /*
- *
- * Next, we'll add some colors to my name.
+ * let's add some color to my name
  *
 */
 
-.name > span:nth-child(1) { color: #87CEEB; }
-.name > span:nth-child(2) { color: #1E90FF; }
-.name > span:nth-child(3) { color: #000080; }
-.name > span:nth-child(4) { color: #313744; }
+.name > span:nth-child(1) { color: #87ceeb; }
+.name > span:nth-child(2) { color: #1e90ff; }
+.name > span:nth-child(3) { color: #4169e1; }
+.name > span:nth-child(4) { color: #000080; }
 
 /*
+ * outside of work, i love my family, friends and sports.
  *
- * Lastly, we'll style the links.
+ * lastly we style those links.
  *
  */
 
 .nav-links > a {
-  color: #636b6f;
-  padding: 0 25px;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: .1rem;
-  text-decoration: none;
-  text-transform: uppercase;
-  border-bottom-style: solid;
+ color: #a6c3d4;
+ padding: 0 25px;
+ font-size: 12px;
+ font-weight: 600;
+ letter-spacing: .1rem;
+ text-decoration: none;
+ text-transform: uppercase;
+ border-bottom-style: solid;
 }
 
-.nav-links > a:nth-child(1) { border-bottom-color:#87CEEB; }
-.nav-links > a:nth-child(2) { border-bottom-color:#1E90FF; }
-.nav-links > a:nth-child(3) { border-bottom-color:#000080; }
+.nav-links > a:nth-child(1) { border-bottom-color: #87ceeb; }
+.nav-links > a:nth-child(2) { border-bottom-color: #00008075; }
+.nav-links > a:nth-child(3) { border-bottom-color: #4169e1; }
 
 /*
+ * there you have it!
  *
- * Nice!
+ * a bit about me, and a styled page.
  *
- * We did it!
- *
- * I hope you enjoyed this!
- *
- * Talk to you later!
+ * hope you enjoyed this....
  *
  */
 `;
 
+// The JavaScript part remains unchanged
 export default {
   data() {
     return {
@@ -142,7 +130,6 @@ export default {
         } else {
           processedStyles += char;
         }
-
         document.getElementById('style-text').innerHTML = processedStyles;
         document.getElementById('style-tag').appendChild(document.createTextNode(char));
       };
@@ -151,10 +138,9 @@ export default {
         if (index < message.length) {
           document.getElementById('style-text').scrollTop = document.getElementById('style-text').scrollHeight;
           writeStyleChar(message[index++]);
-
           this.animationTimeout = setTimeout(() => {
             writeStyles(message, index);
-          }, 10);
+          }, 25);
         }
       };
 

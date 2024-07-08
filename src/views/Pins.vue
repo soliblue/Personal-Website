@@ -1,6 +1,6 @@
 <template>
   <div class="animated fadeIn">
-    <BackButton backgroundColor="#1E90FF" />
+    <BackButton backgroundColor="#4169e1" />
     <div class="pin-card-container" v-for="pin in pins" :key="pin.id">
       <div class="pin-card">
         <div v-if="pin.type === 'quote'">

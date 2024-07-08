@@ -46,10 +46,12 @@ export default {
 <style scoped>
   .css-code {
     height: 40vh;
+    font-weight: lighter;
+    font-size: smaller;
     overflow-y: scroll;
   }
   .social-links {
     height: 25px;
-    padding: 1em;
+    padding: 0em 1em 0em 1em;
   }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <div class="animated fadeIn">
-    <BackButton backgroundColor="#000080" />
+    <BackButton backgroundColor="#00008075" />
     <div class="disclaimer">
     <p>
       I enjoy coding on my nights & weekends. I build stuff for fun or to learn how to use a library or language. Most, if not all, of the projects here should be seen as fun prototypes that sometimes made it a bit further than that.
