@@ -1,0 +1,90 @@
+[debug] [2024-07-08T06:05:50.053Z] ----------------------------------------------------------------------
+[debug] [2024-07-08T06:05:50.054Z] Command:       /Users/soli/.nvm/versions/node/v18.17.0/bin/node /Users/soli/.nvm/versions/node/v18.17.0/bin/firebase deploy
+[debug] [2024-07-08T06:05:50.054Z] CLI Version:   13.3.0
+[debug] [2024-07-08T06:05:50.055Z] Platform:      darwin
+[debug] [2024-07-08T06:05:50.055Z] Node Version:  v18.17.0
+[debug] [2024-07-08T06:05:50.057Z] Time:          Mon Jul 08 2024 08:05:50 GMT+0200 (Central European Summer Time)
+[debug] [2024-07-08T06:05:50.057Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2024-07-08T06:05:50.058Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[debug] [2024-07-08T06:05:50.113Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2024-07-08T06:05:50.113Z] > authorizing via signed-in user (asoliman96@gmail.com)
+[debug] [2024-07-08T06:05:50.113Z] [iam] checking project personal-website-e63ac for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2024-07-08T06:05:50.113Z] > refreshing access token with scopes: []
+[debug] [2024-07-08T06:05:50.114Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2024-07-08T06:05:50.114Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2024-07-08T06:05:50.263Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2024-07-08T06:05:50.264Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2024-07-08T06:05:50.278Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/personal-website-e63ac:testIamPermissions [none]
+[debug] [2024-07-08T06:05:50.279Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/personal-website-e63ac:testIamPermissions x-goog-quota-user=projects/personal-website-e63ac
+[debug] [2024-07-08T06:05:50.279Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/personal-website-e63ac:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2024-07-08T06:05:50.438Z] <<< [apiv2][status] GET https://firebase-public.firebaseio.com/cli.json 200
+[debug] [2024-07-08T06:05:50.438Z] <<< [apiv2][body] GET https://firebase-public.firebaseio.com/cli.json {"cloudBuildErrorAfter":1594252800000,"cloudBuildWarnAfter":1590019200000,"defaultNode10After":1594252800000,"minVersion":"3.0.5","node8DeploysDisabledAfter":1613390400000,"node8RuntimeDisabledAfter":1615809600000,"node8WarnAfter":1600128000000}
+[debug] [2024-07-08T06:05:50.993Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/personal-website-e63ac:testIamPermissions 200
+[debug] [2024-07-08T06:05:50.993Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/personal-website-e63ac:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2024-07-08T06:05:50.994Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/personal-website-e63ac [none]
+[debug] [2024-07-08T06:05:51.411Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/personal-website-e63ac 200
+[debug] [2024-07-08T06:05:51.411Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/personal-website-e63ac {"projectId":"personal-website-e63ac","projectNumber":"771751095859","displayName":"Soli's","name":"projects/personal-website-e63ac","resources":{"hostingSite":"personal-website-e63ac","storageBucket":"personal-website-e63ac.appspot.com","locationId":"europe-west"},"state":"ACTIVE","etag":"1_826cbe57-a6ed-4dee-88e0-14c54548a415"}
+[info] 
+[info] === Deploying to 'personal-website-e63ac'...
+[info] 
+[info] i  deploying hosting 
+[debug] [2024-07-08T06:05:51.413Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/personal-website-e63ac/versions [none]
+[debug] [2024-07-08T06:05:51.413Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/personal-website-e63ac/versions {"status":"CREATED","labels":{"deployment-tool":"cli-firebase"}}
+[debug] [2024-07-08T06:05:53.126Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/personal-website-e63ac/versions 200
+[debug] [2024-07-08T06:05:53.127Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/personal-website-e63ac/versions {"name":"projects/771751095859/sites/personal-website-e63ac/versions/4f1bdd14854e8d63","status":"CREATED","config":{},"labels":{"deployment-tool":"cli-firebase"}}
+[info] i  hosting[personal-website-e63ac]: beginning deploy... 
+[info] i  hosting[personal-website-e63ac]: found 29 files in dist 
+[debug] [2024-07-08T06:05:53.134Z] [hosting] uploading with 200 concurrency
+[debug] [2024-07-08T06:05:53.228Z] [hosting] hash cache [ZGlzdA] stored for 29 files
+[debug] [2024-07-08T06:05:53.228Z] [hosting][hash queue][FINAL] {"max":88,"min":2,"avg":11.655172413793103,"active":0,"complete":29,"success":29,"errored":0,"retried":0,"total":29,"elapsed":92}
+[debug] [2024-07-08T06:05:53.228Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/771751095859/sites/personal-website-e63ac/versions/4f1bdd14854e8d63:populateFiles [none]
+[debug] [2024-07-08T06:05:53.228Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/771751095859/sites/personal-website-e63ac/versions/4f1bdd14854e8d63:populateFiles {"files":{"/animation/index.html":"e660da3a69d5ec361739c43bdb95e0b9a568537b61fe531840ff8ebf2cf2c6e6","/pins/index.html":"e660da3a69d5ec361739c43bdb95e0b9a568537b61fe531840ff8ebf2cf2c6e6","/plugins/index.html":"e660da3a69d5ec361739c43bdb95e0b9a568537b61fe531840ff8ebf2cf2c6e6","/projects/index.html":"e660da3a69d5ec361739c43bdb95e0b9a568537b61fe531840ff8ebf2cf2c6e6","/resume/index.html":"e660da3a69d5ec361739c43bdb95e0b9a568537b61fe531840ff8ebf2cf2c6e6","/index.html":"72106cec79b3721d3666197bbacf60a5f5abb7f977ba2d593331ba236023c0a6","/static/css/app.c9bb43b4a68c0dfb5690df77fcf4d943.css":"3e84bf7ec77a270230cff63d416ea198ac4ad78e8d82b58d859a48d8fbc08d20","/static/css/app.c9bb43b4a68c0dfb5690df77fcf4d943.css.map":"d85ba8b3ca2e2de14d23704609692732f7e0cb6d4395f56d0aa79948049f8409","/static/favicon/apple-touch-icon.png":"2f375c380550dfc3f6f668ea3477005949e3d557b2af49dfcb9d9ab2118373f2","/static/favicon/android-chrome-192x192.png":"b9f671c8ffdad1f47a6182eb0ab73643999257f885597727205c1aa6eaf92ec3","/static/favicon/browserconfig.xml":"0750e3233b48515b59dcbc5b36e64eafbeb9e346e083d5450cabcd5ae7b179f8","/static/favicon/favicon-16x16.png":"d755dccf8d1d9665f9046332c132b4639a279ea95049fc22f6f873f731d13061","/static/favicon/favicon-32x32.png":"fd5494ed7201751fdc8d6e256de7d3327cb9c10dc743aa86426ab7212b158231","/static/favicon/favicon.png":"fd5494ed7201751fdc8d6e256de7d3327cb9c10dc743aa86426ab7212b158231","/static/favicon/site.webmanifest":"8077602a41c2dd346601f2c34738371a2cc544c41c5d1cb8eb757c98b759bf7f","/static/favicon/safari-pinned-tab.svg":"90f6de36bf73024fa50d0b1aa185ac8e9928561a968d018d0f9ee678439b6059","/static/favicon/favicon.ico":"2ff0e1cd37095863fd8e102c5f768f617e41c6fd847dc4a57cdf39937cbf84ea","/static/js/manifest.2ae2e69a05c33dfc65f8.js":"3f771fa490335b2de2ae7615f79fd6b0609c03728f6d1884741069ae77344b74","/static/js/manifest.2ae2e69a05c33dfc65f8.js.map":"1f964bbe002927d4eed935b998f8a4d23a10ab89a7bca7a958cc290c8c0c5351","/static/og-image.jpeg":"d1e1438d18d89bd372e8de9294c8cf45f915d8abb347d0d51e103c0c95187c63","/static/img/twitter.212959f.png":"e871ed5edf5a38afdbcbf4741d7781e0d09adb443082b0358ee9d544d3daef0e","/static/js/vendor.a9a7a9afd39ad5c28c25.js":"da05d651af29093c2282f1d6009a4b72b854b09f5cc1cd07c005495747b53e78","/static/favicon/android-chrome-512x512.png":"eef53f136ee3fffea29a44d5304a95ad64646c92b585d181129b5f50efc22e2e","/static/img/manifold.12368c8.png":"34ad784e35a8c8c104498f40f1b0a4758e2121aedb968f8f7cb46e98798eb53d","/static/favicon/adaptive-icon.png":"46399fc7c2f7a3f99fb73250f1c3e48dfaf7431a6afa7023a9640da7d826beee","/static/favicon/icon.png":"46399fc7c2f7a3f99fb73250f1c3e48dfaf7431a6afa7023a9640da7d826beee","/static/js/app.c966ede122fe00eca56a.js":"0bbbdfeb7adeb4eb02b8df37b02c64e9abeab2e8e84a04ef9dfd389b05a13b17","/static/js/app.c966ede122fe00eca56a.js.map":"2da864501fdbfffccef32d87c36b410e3e2bdf6851412e32375330e6af79ca42","/static/js/vendor.a9a7a9afd39ad5c28c25.js.map":"0e3bc1127f660aed523577de7f3252ce7a5055cab7ad290e861196f54258d100"}}
+[debug] [2024-07-08T06:05:54.438Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/771751095859/sites/personal-website-e63ac/versions/4f1bdd14854e8d63:populateFiles 200
+[debug] [2024-07-08T06:05:54.438Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/771751095859/sites/personal-website-e63ac/versions/4f1bdd14854e8d63:populateFiles {"uploadRequiredHashes":["d85ba8b3ca2e2de14d23704609692732f7e0cb6d4395f56d0aa79948049f8409","1f964bbe002927d4eed935b998f8a4d23a10ab89a7bca7a958cc290c8c0c5351","3e84bf7ec77a270230cff63d416ea198ac4ad78e8d82b58d859a48d8fbc08d20","72106cec79b3721d3666197bbacf60a5f5abb7f977ba2d593331ba236023c0a6","0bbbdfeb7adeb4eb02b8df37b02c64e9abeab2e8e84a04ef9dfd389b05a13b17","2da864501fdbfffccef32d87c36b410e3e2bdf6851412e32375330e6af79ca42"],"uploadUrl":"https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/4f1bdd14854e8d63/files"}
+[debug] [2024-07-08T06:05:54.440Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/4f1bdd14854e8d63/files/d85ba8b3ca2e2de14d23704609692732f7e0cb6d4395f56d0aa79948049f8409 [none]
+[debug] [2024-07-08T06:05:54.441Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/4f1bdd14854e8d63/files/d85ba8b3ca2e2de14d23704609692732f7e0cb6d4395f56d0aa79948049f8409 [stream]
+[debug] [2024-07-08T06:05:54.443Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/4f1bdd14854e8d63/files/1f964bbe002927d4eed935b998f8a4d23a10ab89a7bca7a958cc290c8c0c5351 [none]
+[debug] [2024-07-08T06:05:54.443Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/4f1bdd14854e8d63/files/1f964bbe002927d4eed935b998f8a4d23a10ab89a7bca7a958cc290c8c0c5351 [stream]
+[debug] [2024-07-08T06:05:54.445Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/4f1bdd14854e8d63/files/3e84bf7ec77a270230cff63d416ea198ac4ad78e8d82b58d859a48d8fbc08d20 [none]
+[debug] [2024-07-08T06:05:54.445Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/4f1bdd14854e8d63/files/3e84bf7ec77a270230cff63d416ea198ac4ad78e8d82b58d859a48d8fbc08d20 [stream]
+[debug] [2024-07-08T06:05:54.446Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/4f1bdd14854e8d63/files/72106cec79b3721d3666197bbacf60a5f5abb7f977ba2d593331ba236023c0a6 [none]
+[debug] [2024-07-08T06:05:54.446Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/4f1bdd14854e8d63/files/72106cec79b3721d3666197bbacf60a5f5abb7f977ba2d593331ba236023c0a6 [stream]
+[debug] [2024-07-08T06:05:54.448Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/4f1bdd14854e8d63/files/0bbbdfeb7adeb4eb02b8df37b02c64e9abeab2e8e84a04ef9dfd389b05a13b17 [none]
+[debug] [2024-07-08T06:05:54.448Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/4f1bdd14854e8d63/files/0bbbdfeb7adeb4eb02b8df37b02c64e9abeab2e8e84a04ef9dfd389b05a13b17 [stream]
+[debug] [2024-07-08T06:05:54.450Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/4f1bdd14854e8d63/files/2da864501fdbfffccef32d87c36b410e3e2bdf6851412e32375330e6af79ca42 [none]
+[debug] [2024-07-08T06:05:54.450Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/4f1bdd14854e8d63/files/2da864501fdbfffccef32d87c36b410e3e2bdf6851412e32375330e6af79ca42 [stream]
+[debug] [2024-07-08T06:05:54.451Z] [hosting][populate queue][FINAL] {"max":1213,"min":1213,"avg":1213,"active":0,"complete":1,"success":1,"errored":0,"retried":0,"total":1,"elapsed":1224}
+[debug] [2024-07-08T06:05:54.451Z] [hosting] uploads queued: 6
+[debug] [2024-07-08T06:05:56.399Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/4f1bdd14854e8d63/files/72106cec79b3721d3666197bbacf60a5f5abb7f977ba2d593331ba236023c0a6 200
+[debug] [2024-07-08T06:05:56.399Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/4f1bdd14854e8d63/files/72106cec79b3721d3666197bbacf60a5f5abb7f977ba2d593331ba236023c0a6 [stream]
+[debug] [2024-07-08T06:05:56.400Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/4f1bdd14854e8d63/files/d85ba8b3ca2e2de14d23704609692732f7e0cb6d4395f56d0aa79948049f8409 200
+[debug] [2024-07-08T06:05:56.400Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/4f1bdd14854e8d63/files/d85ba8b3ca2e2de14d23704609692732f7e0cb6d4395f56d0aa79948049f8409 [stream]
+[debug] [2024-07-08T06:05:56.400Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/4f1bdd14854e8d63/files/0bbbdfeb7adeb4eb02b8df37b02c64e9abeab2e8e84a04ef9dfd389b05a13b17 200
+[debug] [2024-07-08T06:05:56.400Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/4f1bdd14854e8d63/files/0bbbdfeb7adeb4eb02b8df37b02c64e9abeab2e8e84a04ef9dfd389b05a13b17 [stream]
+[debug] [2024-07-08T06:05:56.634Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/4f1bdd14854e8d63/files/1f964bbe002927d4eed935b998f8a4d23a10ab89a7bca7a958cc290c8c0c5351 200
+[debug] [2024-07-08T06:05:56.634Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/4f1bdd14854e8d63/files/1f964bbe002927d4eed935b998f8a4d23a10ab89a7bca7a958cc290c8c0c5351 [stream]
+[debug] [2024-07-08T06:05:56.780Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/4f1bdd14854e8d63/files/3e84bf7ec77a270230cff63d416ea198ac4ad78e8d82b58d859a48d8fbc08d20 200
+[debug] [2024-07-08T06:05:56.780Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/4f1bdd14854e8d63/files/3e84bf7ec77a270230cff63d416ea198ac4ad78e8d82b58d859a48d8fbc08d20 [stream]
+[debug] [2024-07-08T06:05:56.835Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/4f1bdd14854e8d63/files/2da864501fdbfffccef32d87c36b410e3e2bdf6851412e32375330e6af79ca42 200
+[debug] [2024-07-08T06:05:56.835Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/personal-website-e63ac/versions/4f1bdd14854e8d63/files/2da864501fdbfffccef32d87c36b410e3e2bdf6851412e32375330e6af79ca42 [stream]
+[debug] [2024-07-08T06:05:56.835Z] [hosting][upload queue][FINAL] {"max":2395,"min":1959,"avg":2135,"active":0,"complete":6,"success":6,"errored":0,"retried":0,"total":6,"elapsed":2396}
+[info] ✔  hosting[personal-website-e63ac]: file upload complete 
+[debug] [2024-07-08T06:05:56.837Z] [hosting] deploy completed after 3709ms
+[debug] [2024-07-08T06:05:56.838Z] [
+  {
+    "config": {
+      "public": "dist",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "site": "personal-website-e63ac"
+    },
+    "version": "projects/771751095859/sites/personal-website-e63ac/versions/4f1bdd14854e8d63"
+  }
+]
+[info] i  hosting[personal-website-e63ac]: finalizing version... 
+[debug] [2024-07-08T06:05:56.840Z] >>> [apiv2][query] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/personal-website-e63ac/versions/4f1bdd14854e8d63 updateMask=status%2Cconfig
+[debug] [2024-07-08T06:05:56.840Z] >>> [apiv2][body] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/personal-website-e63ac/versions/4f1bdd14854e8d63 {"status":"FINALIZED","config":{}}

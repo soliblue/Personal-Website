@@ -2,32 +2,29 @@
   {
     "title": "memes ai",
     "year": "2024",
-    "type": "iOS Application",
-    "tags": ["Swift", "SwiftUI", "iOS"],
+    "tags": ["Swift", "SwiftUI", "FastAPI"],
     "description": "03.07.2024: Are we at a point where ai can make funny memes? I built an iOS app to find out.",
     "link": "https://memesai.app"
   },
   {
-    "title": "happy - Birthday Reminder",
+    "title": "happy - birthday reminder",
     "year": "2023",
-    "type": "iOS Application",
-    "tags": ["Swift", "SwiftUI", "iOS"],
+    "tags": ["Swift", "SwiftUI"],
     "description": "I kept forgetting the birthdays of people I love, so I built an app to solve my problem and published it on the app store.",
     "link": "https://apple.co/3FJD3eX"
   },
   {
-    "title": "SongGPT",
+    "title": "songgpt",
     "year": "2023",
-    "tags": ["OpenAI", "React Native", "FastAPI", "Web"],
+    "tags": ["React Native", "FastAPI"],
     "description": "I wondered if a text-based LLM like ChatGPT can create original music compositions so I built a web-app to explore this idea. I am not sure anything useful came out of this other than learning a couple of nice tricks for prompt engineering.",
     "link": "https://songgpt.soli.blue/"
   },
   {
-    "title": "Piasso",
-    "year": "2023",
-    "type": "Cross Platform Application",
-    "tags": ["OpenAI", "FastAPI", "React Native", "iOS", "Web"],
+    "title": "piasso - ai assistant",
+    "year": "2022",
+    "tags": ["React Native", "FastAPI", "Google Cloud", "Docker"],
     "description": "I built Piasso for three reasons. (1) I wanted to allow people to generate ai images in any language, (2) I wanted to replicate ChatGPT's functionality using DaVinci and (3) I wanted to allow people in Egypt to try ChatGPT while it was banned there. At the peak Piasso had around ~1k weekly active users but I couldn't sustain the cost of running it so I paused registrations and halted growth.",
-    "link": "https://piasso.ai"
+    "link": "https://apps.apple.com/de/app/piasso-ai-assistant/id6444704118?l=en-GB"
   }
 ]

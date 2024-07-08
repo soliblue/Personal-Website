@@ -3,14 +3,14 @@
     <BackButton backgroundColor="#000080" />
     <div class="disclaimer">
     <p>
-      I love coding on nights & weekends. I usually just build stuff for fun or to learn how to use a library or language. Most, if not all, of the projects here should be seen as fun prototypes that sometimes made it a bit further than that.
+      I enjoy coding on my nights & weekends. I build stuff for fun or to learn how to use a library or language. Most, if not all, of the projects here should be seen as fun prototypes that sometimes made it a bit further than that.
     </p>
   </div>
-    <div class="filter-tags">
+    <!-- <div class="filter-tags">
       <span v-for="tag in allTags" :key="tag" class="tag" :class="{ selected: selectedTags.includes(tag) }" @click="toggleTag(tag)">
         {{ tag }}
       </span>
-    </div>
+    </div> -->
     <div v-for="project in filteredProjects" class="project" :key="project.id">
       <h2>{{ project.title }}</h2>
       <p>
@@ -65,12 +65,10 @@ export default {
 .disclaimer {
   max-width: 500px;
   margin: auto;
-  margin-bottom: 2em;
-  padding: 1em;
+  padding: 0.5em 0.5em 0.5em 1em;
   text-align: left;
-  background: #f9f9f9;
-  border-radius: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 15px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .project, .filter-tags {

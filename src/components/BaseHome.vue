@@ -22,7 +22,7 @@
       <div class="nav-links">
         <router-link to="/resume">Resume</router-link>
         &nbsp;
-        <router-link to="/projects">Projects</router-link>
+        <router-link to="/projects">Side Projects</router-link>
         &nbsp;
         <router-link to="/pins">Pins</router-link>
       </div>

@@ -37,7 +37,7 @@ const styles = `
   background: #313744;
   padding: 24px 12px;
   box-shadow: 0px 4px 0px 2px rgba(0,0,0,0.1);
-  width:75%;
+  width:min(75%,750px);
 }
 
 /*
@@ -104,7 +104,7 @@ const styles = `
 
 /*
  *
- * Woohoo!
+ * Nice!
  *
  * We did it!
  *
