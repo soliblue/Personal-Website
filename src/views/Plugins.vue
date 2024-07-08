@@ -88,7 +88,7 @@ export default {
   padding: 1.5vh;
   color: #2196F3;
   font-size: 1.5em;
-  border-radius: 5px;
+
   border: 1px solid #ebebeb;
 }
 
@@ -196,11 +196,11 @@ input:checked + .slider:before {
 }
 
 .slider {
-  border-radius: 34px;
+
 }
 
 .slider:before {
-  border-radius: 50%;
+
 }
 
 .load-more-btn {
@@ -211,7 +211,7 @@ input:checked + .slider:before {
   background-color: #1E90FF;
   color: white;
   border: none;
-  border-radius: 5px;
+
   cursor: pointer;
   text-align: center;
   font-size: 1.2em;

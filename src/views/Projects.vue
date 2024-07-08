@@ -62,7 +62,7 @@ export default {
   margin: auto;
   padding: 0.5em 0.5em 0.5em 1em;
   text-align: left;
-  border-radius: 15px;
+
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
@@ -76,7 +76,7 @@ export default {
   display: inline-block;
   background: #00008075;
   color: white;
-  border-radius: 5px;
+
   padding: 0.2em 0.5em;
   margin: 0 0.3em 0.3em 0;
   cursor: pointer;
