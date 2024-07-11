@@ -17,6 +17,9 @@
         <a href="https://twitter.com/_xSoli" target="_blank">
           <img src="../assets/twitter.png" class="social-links" >
         </a>
+        <a href="https://www.instagram.com/soli__/" target="_blank">
+          <img src="../assets/instagram.png" class="social-links" >
+        </a>
       </div>
       <br>
       <div class="nav-links">
