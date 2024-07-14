@@ -30,7 +30,7 @@
   ],
   "education": [
     {
-      "title": "Bachelor of Science - Computer Science",
+      "title": "B.Sc. Computer Science",
       "subtitle": "RWTH Aachen University",
       "logo": "rwth.png",
       "url": "https://www.rwth-aachen.de/",
@@ -39,13 +39,12 @@
       "end": "August 2018"
     },
     {
-      "title": "Master of Science - Computer Science",
+      "title": "M.Sc. Computer Science",
       "subtitle": "RWTH Aachen University",
       "logo": "rwth.png",
       "url": "https://www.rwth-aachen.de/",
       "location": "Aachen, Germany",
-      "start": "October 2018",
-      "end": "Present"
+      "start": "October 2018"
     }
   ],
   "languages": [

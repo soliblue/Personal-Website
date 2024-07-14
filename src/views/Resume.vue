@@ -11,7 +11,7 @@
           </div>
           <div class="information">
             <span class="gray-text">
-              {{ item.start }} - {{ item.end }}
+              {{ item.start }} {{ item.end ? ' - ' + item.end : '' }}
             </span>
             <span class="gray-text">
               {{ item.location }}
