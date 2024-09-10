@@ -1,19 +1,24 @@
 {
   "experience": [
     {
-      "title": "Engineering",
+      "title": "Founder",
+      "subtitle": "toy2life",
+      "url": "https://toy2life.com",
+      "start": "Sep 2024",
+      "end": "Present"
+    },
+    {
+      "title": "Founding CTO",
       "subtitle": "biddz",
       "url": "https://www.ibbventures.de/de/news/biddz-round",
-      "logo": "biddz.png",
       "location": "Berlin, Germany",
       "start": "Sep 2021",
-      "end": "Present"
+      "end": "Aug 2024"
     },
     {
       "title": "DACH Marketplace Operations Manager",
       "subtitle": "Uber",
       "url": "https://uber.com",
-      "logo": "uber.jpeg",
       "location": "Berlin, Germany",
       "start": "Sep 2019",
       "end": "Aug 2021"
@@ -21,7 +26,6 @@
     {
       "title": "Student Research Assistant",
       "subtitle": "RWTH Aachen University",
-      "logo": "rwth.png",
       "url": "https://www.rwth-aachen.de/",
       "location": "Aachen, Germany",
       "start": "Sep 2015",
@@ -32,7 +36,6 @@
     {
       "title": "B.Sc. Computer Science",
       "subtitle": "RWTH Aachen University",
-      "logo": "rwth.png",
       "url": "https://www.rwth-aachen.de/",
       "location": "Aachen, Germany",
       "start": "October 2014",
@@ -41,7 +44,6 @@
     {
       "title": "M.Sc. Computer Science",
       "subtitle": "RWTH Aachen University",
-      "logo": "rwth.png",
       "url": "https://www.rwth-aachen.de/",
       "location": "Aachen, Germany",
       "start": "October 2018"
