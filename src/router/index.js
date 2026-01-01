@@ -6,6 +6,7 @@ import Resume from '@/views/Resume';
 import Plugins from '@/views/Plugins';
 import Projects from '@/views/Projects';
 import BuildHome from '@/views/BuildHome';
+import AppDoc from '@/views/AppDoc';
 
 Vue.use(Router);
 
@@ -41,6 +42,11 @@ export default new Router({
       path: '/animation',
       name: 'BuildHome',
       component: BuildHome,
+    },
+    {
+      path: '/apps/:app/:page',
+      name: 'AppDoc',
+      component: AppDoc,
     },
   ],
 });
