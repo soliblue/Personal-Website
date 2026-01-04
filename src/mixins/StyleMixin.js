@@ -27,13 +27,16 @@ const styles = `
   padding: 24px 12px;
   box-shadow: 0px 4px 0px 2px rgba(0,0,0,0.1);
   width: min(90%, 750px);
+  height: 40vh;
+  overflow-y: scroll;
+  border-radius: 12px;
+  font-weight: 300;
 }
 
 /*
  * nice, this seems to be working
- * i worked in academia, uber, startups and now..
- * i am in exploration mode
- *
+ * i've worked in academia, uber, and a few startups
+ * now i'm obsessed with AI and education
  *
  * let's make this code more readable
  *
@@ -45,8 +48,8 @@ const styles = `
 .value { color: #ffffff; }
 
 /*
- * if i had to pick one thing i'm good at,
- * it would probably be building mvps for startups
+ * i like turning ideas into products people actually use
+ * shipping fast, learning faster
  *
 */
 
@@ -56,38 +59,62 @@ const styles = `
 }
 
 /*
+ * cs concepts that blow my mind:
+ * word embeddings, cantor's diagonal proof,
+ * turing machines - addition from just 0s and 1s
+ * and how everything ends up being turing complete
+ *
+*/
+
+/*
  * let's add some color to my name
  *
 */
 
-.name > span:nth-child(1) { color: #87ceeb; }
-.name > span:nth-child(2) { color: #1e90ff; }
-.name > span:nth-child(3) { color: #4169e1; }
-.name > span:nth-child(4) { color: #000080; }
+.name > span:nth-child(1) { color: var(--blue-1); }
+.name > span:nth-child(2) { color: var(--blue-2); }
+.name > span:nth-child(3) { color: var(--blue-3); }
+.name > span:nth-child(4) { color: var(--blue-4); }
 
 /*
- * outside of work, i love my family, friends and sports
+ * outside of work, i love audiovisual art
+ * christopher bauder's installations blow my mind
  *
 */
 
 .nav-links > a {
-  color: #a6c3d4;
+  color: var(--nav-text);
   padding: 0 25px;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: .1rem;
   text-decoration: none;
   border-bottom-style: solid;
 }
 
-.nav-links > a:nth-child(1) { border-bottom-color: #87ceeb; }
-.nav-links > a:nth-child(2) { border-bottom-color: #00008075; }
-.nav-links > a:nth-child(3) { border-bottom-color: #4169e1; }
+/*
+ * i'm into prediction markets too
+ * one of the top ai market creators on manifold
+ *
+*/
+
+.nav-links > a:nth-child(1) { border-bottom-color: var(--blue-1); }
+.nav-links > a:nth-child(2) { border-bottom-color: var(--blue-2); }
 
 /*
- * there you have it!
- * a bit about me, and a styled page
- * hope you enjoyed this...
+ * art and architecture fascinate me
+ * hundertwasser, gaudi... how design shapes humans
+ *
+*/
+
+.nav-links > a:nth-child(3) { border-bottom-color: var(--blue-3); }
+.nav-links > a:nth-child(4) { border-bottom-color: var(--blue-4); }
+
+/*
+ * i love fonts, apps, travel, connecting with people
+ * and i'm a believer in the power of psychedelics
+ *
+ * there you have it! feel free to say hi...
  *
  */
 `;
@@ -97,12 +124,22 @@ export default {
   data() {
     return {
       animationTimeout: null,
+      isAnimating: false,
+      animationDone: false,
     };
   },
   methods: {
     processStyles(animation = false) {
       let processedStyles = '';
       let openComment = false;
+
+      if (animation) {
+        this.isAnimating = true;
+        this.animationDone = false;
+      } else {
+        this.isAnimating = false;
+        this.animationDone = true;
+      }
 
       const writeStyleChar = (char) => {
         if (char === '/' && !openComment) {
@@ -141,6 +178,9 @@ export default {
               writeStyles(message, index);
             }, 15);
           }
+        } else {
+          this.isAnimating = false;
+          this.animationDone = true;
         }
       };
 

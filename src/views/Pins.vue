@@ -1,6 +1,6 @@
 <template>
   <div class="animated fadeIn">
-    <BackButton backgroundColor="#4169e1" />
+    <BackButton />
     <div class="pin-card-container" v-for="pin in pins" :key="pin.id">
       <div class="pin-card">
         <div v-if="pin.type === 'quote'">
@@ -46,6 +46,8 @@ export default {
   margin: auto;
   padding: 1em;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  background: var(--surface);
 }
 
 .book-content {

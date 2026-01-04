@@ -1,30 +1,73 @@
 [
   {
-    "title": "memes ai",
+    "title": "habibi",
+    "subtitle": "couples & relationships",
     "year": "2024",
-    "tags": ["Swift", "SwiftUI", "FastAPI"],
-    "description": "03.07.2024: Are we at a point where ai can make funny memes? I built an iOS app to find out.",
-    "link": "https://memesai.app"
+    "tags": ["Swift", "SwiftUI", "iCloud"],
+    "description": "A couples app for sending handwritten notes and drawings to your partner. Features a canvas editor with drawing, text, and stickers. Uses iCloud for pairing and syncing between devices - no account creation needed, just share a code with your partner.",
+    "status": "live"
   },
   {
-    "title": "happy - birthday reminder",
-    "year": "2023",
-    "tags": ["Swift", "SwiftUI"],
-    "description": "I kept forgetting the birthdays of people I love, so I built an app to solve my problem and published it on the app store.",
-    "link": "https://apple.co/3FJD3eX"
+    "title": "habibis",
+    "subtitle": "friends contact reminder",
+    "year": "2024",
+    "tags": ["Swift", "SwiftUI", "iCloud"],
+    "description": "A friendship maintenance app that helps you stay in touch with the people you care about. Set contact frequency goals, log interactions, track streaks, and get reminders when friends are due for a catch-up. Uses iCloud for sync across devices with no backend required.",
+    "status": "live"
+  },
+  {
+    "title": "goaudio",
+    "subtitle": "ai audio production",
+    "year": "2024",
+    "tags": ["FastAPI", "React Native", "Cloud Run", "Docker", "AI"],
+    "description": "An AI-powered audio production platform that transforms content into high-quality audiobooks, podcasts, and news formats. We're making professional audio content creation faster and more accessible.",
+    "link": "https://goaudio.ai",
+    "status": "live"
   },
   {
     "title": "songgpt",
+    "subtitle": "ai music composer",
     "year": "2023",
     "tags": ["React Native", "FastAPI"],
     "description": "I wondered if a text-based LLM like ChatGPT can create original music compositions so I built a web-app to explore this idea. I am not sure anything useful came out of this other than learning a couple of nice tricks for prompt engineering.",
-    "link": "https://songgpt.soli.blue/"
+    "link": "https://songgpt.soli.blue/",
+    "status": "live"
   },
   {
-    "title": "piasso - ai assistant",
+    "title": "toy2life",
+    "subtitle": "ai-powered talking toys",
+    "year": "2021",
+    "tags": ["C++", "ESP32", "Hardware", "3D Printing", "AI"],
+    "description": "I wanted to explore real-time voice interaction with AI, specifically how it could transform children's play and education. We built a device that brought toys to life through conversation and implemented memory so the AI could remember past interactions - before major players like ChatGPT added this feature. Over 50 families tested our prototype, but we couldn't make it engaging enough for kids to use daily and failed to raise funding. Still, it was my first hardware project where I learned C++, memory management, ESP32 development, 3D printing, and soldering.",
+    "link": "https://toy2life.com",
+    "status": "graveyard"
+  },
+  {
+    "title": "memes ai",
+    "subtitle": "ai meme generator",
+    "year": "2024",
+    "tags": ["Swift", "SwiftUI", "FastAPI"],
+    "description": "I wanted to explore whether AI had reached the point where it could generate genuinely funny memes. I built an iOS app that let users create AI-generated memes and tested if humor could emerge from prompts alone. Turns out comedy is still one of the harder things for AI to nail - the results were hit or miss, but it was a fun experiment.",
+    "link": "https://memesai.app",
+    "status": "graveyard"
+  },
+  {
+    "title": "happy",
+    "subtitle": "birthday reminder",
+    "year": "2023",
+    "tags": ["Swift", "SwiftUI"],
+    "description": "I kept forgetting the birthdays of people I care about, so I built an app to solve my own problem. The clever bit: it uses your phone's contacts as the database, so there's no backend and no account needed. If you delete the app, no data is lost - everything is saved in your local contacts. I learned the full cycle of shipping an iOS app, from development to App Store review to post-launch updates.",
+    "link": "https://apple.co/3FJD3eX",
+    "status": "graveyard"
+  },
+  {
+    "title": "piasso",
+    "subtitle": "ai assistant in arabic",
     "year": "2022",
     "tags": ["React Native", "FastAPI", "Google Cloud", "Docker"],
-    "description": "I built Piasso for three reasons. (1) I wanted to allow people to generate ai images in any language, (2) I wanted to replicate ChatGPT's functionality using DaVinci and (3) I wanted to allow people in Egypt to try ChatGPT while it was banned there. At the peak Piasso had around ~1k weekly active users but I couldn't sustain the cost of running it so I paused registrations and halted growth.",
-    "link": "https://apps.apple.com/de/app/piasso-ai-assistant/id6444704118?l=en-GB"
+    "description": "I built Piasso for three reasons. (1) I wanted to allow people to generate AI images in any language, (2) I wanted to replicate ChatGPT's functionality using DaVinci and (3) I wanted to allow people in Egypt to try ChatGPT while it was banned there. I also implemented a hacky version of function calling that let users generate images by asking the AI - before this was officially supported by major players. At the peak Piasso reached around 100k users, but I couldn't sustain the cost of running it so I paused registrations and halted growth.",
+    "link": "https://apps.apple.com/de/app/piasso-ai-assistant/id6444704118?l=en-GB",
+    "press": "https://cairoscene.com/Buzz/Piasso-is-the-AI-Powered-Art-App-That-Can-Understand-Arabic",
+    "status": "graveyard"
   }
 ]

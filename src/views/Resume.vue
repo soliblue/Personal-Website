@@ -1,6 +1,6 @@
 <template>
   <div class="animated fadeIn">
-    <BackButton backgroundColor="#87CEEB"/>
+    <BackButton />
     <div class="content">
       <div v-for="(section, index) in sections" :key="index">
         <h3>{{ section.title }}</h3>
@@ -16,6 +16,9 @@
             <span class="gray-text">
               {{ item.location }}
             </span>
+          </div>
+          <div v-if="item.description" class="description">
+            {{ item.description }}
           </div>
         </div>
         <div class="seperator"></div>
@@ -53,6 +56,7 @@ export default {
 <style scoped>
 .title-link a {
   text-decoration: none;
+  color: var(--link);
 }
 
 .item, .language {
@@ -72,13 +76,13 @@ export default {
 }
 
 .seperator {
-  border-top: solid 1px;
+  border-top: solid 1px var(--text-secondary);
   width: 100%;
   margin: 2vh 0 2vh 0;
 }
 
 .gray-text {
-  color: gray;
+  color: var(--text-secondary);
   font-size: small;
   margin-right: 2vh;
 }
@@ -86,5 +90,24 @@ export default {
 .information {
   display: flex;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px;
 }
+
+@media (max-width: 500px) {
+  .content {
+    padding: 3vw;
+  }
+
+  .information {
+    flex-direction: column;
+  }
+}
+
+.description {
+  color: var(--text-secondary);
+  font-size: 0.95em;
+  margin-top: 0.5vh;
+}
+
 </style>

@@ -1,16 +1,24 @@
 {
   "experience": [
     {
+      "title": "Senior AI Product Engineer",
+      "subtitle": "Knowunity",
+      "url": "https://knowunity.com",
+      "description": "Building AI-powered educational products for 30 million students",
+      "start": "Sep 2025",
+      "end": "Present"
+    },
+    {
       "title": "Founder",
       "subtitle": "toy2life",
       "url": "https://toy2life.com",
       "start": "Sep 2024",
-      "end": "Present"
+      "end": "Aug 2025"
     },
     {
       "title": "Founding CTO",
-      "subtitle": "biddz",
-      "url": "https://www.ibbventures.de/de/news/biddz-round",
+      "subtitle": "goaudio.ai",
+      "url": "https://goaudio.ai",
       "location": "Berlin, Germany",
       "start": "Sep 2021",
       "end": "Aug 2024"

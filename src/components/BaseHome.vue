@@ -1,13 +1,14 @@
 <template>
-  <div class="content">
+  <div class="base-home-wrapper">
+    <div class="content">
       <h2 class="name">
         <span>s</span>
         <span>o</span>
         <span>l</span>
         <span>i</span>
       </h2>
-      <br>
-      <div class="animated fadeIn">
+      <p class="tagline">ai whisperer</p>
+      <div class="social-icons animated fadeIn">
         <a href="https://github.com/soliblue" target="_blank">
           <img src="../assets/github.png" class="social-links" >
         </a>
@@ -18,40 +19,88 @@
           <img src="../assets/twitter.png" class="social-links" >
         </a>
       </div>
-      <br>
       <div class="nav-links">
         <router-link to="/resume">resume</router-link>
-        &nbsp;
-        <router-link to="/projects">side-projects</router-link>
-        &nbsp;
+        <router-link to="/projects">projects</router-link>
         <router-link to="/pins">pins</router-link>
+        <a href="https://cal.com/solimeet/15min" target="_blank">book a call</a>
       </div>
-      <br>
       <pre id="style-text" class="css-code" />
-      <br>
-      <div class="controls">
-        <a href="/#/animation">play</a>
-        <router-link to="/">skip</router-link>
-      </div>
     </div>
+    <a v-if="animationDone" href="/" class="floating-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+      </svg>
+      <span>replay</span>
+    </a>
+    <router-link v-if="isAnimating" to="/home" class="floating-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <polygon points="5 4 15 12 5 20 5 4"></polygon>
+        <line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2"></line>
+      </svg>
+      <span>skip</span>
+    </router-link>
+  </div>
 </template>
 
 <script>
-
 export default {
   name: 'BaseHome',
+  props: {
+    isAnimating: {
+      type: Boolean,
+      default: false,
+    },
+    animationDone: {
+      type: Boolean,
+      default: true,
+    },
+  },
 };
 </script>
 
 <style scoped>
-  .css-code {
-    height: 40vh;
-    font-weight: lighter;
-    font-size: smaller;
-    overflow-y: scroll;
+  /* Only styles for elements NOT styled by the animation */
+  .name {
+    margin-bottom: 0;
   }
+
+  .tagline {
+    color: var(--text-secondary);
+    font-size: 0.9em;
+    margin: 0.3em 0 0.8em 0;
+    letter-spacing: 0.1em;
+  }
+
+  .social-icons {
+    margin: 0.5em 0;
+  }
+
   .social-links {
     height: 25px;
-    padding: 0em 1em 0em 1em;
+    padding: 0 0.8em;
+  }
+
+  .floating-btn {
+    position: fixed;
+    bottom: 1em;
+    right: 1em;
+    background: var(--surface);
+    color: var(--text);
+    padding: 0.6em 1em;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    text-decoration: none;
+    font-size: 0.9em;
+    opacity: 0.8;
+    transition: opacity 0.2s, background 0.2s;
+    z-index: 1000;
+  }
+
+  .floating-btn:hover {
+    opacity: 1;
+    background: var(--surface-hover);
   }
 </style>

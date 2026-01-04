@@ -11,10 +11,16 @@ import AppDoc from '@/views/AppDoc';
 Vue.use(Router);
 
 export default new Router({
+  mode: 'history',
   routes: [
 
     {
       path: '/',
+      name: 'BuildHome',
+      component: BuildHome,
+    },
+    {
+      path: '/home',
       name: 'Home',
       component: Home,
     },
@@ -38,12 +44,7 @@ export default new Router({
       name: 'Projects',
       component: Projects,
     },
-    {
-      path: '/animation',
-      name: 'BuildHome',
-      component: BuildHome,
-    },
-    {
+        {
       path: '/apps/:app/:page',
       name: 'AppDoc',
       component: AppDoc,

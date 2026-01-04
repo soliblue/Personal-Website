@@ -1,5 +1,5 @@
 <template>
-  <BaseHome />
+  <BaseHome :isAnimating="isAnimating" :animationDone="animationDone" />
 </template>
 
 <script>

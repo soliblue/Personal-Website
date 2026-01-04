@@ -1,6 +1,6 @@
 <template>
   <div class="animated fadeIn center">
-    <BackButton backgroundColor="#1E90FF" />
+    <BackButton />
     <div class="max-width-500 margin-auto center">
       <br>
       <input type="text" v-model="searchTerm" placeholder="Search OpenAI Plugins" class="search-input">
@@ -86,10 +86,11 @@ export default {
 .search-input {
   width: 100%;
   padding: 1.5vh;
-  color: #2196F3;
+  color: var(--text);
+  background: var(--surface);
   font-size: 1.5em;
-
-  border: 1px solid #ebebeb;
+  border: none;
+  border-radius: 12px;
 }
 
 .helper-text {
@@ -134,6 +135,8 @@ export default {
   font-size: 1.2em;
   transition: transform .75s;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  background: var(--surface);
 }
 
 .card:hover {
@@ -164,7 +167,8 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #ccc;
+  background-color: var(--surface-hover);
+  border-radius: 34px;
   -webkit-transition: .4s;
   transition: .4s;
 }
@@ -176,17 +180,18 @@ export default {
   width: 26px;
   left: 4px;
   bottom: 4px;
-  background-color: white;
+  background-color: var(--bg);
+  border-radius: 50%;
   -webkit-transition: .4s;
   transition: .4s;
 }
 
 input:checked + .slider {
-  background-color: #2196F3;
+  background-color: var(--accent);
 }
 
 input:focus + .slider {
-  box-shadow: 0 0 1px #2196F3;
+  box-shadow: 0 0 1px var(--accent);
 }
 
 input:checked + .slider:before {
@@ -208,10 +213,10 @@ input:checked + .slider:before {
   width: 100%;
   padding: 10px;
   margin-top: 20px;
-  background-color: #1E90FF;
+  background-color: var(--accent);
   color: white;
   border: none;
-
+  border-radius: 12px;
   cursor: pointer;
   text-align: center;
   font-size: 1.2em;
@@ -219,6 +224,6 @@ input:checked + .slider:before {
 }
 
 .load-more-btn:hover {
-  background-color: #1c7cd6;
+  background-color: var(--accent-solid);
 }
 </style>
