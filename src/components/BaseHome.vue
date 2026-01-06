@@ -27,7 +27,7 @@
       </div>
       <pre id="style-text" class="css-code" />
     </div>
-    <a v-if="animationDone" href="/" class="floating-btn">
+    <a v-if="animationDone" href="/animation" class="floating-btn">
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
         <polygon points="5 3 19 12 5 21 5 3"></polygon>
       </svg>
@@ -39,6 +39,13 @@
         <line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2"></line>
       </svg>
       <span>skip</span>
+    </router-link>
+    <router-link to="/terminal" class="floating-btn left">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="4 17 10 11 4 5"></polyline>
+        <line x1="12" y1="19" x2="20" y2="19"></line>
+      </svg>
+      <span>terminal</span>
     </router-link>
   </div>
 </template>
@@ -102,5 +109,10 @@ export default {
   .floating-btn:hover {
     opacity: 1;
     background: var(--surface-hover);
+  }
+
+  .floating-btn.left {
+    right: auto;
+    left: 1em;
   }
 </style>
