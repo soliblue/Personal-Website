@@ -35,7 +35,8 @@ export default {
     if (saved) {
       this.isDark = saved === 'dark';
     } else {
-      this.isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      // Default to light theme (don't follow system preference)
+      this.isDark = false;
     }
     this.applyTheme();
   },

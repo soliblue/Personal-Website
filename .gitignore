@@ -14,3 +14,5 @@ yarn-error.log*
 *.sln
 .env
 functions/.env
+ui-debug.log
+functions/ui-debug.log

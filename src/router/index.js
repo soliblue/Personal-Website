@@ -26,11 +26,19 @@ export default new Router({
       path: '/animation',
       name: 'BuildHome',
       component: BuildHome,
+      beforeEnter: (to, from, next) => {
+        localStorage.setItem('homeVersion', 'animation');
+        next();
+      },
     },
     {
       path: '/terminal',
       name: 'TerminalHome',
       component: TerminalHome,
+      beforeEnter: (to, from, next) => {
+        localStorage.setItem('homeVersion', 'terminal');
+        next();
+      },
     },
     {
       path: '/home',

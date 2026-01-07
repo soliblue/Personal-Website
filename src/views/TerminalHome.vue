@@ -196,13 +196,13 @@ export default {
       if (input.startsWith('/')) {
         const cmd = input.toLowerCase();
         if (cmd === '/projects') {
-          this.$router.push('/projects');
+          this.openModal('projects');
           return;
         } else if (cmd === '/resume') {
-          this.$router.push('/resume');
+          this.openModal('resume');
           return;
         } else if (cmd === '/pins') {
-          this.$router.push('/pins');
+          this.openModal('pins');
           return;
         } else if (cmd === '/help') {
           this.messages.push({
