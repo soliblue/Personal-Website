@@ -1,19 +1,5 @@
 <template>
   <div class="wiki-page">
-    <div class="wiki-header">
-      <div class="wiki-logo">
-        <div class="wiki-logo-icon">W</div>
-        <div class="wiki-logo-text">
-          <span class="wiki-title">Wikipedia</span>
-          <span class="wiki-subtitle">The Free Encyclopedia</span>
-        </div>
-      </div>
-      <div class="wiki-search">
-        <input type="text" placeholder="Search Wikipedia" disabled>
-        <button disabled>Search</button>
-      </div>
-    </div>
-
     <div class="wiki-content">
       <div class="wiki-sidebar">
         <div class="wiki-nav-section">
@@ -43,9 +29,6 @@
         <div class="wiki-intro">
           <div class="wiki-infobox">
             <div class="infobox-title">Soli</div>
-            <div class="infobox-image">
-              <div class="infobox-placeholder">No photo available</div>
-            </div>
             <table class="infobox-data">
               <tr>
                 <th>Occupation</th>
