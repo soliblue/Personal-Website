@@ -49,11 +49,11 @@
             <table class="infobox-data">
               <tr>
                 <th>Occupation</th>
-                <td>{{ resume.experience[0]?.title || 'Software Engineer' }}</td>
+                <td>{{ currentJob.title }}</td>
               </tr>
               <tr>
                 <th>Employer</th>
-                <td><a :href="resume.experience[0]?.url" target="_blank">{{ resume.experience[0]?.subtitle }}</a></td>
+                <td><a :href="currentJob.url" target="_blank">{{ currentJob.subtitle }}</a></td>
               </tr>
               <tr>
                 <th>Known for</th>
@@ -72,8 +72,8 @@
 
           <p>
             <strong>Soli</strong> is a software engineer based in Berlin, Germany.
-            He currently works as {{ resume.experience[0]?.title }} at
-            <a :href="resume.experience[0]?.url" target="_blank">{{ resume.experience[0]?.subtitle }}</a>.<sup>[1]</sup>
+            He currently works as {{ currentJob.title }} at
+            <a :href="currentJob.url" target="_blank">{{ currentJob.subtitle }}</a>.<sup>[1]</sup>
           </p>
           <p>
             He has previously worked at various companies and has founded several projects,
@@ -157,7 +157,7 @@
 
         <h2 id="references">References <span class="wiki-edit">[<a href="#">edit</a>]</span></h2>
         <ol class="wiki-references">
-          <li>^ <a :href="resume.experience[0]?.url" target="_blank">{{ resume.experience[0]?.subtitle }} website</a>. Retrieved {{ currentDate }}.</li>
+          <li>^ <a :href="currentJob.url" target="_blank">{{ currentJob.subtitle }} website</a>. Retrieved {{ currentDate }}.</li>
           <li>^ "Soli's personal website". <a href="https://soli.blue">soli.blue</a>. Retrieved {{ currentDate }}.</li>
         </ol>
 
@@ -196,6 +196,9 @@ export default {
     };
   },
   computed: {
+    currentJob() {
+      return this.resume.experience[0] || { title: 'Software Engineer', subtitle: '', url: '' };
+    },
     liveProjects() {
       return this.projects.filter(p => p.status === 'live');
     },
