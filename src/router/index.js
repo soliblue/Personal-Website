@@ -9,6 +9,7 @@ import BuildHome from '@/views/BuildHome';
 import TerminalHome from '@/views/TerminalHome';
 import NewspaperHome from '@/views/NewspaperHome';
 import Windows95Home from '@/views/Windows95Home';
+import WikipediaHome from '@/views/WikipediaHome';
 import AppDoc from '@/views/AppDoc';
 
 Vue.use(Router);
@@ -57,6 +58,15 @@ export default new Router({
       component: Windows95Home,
       beforeEnter: (to, from, next) => {
         localStorage.setItem('homeVersion', 'windows95');
+        next();
+      },
+    },
+    {
+      path: '/wikipedia',
+      name: 'WikipediaHome',
+      component: WikipediaHome,
+      beforeEnter: (to, from, next) => {
+        localStorage.setItem('homeVersion', 'wikipedia');
         next();
       },
     },

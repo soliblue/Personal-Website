@@ -88,6 +88,13 @@
         </svg>
         <span>win95</span>
       </router-link>
+      <router-link to="/wikipedia" class="floating-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <text x="12" y="16" text-anchor="middle" font-size="12" fill="currentColor" stroke="none">W</text>
+        </svg>
+        <span>wiki</span>
+      </router-link>
     </div>
 
     <!-- Modal -->

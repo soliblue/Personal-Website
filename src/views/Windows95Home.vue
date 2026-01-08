@@ -301,6 +301,10 @@
           <img src="../assets/win95/doc.svg">
           <span>Newspaper Mode</span>
         </div>
+        <div class="menu-item-row" @click="navigateTo('/wikipedia')">
+          <img src="../assets/win95/globe.svg">
+          <span>Wikipedia Mode</span>
+        </div>
         <div class="menu-divider"></div>
         <div class="menu-item-row shutdown" @click="shutdown">
           <img src="../assets/win95/shutdown.svg">
