@@ -61,14 +61,25 @@
         </div>
       </div>
     </div>
-    <router-link to="/animation" class="floating-btn">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-        <line x1="3" y1="9" x2="21" y2="9"></line>
-        <line x1="9" y1="21" x2="9" y2="9"></line>
-      </svg>
-      <span>classic</span>
-    </router-link>
+    <div class="floating-btns">
+      <router-link to="/animation" class="floating-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="3" y1="9" x2="21" y2="9"></line>
+          <line x1="9" y1="21" x2="9" y2="9"></line>
+        </svg>
+        <span>classic</span>
+      </router-link>
+      <router-link to="/newspaper" class="floating-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"></path>
+          <path d="M18 14h-8"></path>
+          <path d="M15 18h-5"></path>
+          <path d="M10 6h8v4h-8V6Z"></path>
+        </svg>
+        <span>newspaper</span>
+      </router-link>
+    </div>
 
     <!-- Modal -->
     <div v-if="activeModal" class="modal-overlay" @click.self="closeModal">
@@ -526,10 +537,16 @@ export default {
   80%, 100% { content: '...'; }
 }
 
-.floating-btn {
+.floating-btns {
   position: fixed;
   bottom: 1em;
   left: 1em;
+  display: flex;
+  gap: 0.5em;
+  z-index: 1000;
+}
+
+.floating-btn {
   background: var(--surface);
   color: var(--text);
   padding: 0.6em 1em;
@@ -541,7 +558,6 @@ export default {
   font-size: 0.9em;
   opacity: 0.8;
   transition: opacity 0.2s, background 0.2s;
-  z-index: 1000;
 }
 
 .floating-btn:hover {

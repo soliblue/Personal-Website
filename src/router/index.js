@@ -7,6 +7,7 @@ import Plugins from '@/views/Plugins';
 import Projects from '@/views/Projects';
 import BuildHome from '@/views/BuildHome';
 import TerminalHome from '@/views/TerminalHome';
+import NewspaperHome from '@/views/NewspaperHome';
 import AppDoc from '@/views/AppDoc';
 
 Vue.use(Router);
@@ -37,6 +38,15 @@ export default new Router({
       component: TerminalHome,
       beforeEnter: (to, from, next) => {
         localStorage.setItem('homeVersion', 'terminal');
+        next();
+      },
+    },
+    {
+      path: '/newspaper',
+      name: 'NewspaperHome',
+      component: NewspaperHome,
+      beforeEnter: (to, from, next) => {
+        localStorage.setItem('homeVersion', 'newspaper');
         next();
       },
     },
