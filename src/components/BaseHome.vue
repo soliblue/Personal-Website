@@ -152,4 +152,19 @@ export default {
     gap: 0.5em;
     z-index: 1000;
   }
+
+  /* Mobile: hide text labels, show only icons */
+  @media (max-width: 600px) {
+    .floating-btn span {
+      display: none;
+    }
+
+    .floating-btn {
+      padding: 0.6em;
+    }
+
+    .floating-btns-left {
+      gap: 0.3em;
+    }
+  }
 </style>
