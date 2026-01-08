@@ -214,6 +214,8 @@
           <router-link to="/animation" class="footer-link">Animation Home</router-link>
           <span class="footer-divider">|</span>
           <router-link to="/terminal" class="footer-link">Terminal Home</router-link>
+          <span class="footer-divider">|</span>
+          <router-link to="/windows95" class="footer-link">Windows 95 Home</router-link>
         </div>
       </footer>
     </div>

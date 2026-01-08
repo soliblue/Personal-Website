@@ -8,6 +8,7 @@ import Projects from '@/views/Projects';
 import BuildHome from '@/views/BuildHome';
 import TerminalHome from '@/views/TerminalHome';
 import NewspaperHome from '@/views/NewspaperHome';
+import Windows95Home from '@/views/Windows95Home';
 import AppDoc from '@/views/AppDoc';
 
 Vue.use(Router);
@@ -47,6 +48,15 @@ export default new Router({
       component: NewspaperHome,
       beforeEnter: (to, from, next) => {
         localStorage.setItem('homeVersion', 'newspaper');
+        next();
+      },
+    },
+    {
+      path: '/windows95',
+      name: 'Windows95Home',
+      component: Windows95Home,
+      beforeEnter: (to, from, next) => {
+        localStorage.setItem('homeVersion', 'windows95');
         next();
       },
     },

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" shape-rendering="crispEdges">
+  <!-- Window frame -->
+  <rect x="2" y="2" width="28" height="28" fill="#c0c0c0"/>
+  <rect x="3" y="3" width="26" height="26" fill="#000"/>
+  <!-- Title bar -->
+  <rect x="2" y="2" width="28" height="4" fill="#000080"/>
+  <!-- Terminal content -->
+  <text x="5" y="14" fill="#c0c0c0" font-family="monospace" font-size="6">C:\&gt;_</text>
+  <text x="5" y="20" fill="#00ff00" font-family="monospace" font-size="5">dir</text>
+  <text x="5" y="26" fill="#c0c0c0" font-family="monospace" font-size="4">soli.exe</text>
+</svg>

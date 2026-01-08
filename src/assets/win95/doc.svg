@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" shape-rendering="crispEdges">
+  <!-- Paper -->
+  <rect x="6" y="2" width="16" height="28" fill="#fff"/>
+  <rect x="6" y="2" width="16" height="1" fill="#fff"/>
+  <rect x="6" y="2" width="1" height="28" fill="#fff"/>
+  <rect x="21" y="2" width="1" height="28" fill="#808080"/>
+  <rect x="6" y="29" width="16" height="1" fill="#808080"/>
+  <!-- Folded corner -->
+  <polygon points="22,2 22,8 28,8" fill="#c0c0c0"/>
+  <polygon points="22,2 28,8 28,8 22,2" fill="#808080" stroke="#808080" stroke-width="1"/>
+  <rect x="22" y="8" width="6" height="22" fill="#fff"/>
+  <rect x="27" y="8" width="1" height="22" fill="#808080"/>
+  <rect x="22" y="29" width="6" height="1" fill="#808080"/>
+  <!-- Text lines -->
+  <rect x="8" y="12" width="12" height="1" fill="#000080"/>
+  <rect x="8" y="15" width="16" height="1" fill="#000"/>
+  <rect x="8" y="18" width="14" height="1" fill="#000"/>
+  <rect x="8" y="21" width="16" height="1" fill="#000"/>
+  <rect x="8" y="24" width="10" height="1" fill="#000"/>
+</svg>

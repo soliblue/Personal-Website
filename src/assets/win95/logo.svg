@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 100" shape-rendering="crispEdges">
+  <!-- Windows 95 style logo -->
+  <!-- Colored flag squares with wave -->
+  <rect x="20" y="10" width="30" height="30" fill="#ff0000" transform="skewX(-10)"/>
+  <rect x="55" y="10" width="30" height="30" fill="#00ff00" transform="skewX(-10)"/>
+  <rect x="20" y="45" width="30" height="30" fill="#0000ff" transform="skewX(-10)"/>
+  <rect x="55" y="45" width="30" height="30" fill="#ffff00" transform="skewX(-10)"/>
+
+  <!-- Text -->
+  <text x="110" y="55" fill="#ffffff" font-family="Arial, sans-serif" font-size="36" font-weight="bold">soli</text>
+  <text x="185" y="55" fill="#c0c0c0" font-family="Arial, sans-serif" font-size="36" font-style="italic">95</text>
+</svg>

@@ -57,6 +57,15 @@
         </svg>
         <span>newspaper</span>
       </router-link>
+      <router-link to="/windows95" class="floating-btn left">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <rect x="2" y="2" width="9" height="9" fill="#f65314"/>
+          <rect x="13" y="2" width="9" height="9" fill="#7cbb00"/>
+          <rect x="2" y="13" width="9" height="9" fill="#00a1f1"/>
+          <rect x="13" y="13" width="9" height="9" fill="#ffbb00"/>
+        </svg>
+        <span>win95</span>
+      </router-link>
     </div>
   </div>
 </template>

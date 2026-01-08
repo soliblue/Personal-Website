@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" shape-rendering="crispEdges">
+  <!-- Envelope -->
+  <rect x="2" y="8" width="28" height="18" fill="#ffffcc"/>
+  <rect x="2" y="8" width="28" height="1" fill="#fff"/>
+  <rect x="2" y="8" width="1" height="18" fill="#fff"/>
+  <rect x="29" y="8" width="1" height="18" fill="#808080"/>
+  <rect x="2" y="25" width="28" height="1" fill="#808080"/>
+  <!-- Flap -->
+  <polygon points="2,8 16,18 30,8" fill="#ffffaa" stroke="#808080" stroke-width="1"/>
+  <!-- Red seal -->
+  <circle cx="16" cy="18" r="4" fill="#cc0000"/>
+  <circle cx="16" cy="18" r="2" fill="#ff0000"/>
+</svg>
