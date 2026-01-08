@@ -107,24 +107,22 @@
           <div class="doc-body">
             <h1>CURRICULUM VITAE</h1>
             <h2>Soli</h2>
-            <p><strong>Current Position:</strong> AI Whisperer</p>
-            <p><strong>Location:</strong> Berlin, Germany</p>
+            <p><strong>Current:</strong> AI Whisperer @ Berlin</p>
             <hr>
             <h3>EXPERIENCE</h3>
-            <p><strong>Habibi.ai</strong> - Founder (2023-Present)</p>
-            <p>Building AI tools for Arabic speakers</p>
-            <br>
-            <p><strong>Various Startups</strong> - Engineer/Founder</p>
-            <p>Failed fast, learned faster</p>
+            <div v-for="(exp, i) in resume.experience" :key="'exp-'+i" class="resume-item">
+              <p><strong>{{ exp.title }}</strong> - {{ exp.subtitle }}</p>
+              <p class="resume-date">{{ exp.start }} - {{ exp.end || 'Present' }}</p>
+            </div>
             <hr>
             <h3>EDUCATION</h3>
-            <p><strong>Polytechnique Montreal</strong> - Computer Engineering</p>
-            <hr>
-            <h3>SKILLS</h3>
-            <p>Python, JavaScript, Vue, React, AI/ML, Product</p>
+            <div v-for="(edu, i) in resume.education" :key="'edu-'+i" class="resume-item">
+              <p><strong>{{ edu.title }}</strong></p>
+              <p>{{ edu.subtitle }}</p>
+            </div>
             <hr>
             <h3>LANGUAGES</h3>
-            <p>English, French, Arabic, German (learning)</p>
+            <p>{{ resume.languages.map(l => l.name + ' (' + l.level + ')').join(', ') }}</p>
           </div>
         </div>
 
@@ -137,24 +135,17 @@
             <span class="address-bar">C:\Projects\</span>
           </div>
           <div class="explorer-body">
-            <div class="folder-item" @dblclick="openExternalLink('https://habibi.ai')">
-              <img src="../assets/win95/folder.svg">
-              <span>Habibi.ai</span>
-            </div>
-            <div class="folder-item" @dblclick="openExternalLink('https://github.com/soliblue')">
-              <img src="../assets/win95/folder.svg">
-              <span>GitHub</span>
-            </div>
-            <div class="folder-item">
-              <img src="../assets/win95/doc.svg">
-              <span>ideas.txt</span>
-            </div>
-            <div class="folder-item">
-              <img src="../assets/win95/doc.svg">
-              <span>todo.txt</span>
+            <div
+              v-for="(project, i) in projects"
+              :key="'proj-'+i"
+              class="folder-item"
+              @dblclick="project.link ? openExternalLink(project.link) : null"
+            >
+              <img :src="project.status === 'graveyard' ? require('../assets/win95/doc.svg') : require('../assets/win95/folder.svg')">
+              <span>{{ project.title }}{{ project.status === 'graveyard' ? '.old' : '' }}</span>
             </div>
           </div>
-          <div class="explorer-status">4 object(s)</div>
+          <div class="explorer-status">{{ projects.length }} object(s)</div>
         </div>
 
         <!-- Pins Window -->
@@ -340,10 +331,15 @@
 </template>
 
 <script>
+import resume from '@/assets/resume.json';
+import projects from '@/assets/projects.json';
+
 export default {
   name: 'Windows95Home',
   data() {
     return {
+      resume,
+      projects,
       booting: true,
       bootProgress: 0,
       shuttingDown: false,
@@ -901,6 +897,19 @@ export default {
   border: none;
   border-top: 1px solid #808080;
   margin: 12px 0;
+}
+
+.resume-item {
+  margin-bottom: 8px;
+}
+
+.resume-item p {
+  margin: 2px 0;
+}
+
+.resume-date {
+  color: #808080;
+  font-size: 10px;
 }
 
 .doc-footer {
