@@ -26,10 +26,6 @@
         <img src="../assets/win95/network.svg" alt="GitHub">
         <span>GitHub</span>
       </div>
-      <div class="desktop-icon" @dblclick="navigateTo('/terminal')">
-        <img src="../assets/win95/terminal.svg" alt="Terminal">
-        <span>Terminal</span>
-      </div>
       <div class="desktop-icon recycle" @dblclick="openWindow('recycle')">
         <img src="../assets/win95/recycle.svg" alt="Recycle Bin">
         <span>Recycle Bin</span>
@@ -94,7 +90,7 @@
             </div>
           </div>
           <div class="about-buttons">
-            <button class="win95-btn" @click="navigateTo('/home')">OK</button>
+            <button class="win95-btn" @click="closeWindow(windows.find(w => w.id === 'about'))">OK</button>
           </div>
         </div>
 
@@ -117,15 +113,18 @@
             <h3>EXPERIENCE</h3>
             <p><strong>Habibi.ai</strong> - Founder (2023-Present)</p>
             <p>Building AI tools for Arabic speakers</p>
+            <br>
             <p><strong>Various Startups</strong> - Engineer/Founder</p>
             <p>Failed fast, learned faster</p>
             <hr>
             <h3>EDUCATION</h3>
             <p><strong>Polytechnique Montreal</strong> - Computer Engineering</p>
             <hr>
-            <div class="doc-footer">
-              <button class="win95-btn" @click="navigateTo('/resume')">View Full Resume</button>
-            </div>
+            <h3>SKILLS</h3>
+            <p>Python, JavaScript, Vue, React, AI/ML, Product</p>
+            <hr>
+            <h3>LANGUAGES</h3>
+            <p>English, French, Arabic, German (learning)</p>
           </div>
         </div>
 
@@ -142,25 +141,55 @@
               <img src="../assets/win95/folder.svg">
               <span>Habibi.ai</span>
             </div>
-            <div class="folder-item" @dblclick="navigateTo('/projects')">
+            <div class="folder-item" @dblclick="openExternalLink('https://github.com/soliblue')">
               <img src="../assets/win95/folder.svg">
-              <span>All Projects...</span>
+              <span>GitHub</span>
+            </div>
+            <div class="folder-item">
+              <img src="../assets/win95/doc.svg">
+              <span>ideas.txt</span>
+            </div>
+            <div class="folder-item">
+              <img src="../assets/win95/doc.svg">
+              <span>todo.txt</span>
             </div>
           </div>
-          <div class="explorer-status">2 object(s)</div>
+          <div class="explorer-status">4 object(s)</div>
         </div>
 
         <!-- Pins Window -->
         <div v-if="win.id === 'pins'" class="explorer-content">
           <div class="explorer-toolbar">
             <button class="toolbar-btn">🌍</button>
-            <span class="address-bar">http://soli.blue/pins</span>
+            <span class="address-bar">C:\Places\</span>
           </div>
-          <div class="explorer-body browser">
-            <p>Loading World Map...</p>
-            <p>Places I've been and loved.</p>
-            <button class="win95-btn" @click="navigateTo('/pins')">Open in Browser</button>
+          <div class="explorer-body">
+            <div class="folder-item">
+              <img src="../assets/win95/folder.svg">
+              <span>Berlin</span>
+            </div>
+            <div class="folder-item">
+              <img src="../assets/win95/folder.svg">
+              <span>Montreal</span>
+            </div>
+            <div class="folder-item">
+              <img src="../assets/win95/folder.svg">
+              <span>Dubai</span>
+            </div>
+            <div class="folder-item">
+              <img src="../assets/win95/folder.svg">
+              <span>Tokyo</span>
+            </div>
+            <div class="folder-item">
+              <img src="../assets/win95/folder.svg">
+              <span>Paris</span>
+            </div>
+            <div class="folder-item">
+              <img src="../assets/win95/folder.svg">
+              <span>London</span>
+            </div>
           </div>
+          <div class="explorer-status">6 object(s) - Places I've loved</div>
         </div>
 
         <!-- Contact Window -->
@@ -369,7 +398,7 @@ export default {
         },
         {
           id: 'pins',
-          title: 'Internet Explorer - World Pins',
+          title: 'Places - Explorer',
           icon: require('../assets/win95/globe.svg'),
           open: false,
           minimized: false,
@@ -579,14 +608,11 @@ export default {
 </script>
 
 <style scoped>
-/* Windows 95 color palette */
-:root {
-  --win95-bg: #008080;
-  --win95-gray: #c0c0c0;
-  --win95-dark: #808080;
-  --win95-light: #ffffff;
-  --win95-shadow: #404040;
-  --win95-blue: #000080;
+/* Block all external animations */
+.win95-desktop,
+.win95-desktop * {
+  animation: none !important;
+  transition: none !important;
 }
 
 .win95-desktop {
