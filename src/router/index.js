@@ -20,8 +20,9 @@ export default new Router({
     {
       path: '/',
       beforeEnter: (to, from, next) => {
-        // Randomly choose between animation and terminal
-        const version = Math.random() < 0.5 ? '/animation' : '/terminal';
+        // Randomly choose between all homepage versions
+        const versions = ['/animation', '/terminal', '/newspaper', '/windows95', '/wikipedia'];
+        const version = versions[Math.floor(Math.random() * versions.length)];
         next(version);
       },
     },
