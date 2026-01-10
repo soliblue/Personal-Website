@@ -14,7 +14,7 @@ export default {
     goBack() {
       // Go back to the homepage version the user came from
       const homeVersion = localStorage.getItem('homeVersion') || 'animation';
-      this.$router.push('/' + homeVersion);
+      this.$router.push(`/${homeVersion}`);
     },
   },
 };

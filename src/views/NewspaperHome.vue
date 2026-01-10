@@ -237,8 +237,8 @@ export default {
       experience: resume.experience,
       education: resume.education,
       languages: resume.languages,
-      projects: projects,
-      pins: pins,
+      projects,
+      pins,
       localTheme: 'light', // light or sepia only
     };
   },

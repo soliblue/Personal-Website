@@ -10,6 +10,7 @@ import TerminalHome from '@/views/TerminalHome';
 import NewspaperHome from '@/views/NewspaperHome';
 import Windows95Home from '@/views/Windows95Home';
 import WikipediaHome from '@/views/WikipediaHome';
+import SpaceGameHome from '@/views/SpaceGameHome';
 import AppDoc from '@/views/AppDoc';
 
 Vue.use(Router);
@@ -21,7 +22,7 @@ export default new Router({
       path: '/',
       beforeEnter: (to, from, next) => {
         // Randomly choose between all homepage versions
-        const versions = ['/animation', '/terminal', '/newspaper', '/windows95', '/wikipedia'];
+        const versions = ['/animation', '/terminal', '/newspaper', '/windows95', '/wikipedia', '/space'];
         const version = versions[Math.floor(Math.random() * versions.length)];
         next(version);
       },
@@ -72,6 +73,15 @@ export default new Router({
       },
     },
     {
+      path: '/space',
+      name: 'SpaceGameHome',
+      component: SpaceGameHome,
+      beforeEnter: (to, from, next) => {
+        localStorage.setItem('homeVersion', 'space');
+        next();
+      },
+    },
+    {
       path: '/home',
       name: 'Home',
       component: Home,
@@ -96,7 +106,7 @@ export default new Router({
       name: 'Projects',
       component: Projects,
     },
-        {
+    {
       path: '/apps/:app/:page',
       name: 'AppDoc',
       component: AppDoc,

@@ -238,14 +238,13 @@ export default {
           });
           this.scrollToBottom();
           return;
-        } else {
-          this.messages.push({
-            role: 'assistant',
-            content: `Unknown command: ${input}\nTry \`/help\` for available commands.`,
-          });
-          this.scrollToBottom();
-          return;
         }
+        this.messages.push({
+          role: 'assistant',
+          content: `Unknown command: ${input}\nTry \`/help\` for available commands.`,
+        });
+        this.scrollToBottom();
+        return;
       }
 
       this.isLoading = true;

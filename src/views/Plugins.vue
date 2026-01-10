@@ -56,12 +56,10 @@ export default {
   computed: {
     filteredPlugins() {
       const lowerCaseSearchTerm = this.searchTerm.toLowerCase();
-      return this.plugins.filter((plugin) => {
-        return plugin.name_for_human.toLowerCase().includes(lowerCaseSearchTerm) ||
+      return this.plugins.filter(plugin => plugin.name_for_human.toLowerCase().includes(lowerCaseSearchTerm) ||
           plugin.description_for_human.toLowerCase().includes(lowerCaseSearchTerm) ||
           (plugin.description_for_model &&
-            plugin.description_for_model.toLowerCase().includes(lowerCaseSearchTerm));
-      });
+            plugin.description_for_model.toLowerCase().includes(lowerCaseSearchTerm)));
     },
     paginatedPlugins() {
       return this.filteredPlugins.slice(0, this.page * this.perPage);

@@ -49,3 +49,20 @@ Content is managed via JSON files in `src/assets/`:
 - `plugins.json` - Plugins list
 - `projects.json` - Projects list
 - `resume.json` - Resume data
+
+## Development Patterns
+
+### Background Tasks & Agents
+When given multiple tasks, use the Task tool to run agents in parallel with `run_in_background: true`. Check progress with TaskOutput.
+
+### Game Asset Generation
+- Use `generate_space_assets.py` to generate game sprites
+- Requires: `GOOGLE_API_KEY` env var, `GEMINI_MODEL=gemini-3-pro-image-preview`
+- Process: Generate with white background → BiRefNet bg removal → auto-crop
+- Reference the `habibi/playground` folder for more asset generation patterns
+
+### General Preferences
+- Always prefer editing existing files over creating new ones
+- Use parallel agents for independent tasks
+- When adding game features, include both visual feedback and sound
+- Menu links in games should open in new tabs to preserve game state
