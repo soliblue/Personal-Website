@@ -1,5 +1,5 @@
 <template>
-  <div class="terminal-container">
+  <div class="terminal-container" :class="{ embedded }">
     <div class="nav-links">
       <button @click="openModal('resume')">resume</button>
       <button @click="openModal('projects')">projects</button>
@@ -61,7 +61,7 @@
         </div>
       </div>
     </div>
-    <div class="floating-btns">
+    <div class="floating-btns" v-if="!embedded">
       <router-link to="/animation" class="floating-btn">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
@@ -185,6 +185,12 @@ import pins from '../assets/pins.json';
 
 export default {
   name: 'TerminalHome',
+  props: {
+    embedded: {
+      type: Boolean,
+      default: false,
+    },
+  },
   data() {
     return {
       userInput: '',
@@ -363,11 +369,15 @@ export default {
     },
     openModal(name) {
       this.activeModal = name;
-      document.body.style.overflow = 'hidden';
+      if (!this.embedded) {
+        document.body.style.overflow = 'hidden';
+      }
     },
     closeModal() {
       this.activeModal = null;
-      document.body.style.overflow = '';
+      if (!this.embedded) {
+        document.body.style.overflow = '';
+      }
     },
   },
 };
@@ -382,6 +392,24 @@ export default {
   justify-content: center;
   padding: 1em;
   gap: 1em;
+}
+
+.terminal-container.embedded {
+  min-height: 100%;
+  height: 100%;
+  padding: 0;
+}
+
+.terminal-container.embedded .nav-links {
+  display: none;
+}
+
+.terminal-container.embedded .terminal {
+  width: 100%;
+  max-height: 100%;
+  height: 100%;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .nav-links {

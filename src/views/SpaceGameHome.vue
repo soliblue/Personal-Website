@@ -9,14 +9,14 @@
         <button class="theme-btn" @click="toggleTheme" :title="isDarkTheme ? 'Switch to light' : 'Switch to dark'">
           {{ isDarkTheme ? '☀' : '☾' }}
         </button>
-        <button class="sound-btn" @click="toggleSound" :title="soundEnabled ? 'Mute sounds' : 'Enable sounds'">
-          {{ soundEnabled ? '🔊' : '🔇' }}
+        <button class="sound-btn" @click="toggleSound" :title="audio.enabled ? 'Mute sounds' : 'Enable sounds'">
+          {{ audio.enabled ? '🔊' : '🔇' }}
         </button>
       </div>
-      <div class="hud-right" :style="hudRightStyle">
-        <div class="stat">SCORE: {{ score }}</div>
-        <div class="stat">LEVEL: {{ level }}</div>
-        <div class="stat multiplier" v-if="multiplier > 1" :style="multiplierStyle">{{ multiplier.toFixed(1) }}x</div>
+      <div class="hud-right" :style="gameplay.getHudRightStyle()">
+        <div class="stat">SCORE: {{ gameplay.score }}</div>
+        <div class="stat">LEVEL: {{ gameplay.level }}</div>
+        <div class="stat multiplier" v-if="gameplay.multiplier > 1" :style="gameplay.getMultiplierStyle()">{{ gameplay.multiplier.toFixed(1) }}x</div>
         <div class="stat high">HIGH: {{ highScore }}</div>
       </div>
     </div>
@@ -51,8 +51,6 @@
     <!-- In-Game Content Viewer -->
     <div class="menu-overlay content-viewer" v-if="contentView" @click.self="closeContent">
       <div class="content-panel">
-        <button class="close-btn" @click="closeContent">×</button>
-
         <!-- Resume Content -->
         <div v-if="contentView === 'resume'" class="content-scroll">
           <h2>RESUME / CV</h2>
@@ -128,27 +126,55 @@
           </div>
         </div>
 
-        <button @click="closeContent" class="menu-item back-btn">← Back to Menu</button>
+        <button @click="closeContent" class="menu-item back-btn">← Back</button>
       </div>
     </div>
 
     <!-- Game Over Screen -->
-    <div class="menu-overlay" v-if="gameState === 'gameover' && !contentView">
-      <div class="menu-panel gameover">
-        <h2>GAME OVER</h2>
-        <div class="final-score">Score: {{ score }}</div>
-        <div class="final-score" v-if="isNewHighScore">NEW HIGH SCORE!</div>
-        <button @click="restartGame" class="menu-item restart">Play Again</button>
-        <div class="menu-divider"></div>
-        <button @click="showContent('resume')" class="menu-item">Resume/CV</button>
-        <button @click="showContent('projects')" class="menu-item">Projects</button>
-        <button @click="showContent('pins')" class="menu-item">Pins</button>
+    <div class="menu-overlay gameover-overlay" v-if="gameState === 'gameover' && !contentView">
+      <div class="gameover-panel">
+        <div class="gameover-title">
+          <span class="glitch" data-text="GAME OVER">GAME OVER</span>
+        </div>
+
+        <div class="gameover-stats">
+          <div class="stat-row main-score">
+            <span class="stat-value">{{ gameplay.score.toLocaleString() }}</span>
+            <span class="stat-label">SCORE</span>
+          </div>
+
+          <div class="stat-divider"></div>
+
+          <div class="stat-row-group">
+            <div class="stat-row small">
+              <span class="stat-label">LEVEL</span>
+              <span class="stat-value">{{ gameplay.level }}</span>
+            </div>
+            <div class="stat-row small">
+              <span class="stat-label">HIGH SCORE</span>
+              <span class="stat-value">{{ highScore.toLocaleString() }}</span>
+            </div>
+          </div>
+
+          <div class="new-highscore" v-if="isNewHighScore">
+            <span class="highscore-text">NEW HIGH SCORE!</span>
+          </div>
+        </div>
+
+        <div class="gameover-actions">
+          <button @click="restartGame" class="action-btn primary">
+            <span class="btn-icon">&#9658;</span>
+            PLAY AGAIN
+          </button>
+          <button @click="toggleMenu" class="action-btn secondary">MENU</button>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+// Asset imports
 import spaceshipImg from '@/assets/space/spaceship.png';
 import asteroid1Img from '@/assets/space/asteroid1.png';
 import asteroid2Img from '@/assets/space/asteroid2.png';
@@ -157,8 +183,35 @@ import resumeData from '@/assets/resume.json';
 import projectsData from '@/assets/projects.json';
 import pinsData from '@/assets/pins.json';
 
+// Game module imports
+import { THEMES, LEVEL_CONFIG } from '@/game/config.js';
+import { createShip, createStars } from '@/game/entities.js';
+import { AudioSystem } from '@/game/audio.js';
+import { InputSystem } from '@/game/input.js';
+import { GameplaySystem } from '@/game/gameplay.js';
+import {
+  updateShip,
+  updateStars,
+  updateObstacles,
+  spawnObstacles,
+  checkCollisions,
+} from '@/game/physics.js';
+import {
+  renderBackground,
+  renderStars,
+  renderTrailParticles,
+  renderExplosionParticles,
+  renderShip,
+  renderObstacles,
+  renderScorePopups,
+  renderLevelUpCelebration,
+  renderProgressBar,
+  applyScreenShake,
+} from '@/game/rendering.js';
+
 export default {
   name: 'SpaceGameHome',
+
   data() {
     return {
       // Canvas
@@ -174,105 +227,30 @@ export default {
       },
       spritesLoaded: false,
 
-      // Close-call streak system
-      streak: 0,
-      multiplier: 1,
-      streakTimer: 0, // Time since last close call
-      streakDecayTime: 60, // Frames before streak decays
-      lastCloseCall: false,
-      fireIntensity: 0, // Visual effect intensity 0-1
-      prevStreak: 0, // Track previous streak for HUD flash
-
-      // Streak particle trail system
-      trailParticles: [],
-      maxTrailParticles: 50,
-
-      // HUD animation state
-      hudFlashIntensity: 0,
-      hudPulseScale: 1,
-      glowPulsePhase: 0, // For pulsing glow animation
-
       // Game state
-      gameState: 'playing', // 'playing', 'paused', 'gameover'
-      score: 0,
-      level: 1,
+      gameState: 'playing',
       highScore: 0,
-      distance: 0,
       isNewHighScore: false,
       isDarkTheme: true,
-
-      // Theme colors
-      themes: {
-        dark: {
-          bg1: '#0a0a1a',
-          bg2: '#1a1a3a',
-          ship: '#00d4ff',
-          engine: '#ff6b00',
-          asteroid: '#4a4a6a',
-          asteroidGlow: '#8b5cf6',
-          text: '#00d4ff',
-          textHigh: '#ffd700',
-        },
-        light: {
-          bg1: '#e8f4fc',
-          bg2: '#c5dff0',
-          ship: '#0088cc',
-          engine: '#ff8c00',
-          asteroid: '#8888aa',
-          asteroidGlow: '#6b4ce6',
-          text: '#0066aa',
-          textHigh: '#cc8800',
-        },
-      },
-
-      // Ship
-      ship: {
-        x: 0,
-        y: 0,
-        width: 40,
-        height: 50,
-        speed: 12,
-        velocityX: 0,
-        velocityY: 0,
-        acceleration: 0.8,
-        friction: 0.92,
-        targetX: null, // For touch controls
-        targetY: null,
-        minY: 0, // Will be set in resize()
-        maxY: 0,
-      },
-
-      // Obstacles
-      obstacles: [],
-      obstacleSpawnTimer: 0,
-      baseSpawnInterval: 60, // frames
-      baseObstacleSpeed: 3,
-
-      // Stars (parallax background)
-      stars: [],
-
-      // Input
-      keys: {
-        left: false,
-        right: false,
-        up: false,
-        down: false,
-      },
       isMobile: false,
-      touchX: null,
+
+      // Systems (initialized in created/mounted)
+      audio: new AudioSystem(),
+      input: new InputSystem(),
+      gameplay: new GameplaySystem(),
+
+      // Game objects
+      ship: null,
+      stars: [],
+      obstacles: [],
+      obstacleSpawnState: { timer: 0 },
 
       // Animation
       animationId: null,
       lastTime: 0,
 
-      // Audio
-      soundEnabled: true,
-      audioContext: null,
-      engineOscillator: null,
-      engineGain: null,
-
       // Content viewer
-      contentView: null, // null, 'resume', 'projects', 'pins'
+      contentView: null,
       resumeData,
       projectsData,
       pinsData,
@@ -281,47 +259,7 @@ export default {
 
   computed: {
     theme() {
-      return this.isDarkTheme ? this.themes.dark : this.themes.light;
-    },
-
-    // Compute streak hue for use in computed properties
-    streakHue() {
-      if (this.streak <= 2) {
-        return 180;
-      } else if (this.streak <= 5) {
-        const t = (this.streak - 2) / 3;
-        return 180 - (t * 150);
-      }
-      const t = Math.min((this.streak - 5) / 5, 1);
-      return 30 - (t * 30);
-    },
-
-    // Dynamic HUD styling based on streak flash
-    hudRightStyle() {
-      if (this.hudFlashIntensity <= 0) return {};
-
-      const hue = this.streak > 0 ? this.streakHue : 180;
-      const glowSize = 10 + (this.hudFlashIntensity * 20);
-      return {
-        filter: `drop-shadow(0 0 ${glowSize}px hsl(${hue}, 100%, 50%))`,
-      };
-    },
-
-    // Dynamic multiplier styling with pulse effect
-    multiplierStyle() {
-      const scale = this.hudPulseScale;
-      const hue = this.streak > 0 ? this.streakHue : 30; // Default orange
-      const glow1 = 10 + (this.hudFlashIntensity * 15);
-      const glow2 = 20 + (this.hudFlashIntensity * 20);
-      const glow3 = 30 + (this.hudFlashIntensity * 25);
-
-      return {
-        transform: `scale(${scale})`,
-        color: `hsl(${hue}, 100%, 50%)`,
-        textShadow: `0 0 ${glow1}px hsl(${hue}, 100%, 50%),
-                     0 0 ${glow2}px hsl(${hue}, 100%, 40%),
-                     0 0 ${glow3}px hsl(${hue}, 100%, 30%)`,
-      };
+      return this.isDarkTheme ? THEMES.dark : THEMES.light;
     },
   },
 
@@ -334,217 +272,66 @@ export default {
   },
 
   methods: {
-    toggleTheme() {
-      this.isDarkTheme = !this.isDarkTheme;
-      localStorage.setItem('spaceGameTheme', this.isDarkTheme ? 'dark' : 'light');
-    },
-
-    toggleSound() {
-      this.soundEnabled = !this.soundEnabled;
-      localStorage.setItem('spaceGameSound', this.soundEnabled ? 'on' : 'off');
-
-      // Start or stop engine sound based on sound state
-      if (this.soundEnabled && this.gameState === 'playing') {
-        this.startEngineSound();
-      } else {
-        this.stopEngineSound();
-      }
-    },
-
-    initAudio() {
-      // Create AudioContext (handle browser prefixes)
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      if (AudioContext) {
-        this.audioContext = new AudioContext();
-      }
-
-      // Load sound preference from localStorage
-      const savedSound = localStorage.getItem('spaceGameSound');
-      this.soundEnabled = savedSound !== 'off'; // Default to on
-    },
-
-    startEngineSound() {
-      if (!this.soundEnabled || !this.audioContext) return;
-
-      // Resume audio context if suspended (browser autoplay policy)
-      if (this.audioContext.state === 'suspended') {
-        this.audioContext.resume();
-      }
-
-      // Don't create multiple engine oscillators
-      if (this.engineOscillator) return;
-
-      // Create engine hum - low frequency sawtooth wave
-      this.engineOscillator = this.audioContext.createOscillator();
-      this.engineGain = this.audioContext.createGain();
-
-      this.engineOscillator.type = 'sawtooth';
-      this.engineOscillator.frequency.setValueAtTime(55, this.audioContext.currentTime); // Low A
-
-      this.engineGain.gain.setValueAtTime(0.08, this.audioContext.currentTime);
-
-      this.engineOscillator.connect(this.engineGain);
-      this.engineGain.connect(this.audioContext.destination);
-
-      this.engineOscillator.start();
-    },
-
-    stopEngineSound() {
-      if (this.engineOscillator) {
-        this.engineOscillator.stop();
-        this.engineOscillator.disconnect();
-        this.engineOscillator = null;
-      }
-      if (this.engineGain) {
-        this.engineGain.disconnect();
-        this.engineGain = null;
-      }
-    },
-
-    playCloseCallSound() {
-      if (!this.soundEnabled || !this.audioContext) return;
-
-      // Resume audio context if suspended
-      if (this.audioContext.state === 'suspended') {
-        this.audioContext.resume();
-      }
-
-      // Short high-pitched "ding" - square wave
-      const oscillator = this.audioContext.createOscillator();
-      const gainNode = this.audioContext.createGain();
-
-      oscillator.type = 'square';
-      oscillator.frequency.setValueAtTime(880, this.audioContext.currentTime); // High A
-      oscillator.frequency.setValueAtTime(1320, this.audioContext.currentTime + 0.05); // E (perfect fifth up)
-
-      gainNode.gain.setValueAtTime(0.15, this.audioContext.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.15);
-
-      oscillator.connect(gainNode);
-      gainNode.connect(this.audioContext.destination);
-
-      oscillator.start(this.audioContext.currentTime);
-      oscillator.stop(this.audioContext.currentTime + 0.15);
-    },
-
-    playGameOverSound() {
-      if (!this.soundEnabled || !this.audioContext) return;
-
-      // Resume audio context if suspended
-      if (this.audioContext.state === 'suspended') {
-        this.audioContext.resume();
-      }
-
-      // Descending tone - sawtooth wave falling pitch
-      const oscillator = this.audioContext.createOscillator();
-      const gainNode = this.audioContext.createGain();
-
-      oscillator.type = 'sawtooth';
-      oscillator.frequency.setValueAtTime(440, this.audioContext.currentTime); // A4
-      oscillator.frequency.exponentialRampToValueAtTime(55, this.audioContext.currentTime + 0.8); // Drop to A1
-
-      gainNode.gain.setValueAtTime(0.2, this.audioContext.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.8);
-
-      oscillator.connect(gainNode);
-      gainNode.connect(this.audioContext.destination);
-
-      oscillator.start(this.audioContext.currentTime);
-      oscillator.stop(this.audioContext.currentTime + 0.8);
-    },
-
-    playLevelUpSound() {
-      if (!this.soundEnabled || !this.audioContext) return;
-
-      // Resume audio context if suspended
-      if (this.audioContext.state === 'suspended') {
-        this.audioContext.resume();
-      }
-
-      // Ascending arpeggio - square wave
-      const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6 (major chord arpeggio)
-      const noteDuration = 0.1;
-
-      notes.forEach((freq, index) => {
-        const oscillator = this.audioContext.createOscillator();
-        const gainNode = this.audioContext.createGain();
-
-        oscillator.type = 'square';
-        oscillator.frequency.setValueAtTime(freq, this.audioContext.currentTime);
-
-        const startTime = this.audioContext.currentTime + index * noteDuration;
-        gainNode.gain.setValueAtTime(0, startTime);
-        gainNode.gain.linearRampToValueAtTime(0.12, startTime + 0.02);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + noteDuration);
-
-        oscillator.connect(gainNode);
-        gainNode.connect(this.audioContext.destination);
-
-        oscillator.start(startTime);
-        oscillator.stop(startTime + noteDuration + 0.05);
-      });
-    },
-
     init() {
       this.canvas = this.$refs.canvas;
       this.ctx = this.canvas.getContext('2d');
 
-      // Ensure fullscreen display with no scrollbars
+      // Fullscreen setup
       document.body.style.overflow = 'hidden';
       document.body.style.margin = '0';
       document.documentElement.style.overflow = 'hidden';
       document.documentElement.style.margin = '0';
 
-      // Load sprites
+      // Load assets
       this.loadSprites();
 
-      // Load high score and theme preference
+      // Load preferences
       this.highScore = parseInt(localStorage.getItem('spaceGameHighScore') || '0', 10);
       const savedTheme = localStorage.getItem('spaceGameTheme');
-      this.isDarkTheme = savedTheme !== 'light'; // Default to dark
+      this.isDarkTheme = savedTheme !== 'light';
 
       // Detect mobile
       this.isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
-      // Setup canvas size
+      // Setup canvas
       this.resize();
       window.addEventListener('resize', this.resize);
 
-      // Setup input handlers
-      window.addEventListener('keydown', this.handleKeyDown);
-      window.addEventListener('keyup', this.handleKeyUp);
-
-      // Touch events
-      this.canvas.addEventListener('touchstart', this.handleTouchStart, { passive: false });
-      this.canvas.addEventListener('touchmove', this.handleTouchMove, { passive: false });
-      this.canvas.addEventListener('touchend', this.handleTouchEnd);
-
-      // Initialize audio
-      this.initAudio();
+      // Initialize systems
+      this.audio.init();
+      this.input.init(this.canvas, {
+        onPause: () => {
+          if (this.gameState === 'playing') {
+            this.toggleMenu();
+          } else if (this.gameState === 'paused') {
+            this.resumeGame();
+          }
+        },
+        isPlaying: () => this.gameState === 'playing',
+      });
 
       // Initialize game objects
-      this.initShip();
-      this.initStars();
+      this.ship = createShip(this.width, this.height);
+      this.ship.minY = this.ship.height / 2 + 60;
+      this.ship.maxY = this.height - this.ship.height / 2 - 20;
+      this.stars = createStars(this.width, this.height);
 
       // Start game loop
       this.lastTime = performance.now();
       this.gameLoop();
 
-      // Start engine sound (after user interaction to comply with autoplay policy)
-      // We'll start it on first user input instead
-      this.canvas.addEventListener('click', this.onFirstInteraction, { once: true });
-      this.canvas.addEventListener('touchstart', this.onFirstInteraction, { once: true });
-      window.addEventListener('keydown', this.onFirstInteraction, { once: true });
-    },
-
-    onFirstInteraction() {
-      if (this.soundEnabled && this.gameState === 'playing') {
-        this.startEngineSound();
-      }
+      // Start engine sound on first interaction
+      const startAudio = () => {
+        if (this.audio.enabled && this.gameState === 'playing') {
+          this.audio.startEngine();
+        }
+      };
+      this.canvas.addEventListener('click', startAudio, { once: true });
+      this.canvas.addEventListener('touchstart', startAudio, { once: true });
+      window.addEventListener('keydown', startAudio, { once: true });
     },
 
     loadSprites() {
-      // Load ship sprite
       const shipSprite = new Image();
       shipSprite.src = spaceshipImg;
       shipSprite.onload = () => {
@@ -552,13 +339,11 @@ export default {
         this.checkSpritesLoaded();
       };
 
-      // Load asteroid sprites
-      const asteroidSrcs = [asteroid1Img, asteroid2Img, asteroid3Img];
-      asteroidSrcs.forEach((src, index) => {
+      [asteroid1Img, asteroid2Img, asteroid3Img].forEach((src, i) => {
         const img = new Image();
         img.src = src;
         img.onload = () => {
-          this.sprites.asteroids[index] = img;
+          this.sprites.asteroids[i] = img;
           this.checkSpritesLoaded();
         };
       });
@@ -575,19 +360,9 @@ export default {
         cancelAnimationFrame(this.animationId);
       }
       window.removeEventListener('resize', this.resize);
-      window.removeEventListener('keydown', this.handleKeyDown);
-      window.removeEventListener('keyup', this.handleKeyUp);
+      this.input.cleanup();
+      this.audio.cleanup();
 
-      // Stop engine sound
-      this.stopEngineSound();
-
-      // Close audio context
-      if (this.audioContext) {
-        this.audioContext.close();
-        this.audioContext = null;
-      }
-
-      // Restore body styles when leaving the game
       document.body.style.overflow = '';
       document.body.style.margin = '';
       document.documentElement.style.overflow = '';
@@ -600,111 +375,52 @@ export default {
       this.canvas.width = this.width;
       this.canvas.height = this.height;
 
-      // Set vertical movement bounds (full screen with padding for ship)
-      this.ship.minY = this.ship.height / 2 + 60; // Top edge + HUD clearance
-      this.ship.maxY = this.height - this.ship.height / 2 - 20; // Bottom edge
+      if (this.ship) {
+        this.ship.minY = this.ship.height / 2 + 60;
+        this.ship.maxY = this.height - this.ship.height / 2 - 20;
 
-      // Reposition ship if needed
-      if (this.ship.x === 0) {
-        this.ship.x = this.width / 2;
-      }
-      if (this.ship.y === 0 || this.ship.y > this.ship.maxY) {
-        this.ship.y = this.ship.maxY - 40;
-      }
-    },
-
-    initShip() {
-      this.ship.x = this.width / 2;
-      this.ship.y = this.height - 100;
-    },
-
-    initStars() {
-      this.stars = [];
-      // Create 3 layers of stars
-      for (let layer = 0; layer < 3; layer++) {
-        const count = 30 + layer * 20;
-        const speed = 0.5 + layer * 0.5;
-        const size = 1 + layer * 0.5;
-
-        for (let i = 0; i < count; i++) {
-          this.stars.push({
-            x: Math.random() * this.width,
-            y: Math.random() * this.height,
-            speed,
-            size,
-            alpha: 0.3 + Math.random() * 0.7,
-          });
+        if (this.ship.x === 0) {
+          this.ship.x = this.width / 2;
+        }
+        if (this.ship.y === 0 || this.ship.y > this.ship.maxY) {
+          this.ship.y = this.ship.maxY - 40;
         }
       }
     },
 
-    // Input handlers
-    handleKeyDown(e) {
-      if (e.key === 'ArrowLeft' || e.key === 'a') {
-        this.keys.left = true;
-      } else if (e.key === 'ArrowRight' || e.key === 'd') {
-        this.keys.right = true;
-      } else if (e.key === 'ArrowUp' || e.key === 'w') {
-        this.keys.up = true;
-      } else if (e.key === 'ArrowDown' || e.key === 's') {
-        this.keys.down = true;
-      } else if (e.key === 'p' || e.key === 'P' || e.key === 'Escape') {
-        if (this.gameState === 'playing') {
-          this.toggleMenu();
-        } else if (this.gameState === 'paused') {
-          this.resumeGame();
-        }
+    // Game state methods
+    toggleTheme() {
+      this.isDarkTheme = !this.isDarkTheme;
+      localStorage.setItem('spaceGameTheme', this.isDarkTheme ? 'dark' : 'light');
+    },
+
+    toggleSound() {
+      const enabled = this.audio.toggle();
+      if (enabled && this.gameState === 'playing') {
+        this.audio.startEngine();
+      } else {
+        this.audio.stopEngine();
       }
     },
 
-    handleKeyUp(e) {
-      if (e.key === 'ArrowLeft' || e.key === 'a') {
-        this.keys.left = false;
-      } else if (e.key === 'ArrowRight' || e.key === 'd') {
-        this.keys.right = false;
-      } else if (e.key === 'ArrowUp' || e.key === 'w') {
-        this.keys.up = false;
-      } else if (e.key === 'ArrowDown' || e.key === 's') {
-        this.keys.down = false;
-      }
-    },
-
-    handleTouchStart(e) {
-      e.preventDefault();
-      if (this.gameState !== 'playing') return;
-      const touch = e.touches[0];
-      this.touchX = touch.clientX;
-      this.ship.targetX = touch.clientX;
-      this.ship.targetY = touch.clientY;
-    },
-
-    handleTouchMove(e) {
-      e.preventDefault();
-      if (this.gameState !== 'playing') return;
-      const touch = e.touches[0];
-      this.touchX = touch.clientX;
-      this.ship.targetX = touch.clientX;
-      this.ship.targetY = touch.clientY;
-    },
-
-    handleTouchEnd() {
-      this.touchX = null;
-      this.ship.targetX = null;
-      this.ship.targetY = null;
-    },
-
-    // Game state
     toggleMenu() {
       if (this.gameState === 'playing') {
         this.gameState = 'paused';
+        this.audio.stopEngine();
       } else if (this.gameState === 'paused') {
         this.gameState = 'playing';
+        if (this.audio.enabled) {
+          this.audio.startEngine();
+        }
       }
     },
 
     resumeGame() {
       this.contentView = null;
       this.gameState = 'playing';
+      if (this.audio.enabled) {
+        this.audio.startEngine();
+      }
     },
 
     showContent(view) {
@@ -716,33 +432,27 @@ export default {
     },
 
     restartGame() {
-      this.score = 0;
-      this.level = 1;
-      this.distance = 0;
+      this.gameplay.reset();
       this.obstacles = [];
-      this.obstacleSpawnTimer = 0;
+      this.obstacleSpawnState.timer = 0;
       this.isNewHighScore = false;
-      this.streak = 0;
-      this.prevStreak = 0;
-      this.multiplier = 1;
-      this.fireIntensity = 0;
-      this.trailParticles = [];
-      this.hudFlashIntensity = 0;
-      this.hudPulseScale = 1;
-      this.glowPulsePhase = 0;
-      this.ship.velocityX = 0;
-      this.ship.velocityY = 0;
-      this.initShip();
+      this.ship = createShip(this.width, this.height);
+      this.ship.minY = this.ship.height / 2 + 60;
+      this.ship.maxY = this.height - this.ship.height / 2 - 20;
       this.gameState = 'playing';
-      this.startEngineSound();
+      this.audio.startEngine();
     },
 
     gameOver() {
+      this.audio.stopEngine();
+      this.gameplay.triggerDeath(this.ship);
+      this.audio.playGameOver();
+    },
+
+    completeGameOver() {
       this.gameState = 'gameover';
-      this.stopEngineSound();
-      this.playGameOverSound();
-      if (this.score > this.highScore) {
-        this.highScore = this.score;
+      if (this.gameplay.score > this.highScore) {
+        this.highScore = this.gameplay.score;
         this.isNewHighScore = true;
         localStorage.setItem('spaceGameHighScore', this.highScore.toString());
       }
@@ -752,10 +462,16 @@ export default {
     gameLoop(currentTime = 0) {
       this.animationId = requestAnimationFrame(this.gameLoop);
 
-      const deltaTime = (currentTime - this.lastTime) / 16.67; // Normalize to ~60fps
+      let deltaTime = (currentTime - this.lastTime) / 16.67;
       this.lastTime = currentTime;
 
-      if (this.gameState === 'playing') {
+      // Cap delta time to prevent huge jumps when returning from background/tab switch
+      // This prevents stars from all aligning when coming back to the page
+      if (deltaTime > 3) {
+        deltaTime = 1;
+      }
+
+      if (this.gameState === 'playing' || this.gameplay.isDying) {
         this.update(deltaTime);
       }
 
@@ -763,537 +479,114 @@ export default {
     },
 
     update(dt) {
+      // Update gameplay (handles death animation too)
+      this.gameplay.update(dt, {
+        onLevelUp: () => {
+          this.audio.playLevelUp();
+        },
+        onDeathComplete: () => {
+          this.completeGameOver();
+        },
+      });
+
+      // Skip other updates if dying
+      if (this.gameplay.isDying) {
+        this.gameplay.updateExplosionParticles(dt);
+        return;
+      }
+
       // Update ship position
-      this.updateShip(dt);
+      const touchTarget = this.input.getTargetPosition();
+      updateShip(this.ship, this.input.keys, touchTarget, this.width, dt);
 
       // Update stars
-      this.updateStars(dt);
+      updateStars(this.stars, this.width, this.height, dt);
 
-      // Spawn obstacles
-      this.spawnObstacles(dt);
+      // Spawn and update obstacles
+      spawnObstacles(this.obstacles, this.obstacleSpawnState, this.width, this.gameplay.level, dt);
+      updateObstacles(this.obstacles, this.height, dt);
 
-      // Update obstacles
-      this.updateObstacles(dt);
-
-      // Check collisions (will end game if hit)
-      this.checkCollisions();
-
-      // Check close calls for streak bonus
-      this.checkCloseCalls();
-
-      // Update streak timer and decay
-      this.updateStreak(dt);
-
-      // Update glow pulse phase for animation
-      this.glowPulsePhase += dt * 0.15;
-
-      // Update trail particles
-      this.updateTrailParticles(dt);
-
-      // Decay HUD flash effect
-      if (this.hudFlashIntensity > 0) {
-        this.hudFlashIntensity = Math.max(0, this.hudFlashIntensity - 0.05 * dt);
-      }
-      if (this.hudPulseScale > 1) {
-        this.hudPulseScale = Math.max(1, this.hudPulseScale - 0.02 * dt);
+      // Check collisions
+      if (checkCollisions(this.ship, this.obstacles)) {
+        this.gameOver();
+        return;
       }
 
-      // Update score with multiplier
-      this.distance += dt * this.multiplier;
-      this.score = Math.floor(this.distance);
+      // Check close calls
+      this.gameplay.checkCloseCalls(this.ship, this.obstacles, {
+        onCloseCall: () => {
+          this.audio.playCloseCall();
+        },
+      });
 
-      const newLevel = Math.floor(this.distance / 1000) + 1;
-      if (newLevel > this.level) {
-        this.level = newLevel;
-        this.playLevelUpSound();
-      }
+      // Check orbits
+      this.gameplay.checkOrbits(this.ship, this.obstacles, {
+        onOrbit: () => {
+          this.audio.playCloseCall(); // Play sound on orbit completion
+        },
+      });
+
+      // Update streak and particles
+      this.gameplay.updateStreak(dt);
+      this.gameplay.updateTrailParticles(this.ship, this.gameState, dt);
+      this.gameplay.updateScorePopups(dt);
     },
 
-    checkCloseCalls() {
-      const shipX = this.ship.x;
-      const shipY = this.ship.y;
-      const closeCallDistance = 80; // Distance to trigger close call
-      const dangerDistance = 40; // Extra close = better bonus
-
-      let closestDistance = Infinity;
-      let isCloseToAny = false;
-
-      for (const obs of this.obstacles) {
-        // Calculate distance from ship center to obstacle center
-        const dx = shipX - obs.x;
-        const dy = shipY - obs.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        const combinedRadius = (this.ship.width + obs.width) / 2;
-
-        // Check if close but not colliding
-        const gap = distance - combinedRadius;
-
-        if (gap > 0 && gap < closeCallDistance) {
-          isCloseToAny = true;
-          closestDistance = Math.min(closestDistance, gap);
-
-          // Mark this obstacle as passed close
-          if (!obs.closeCallCounted && obs.y > shipY) {
-            obs.closeCallCounted = true;
-
-            // Calculate bonus based on how close (closer = better)
-            const closenessBonus = 1 - (gap / closeCallDistance);
-
-            // Track previous streak for HUD flash
-            this.prevStreak = this.streak;
-
-            // Increment streak
-            this.streak += 1;
-            this.streakTimer = 0;
-
-            // Trigger HUD flash effect on new streak
-            this.hudFlashIntensity = 1.0;
-            this.hudPulseScale = 1.2;
-
-            // Play close call sound
-            this.playCloseCallSound();
-
-            // Multiplier increases with streak (max 10x)
-            this.multiplier = Math.min(1 + this.streak * 0.5, 10);
-
-            // Fire intensity based on closeness and streak
-            this.fireIntensity = Math.min(closenessBonus + (this.streak * 0.1), 1);
-          }
-        }
-      }
-
-      // Update ongoing close call state
-      this.lastCloseCall = isCloseToAny;
-
-      // If currently very close, boost fire effect
-      if (isCloseToAny && closestDistance < dangerDistance) {
-        this.fireIntensity = Math.min(this.fireIntensity + 0.05, 1);
-      }
-    },
-
-    updateStreak(dt) {
-      // Decay streak timer
-      this.streakTimer += dt;
-
-      // If no close calls for a while, decay the streak
-      if (this.streakTimer > this.streakDecayTime) {
-        if (this.streak > 0) {
-          this.streak = Math.max(0, this.streak - 1);
-          this.multiplier = Math.max(1, 1 + this.streak * 0.5);
-          this.streakTimer = this.streakDecayTime * 0.5; // Slow decay
-        }
-        // Decay fire intensity
-        this.fireIntensity = Math.max(0, this.fireIntensity - 0.02);
-      }
-    },
-
-    updateShip(dt) {
-      // Horizontal keyboard movement with acceleration
-      if (this.keys.left) {
-        this.ship.velocityX -= this.ship.acceleration * dt;
-      }
-      if (this.keys.right) {
-        this.ship.velocityX += this.ship.acceleration * dt;
-      }
-
-      // Vertical keyboard movement with acceleration
-      if (this.keys.up) {
-        this.ship.velocityY -= this.ship.acceleration * dt;
-      }
-      if (this.keys.down) {
-        this.ship.velocityY += this.ship.acceleration * dt;
-      }
-
-      // Apply friction
-      this.ship.velocityX *= this.ship.friction;
-      this.ship.velocityY *= this.ship.friction;
-
-      // Clamp velocity to max speed
-      this.ship.velocityX = Math.max(-this.ship.speed, Math.min(this.ship.speed, this.ship.velocityX));
-      this.ship.velocityY = Math.max(-this.ship.speed, Math.min(this.ship.speed, this.ship.velocityY));
-
-      // Apply velocity to position
-      this.ship.x += this.ship.velocityX * dt;
-      this.ship.y += this.ship.velocityY * dt;
-
-      // Touch movement (smooth follow)
-      if (this.ship.targetX !== null) {
-        const diffX = this.ship.targetX - this.ship.x;
-        this.ship.x += diffX * 0.2 * dt;
-      }
-      if (this.ship.targetY !== null) {
-        const diffY = this.ship.targetY - this.ship.y;
-        this.ship.y += diffY * 0.2 * dt;
-      }
-
-      // Keep ship in horizontal bounds
-      const halfWidth = this.ship.width / 2;
-      this.ship.x = Math.max(halfWidth, Math.min(this.width - halfWidth, this.ship.x));
-
-      // Keep ship in vertical bounds (bottom portion of screen)
-      this.ship.y = Math.max(this.ship.minY, Math.min(this.ship.maxY, this.ship.y));
-    },
-
-    updateStars(dt) {
-      for (const star of this.stars) {
-        star.y += star.speed * dt;
-        if (star.y > this.height) {
-          star.y = 0;
-          star.x = Math.random() * this.width;
-        }
-      }
-    },
-
-    updateTrailParticles(dt) {
-      // Spawn new particles when on a streak
-      if (this.streak > 0 && this.gameState === 'playing') {
-        // Spawn rate increases with streak
-        const spawnChance = Math.min(0.3 + this.streak * 0.1, 0.8);
-        if (Math.random() < spawnChance && this.trailParticles.length < this.maxTrailParticles) {
-          // Calculate glow color based on streak (cyan -> orange -> red)
-          const hue = this.getStreakHue();
-
-          this.trailParticles.push({
-            x: this.ship.x + (Math.random() - 0.5) * this.ship.width * 0.6,
-            y: this.ship.y + this.ship.height / 2,
-            vx: (Math.random() - 0.5) * 2,
-            vy: 2 + Math.random() * 3,
-            life: 1.0,
-            decay: 0.02 + Math.random() * 0.02,
-            size: 2 + Math.random() * 3 + this.streak * 0.5,
-            hue,
-          });
-        }
-      }
-
-      // Update existing particles
-      for (let i = this.trailParticles.length - 1; i >= 0; i--) {
-        const p = this.trailParticles[i];
-        p.x += p.vx * dt;
-        p.y += p.vy * dt;
-        p.life -= p.decay * dt;
-
-        // Remove dead particles
-        if (p.life <= 0) {
-          this.trailParticles.splice(i, 1);
-        }
-      }
-    },
-
-    // Get glow color hue based on streak level (180=cyan, 30=orange, 0=red)
-    getStreakHue() {
-      // streak 0-2: cyan (180)
-      // streak 3-5: transition to orange (30)
-      // streak 6+: transition to red (0)
-      if (this.streak <= 2) {
-        return 180;
-      } else if (this.streak <= 5) {
-        // Interpolate from cyan (180) to orange (30)
-        const t = (this.streak - 2) / 3;
-        return 180 - t * 150;
-      }
-      // Interpolate from orange (30) to red (0)
-      const t = Math.min((this.streak - 5) / 5, 1);
-      return 30 - t * 30;
-    },
-
-    spawnObstacles(dt) {
-      this.obstacleSpawnTimer += dt;
-
-      // Spawn interval decreases with level
-      const spawnInterval = this.baseSpawnInterval / (1 + (this.level - 1) * 0.1);
-
-      if (this.obstacleSpawnTimer >= spawnInterval) {
-        this.obstacleSpawnTimer = 0;
-
-        // Obstacle properties scale with level
-        const speed = this.baseObstacleSpeed * (1 + (this.level - 1) * 0.05);
-        const size = 30 + Math.random() * 30;
-
-        this.obstacles.push({
-          x: Math.random() * (this.width - size) + size / 2,
-          y: -size,
-          width: size,
-          height: size,
-          speed,
-          rotation: Math.random() * Math.PI * 2,
-          rotationSpeed: (Math.random() - 0.5) * 0.1,
-          vertices: this.generateAsteroidVertices(),
-          spriteIndex: Math.floor(Math.random() * 3), // Random asteroid sprite
-          passedBy: false, // Track if ship passed by for close-call detection
-        });
-      }
-    },
-
-    generateAsteroidVertices() {
-      const vertices = [];
-      const numVertices = 7 + Math.floor(Math.random() * 4);
-      for (let i = 0; i < numVertices; i++) {
-        const angle = (i / numVertices) * Math.PI * 2;
-        const radius = 0.7 + Math.random() * 0.3;
-        vertices.push({ angle, radius });
-      }
-      return vertices;
-    },
-
-    updateObstacles(dt) {
-      for (let i = this.obstacles.length - 1; i >= 0; i--) {
-        const obs = this.obstacles[i];
-        obs.y += obs.speed * dt;
-        obs.rotation += obs.rotationSpeed * dt;
-
-        // Remove if off screen
-        if (obs.y > this.height + obs.height) {
-          this.obstacles.splice(i, 1);
-        }
-      }
-    },
-
-    checkCollisions() {
-      const shipHitbox = {
-        x: this.ship.x - this.ship.width * 0.35,
-        y: this.ship.y - this.ship.height * 0.35,
-        width: this.ship.width * 0.7,
-        height: this.ship.height * 0.7,
-      };
-
-      for (const obs of this.obstacles) {
-        const obsHitbox = {
-          x: obs.x - obs.width * 0.4,
-          y: obs.y - obs.height * 0.4,
-          width: obs.width * 0.8,
-          height: obs.height * 0.8,
-        };
-
-        if (this.aabbCollision(shipHitbox, obsHitbox)) {
-          this.gameOver();
-          return;
-        }
-      }
-    },
-
-    aabbCollision(a, b) {
-      return (
-        a.x < b.x + b.width &&
-        a.x + a.width > b.x &&
-        a.y < b.y + b.height &&
-        a.y + a.height > b.y
-      );
-    },
-
-    // Rendering
     render() {
       const ctx = this.ctx;
 
-      // Clear and draw background
-      this.renderBackground();
-
-      // Draw stars
-      this.renderStars();
-
-      // Draw trail particles (behind ship)
-      this.renderTrailParticles();
-
-      // Draw obstacles
-      this.renderObstacles();
-
-      // Draw ship
-      this.renderShip();
-    },
-
-    renderBackground() {
-      const ctx = this.ctx;
-      const gradient = ctx.createLinearGradient(0, 0, 0, this.height);
-      gradient.addColorStop(0, this.theme.bg1);
-      gradient.addColorStop(1, this.theme.bg2);
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, this.width, this.height);
-    },
-
-    renderStars() {
-      const ctx = this.ctx;
-      const starColor = this.isDarkTheme ? '255, 255, 255' : '0, 0, 50';
-      for (const star of this.stars) {
-        ctx.fillStyle = `rgba(${starColor}, ${star.alpha * (this.isDarkTheme ? 1 : 0.3)})`;
-        ctx.beginPath();
-        ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    },
-
-    renderTrailParticles() {
-      const ctx = this.ctx;
-
-      for (const p of this.trailParticles) {
-        ctx.save();
-
-        // Draw glowing particle
-        const alpha = p.life * 0.8;
-        ctx.globalAlpha = alpha;
-
-        // Glow effect
-        ctx.shadowColor = `hsl(${p.hue}, 100%, 60%)`;
-        ctx.shadowBlur = p.size * 2;
-
-        ctx.fillStyle = `hsl(${p.hue}, 100%, 70%)`;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.restore();
-      }
-    },
-
-    renderShip() {
-      const ctx = this.ctx;
-      const { x, y, width, height } = this.ship;
-
       ctx.save();
-      ctx.translate(x, y);
 
-      // Enhanced fire effect based on streak
-      const baseFlameHeight = 15;
-      const streakFlameBonus = this.fireIntensity * 40;
-      const flameHeight = baseFlameHeight + streakFlameBonus + Math.random() * 5;
+      // Apply screen shake
+      applyScreenShake(ctx, this.gameplay.screenShakeIntensity);
 
-      // Draw pulsing glow aura when on a streak
-      if (this.streak > 0) {
-        const hue = this.getStreakHue();
-        const pulseAmount = Math.sin(this.glowPulsePhase) * 0.3 + 0.7; // Pulse between 0.4 and 1.0
-        const baseGlowRadius = 30 + this.streak * 8; // Glow gets bigger with streak
-        const glowRadius = baseGlowRadius * pulseAmount;
-        const glowAlpha = Math.min(0.3 + this.streak * 0.05, 0.6) * pulseAmount;
+      // Background
+      renderBackground(ctx, this.width, this.height, this.theme);
 
-        // Draw multiple glow layers for a softer effect
-        for (let i = 3; i >= 1; i--) {
-          const layerRadius = glowRadius * (i / 3);
-          const layerAlpha = glowAlpha * (1 - i / 4);
+      // Stars
+      renderStars(ctx, this.stars, this.isDarkTheme);
 
-          const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, layerRadius);
-          gradient.addColorStop(0, `hsla(${hue}, 100%, 60%, ${layerAlpha})`);
-          gradient.addColorStop(0.5, `hsla(${hue}, 100%, 50%, ${layerAlpha * 0.5})`);
-          gradient.addColorStop(1, `hsla(${hue}, 100%, 40%, 0)`);
+      // Progress bar to next level
+      renderProgressBar(ctx, this.width, this.gameplay.score, this.gameplay.level, LEVEL_CONFIG.pointsPerLevel);
 
-          ctx.fillStyle = gradient;
-          ctx.beginPath();
-          ctx.arc(0, 0, layerRadius, 0, Math.PI * 2);
-          ctx.fill();
-        }
-      }
+      // Trail particles (behind ship)
+      renderTrailParticles(ctx, this.gameplay.trailParticles);
 
-      // Draw streak fire trail (behind ship)
-      if (this.fireIntensity > 0) {
-        const trailLength = 20 + this.fireIntensity * 60;
-        const hue = this.getStreakHue();
-        const gradient = ctx.createLinearGradient(0, height / 2, 0, height / 2 + trailLength);
-        gradient.addColorStop(0, `hsla(${hue}, 100%, 50%, ${0.8 * this.fireIntensity})`);
-        gradient.addColorStop(0.3, `hsla(${Math.max(0, hue - 20)}, 100%, 60%, ${0.6 * this.fireIntensity})`);
-        gradient.addColorStop(1, `hsla(${hue}, 100%, 50%, 0)`);
+      // Obstacles
+      renderObstacles(ctx, this.obstacles, this.sprites, this.spritesLoaded, this.theme);
 
-        ctx.fillStyle = gradient;
-        ctx.beginPath();
-        ctx.moveTo(-width / 3, height / 2);
-        ctx.lineTo(0, height / 2 + trailLength);
-        ctx.lineTo(width / 3, height / 2);
-        ctx.closePath();
-        ctx.fill();
-      }
-
-      // Use sprite if loaded, otherwise fallback to shape
-      if (this.spritesLoaded && this.sprites.ship) {
-        const spriteSize = Math.max(width, height) * 1.5;
-
-        // Add glow around the sprite when on streak
-        if (this.streak > 0) {
-          const hue = this.getStreakHue();
-          ctx.shadowColor = `hsl(${hue}, 100%, 50%)`;
-          ctx.shadowBlur = 15 + this.streak * 5;
-        }
-
-        ctx.drawImage(
-          this.sprites.ship,
-          -spriteSize / 2,
-          -spriteSize / 2,
-          spriteSize,
-          spriteSize,
+      // Ship (if not completely dead)
+      if (!this.gameplay.isDying || this.gameplay.deathTimer < 10) {
+        renderShip(
+          ctx,
+          this.ship,
+          this.sprites,
+          this.spritesLoaded,
+          this.gameplay.streak,
+          this.gameplay.fireIntensity,
+          this.gameplay.glowPulsePhase,
+          this.theme,
         );
-      } else {
-        // Fallback: draw shape
-        const hue = this.streak > 0 ? this.getStreakHue() : 180; // Cyan default
-        ctx.shadowColor = this.streak > 0 ? `hsl(${hue}, 100%, 50%)` : this.theme.ship;
-        ctx.shadowBlur = 20 + this.streak * 3;
+      }
 
-        ctx.fillStyle = this.streak > 0 ? `hsl(${hue}, 100%, 50%)` : this.theme.ship;
-        ctx.beginPath();
-        ctx.moveTo(0, -height / 2);
-        ctx.lineTo(-width / 2, height / 2);
-        ctx.lineTo(width / 2, height / 2);
-        ctx.closePath();
-        ctx.fill();
+      // Explosion particles
+      renderExplosionParticles(ctx, this.gameplay.explosionParticles);
 
-        ctx.fillStyle = this.theme.bg1;
-        ctx.beginPath();
-        ctx.moveTo(0, -height / 4);
-        ctx.lineTo(-width / 4, height / 4);
-        ctx.lineTo(width / 4, height / 4);
-        ctx.closePath();
-        ctx.fill();
+      // Score popups
+      renderScorePopups(ctx, this.gameplay.scorePopups);
 
-        // Engine glow
-        ctx.shadowColor = this.theme.engine;
-        ctx.shadowBlur = 15 + this.fireIntensity * 20;
-        ctx.fillStyle = this.theme.engine;
-        ctx.beginPath();
-        ctx.moveTo(-width / 4, height / 2);
-        ctx.lineTo(0, height / 2 + flameHeight);
-        ctx.lineTo(width / 4, height / 2);
-        ctx.closePath();
-        ctx.fill();
+      // Level up celebration
+      if (this.gameplay.levelUpAnimation) {
+        renderLevelUpCelebration(
+          ctx,
+          this.width,
+          this.height,
+          this.gameplay.levelUpAnimation.level,
+          this.gameplay.levelUpAnimation.progress,
+        );
       }
 
       ctx.restore();
-    },
-
-    renderObstacles() {
-      const ctx = this.ctx;
-
-      for (const obs of this.obstacles) {
-        ctx.save();
-        ctx.translate(obs.x, obs.y);
-        ctx.rotate(obs.rotation);
-
-        // Use sprite if loaded
-        if (this.spritesLoaded && this.sprites.asteroids[obs.spriteIndex]) {
-          const sprite = this.sprites.asteroids[obs.spriteIndex];
-          const size = obs.width * 1.2;
-          ctx.drawImage(sprite, -size / 2, -size / 2, size, size);
-        } else {
-          // Fallback: draw shape
-          ctx.shadowColor = this.theme.asteroidGlow;
-          ctx.shadowBlur = 10;
-
-          ctx.fillStyle = this.theme.asteroid;
-          ctx.strokeStyle = this.theme.asteroidGlow;
-          ctx.lineWidth = 2;
-
-          ctx.beginPath();
-          for (let i = 0; i < obs.vertices.length; i++) {
-            const v = obs.vertices[i];
-            const vx = Math.cos(v.angle) * v.radius * obs.width / 2;
-            const vy = Math.sin(v.angle) * v.radius * obs.height / 2;
-            if (i === 0) {
-              ctx.moveTo(vx, vy);
-            } else {
-              ctx.lineTo(vx, vy);
-            }
-          }
-          ctx.closePath();
-          ctx.fill();
-          ctx.stroke();
-        }
-
-        ctx.restore();
-      }
     },
   },
 };
@@ -1482,9 +775,213 @@ canvas {
   text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
 }
 
-.menu-panel.gameover h2 {
-  color: #ff4444;
-  text-shadow: 0 0 20px rgba(255, 68, 68, 0.5);
+/* Epic Game Over Screen */
+.gameover-overlay {
+  background: radial-gradient(ellipse at center, rgba(20, 0, 30, 0.95) 0%, rgba(5, 5, 15, 0.98) 100%);
+}
+
+.gameover-panel {
+  text-align: center;
+  padding: 50px 60px;
+  min-width: 400px;
+  background: linear-gradient(180deg, rgba(30, 10, 40, 0.9) 0%, rgba(15, 5, 25, 0.95) 100%);
+  border: 2px solid rgba(255, 50, 50, 0.4);
+  border-radius: 8px;
+  box-shadow:
+    0 0 60px rgba(255, 50, 50, 0.3),
+    inset 0 0 60px rgba(255, 50, 50, 0.05);
+  animation: panelAppear 0.5s ease-out;
+}
+
+@keyframes panelAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.gameover-title {
+  margin-bottom: 40px;
+}
+
+.glitch {
+  font-family: 'Courier New', monospace;
+  font-size: 56px;
+  font-weight: bold;
+  color: #ff3333;
+  text-shadow:
+    0 0 10px #ff3333,
+    0 0 20px #ff3333,
+    0 0 40px #ff0000,
+    0 0 80px #ff0000;
+  letter-spacing: 8px;
+  position: relative;
+  animation: textGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes textGlow {
+  from {
+    text-shadow:
+      0 0 10px #ff3333,
+      0 0 20px #ff3333,
+      0 0 40px #ff0000;
+  }
+  to {
+    text-shadow:
+      0 0 20px #ff3333,
+      0 0 40px #ff3333,
+      0 0 60px #ff0000,
+      0 0 100px #ff0000;
+  }
+}
+
+.gameover-stats {
+  margin-bottom: 40px;
+}
+
+.stat-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.stat-row.main-score .stat-value {
+  font-size: 72px;
+  font-weight: bold;
+  color: #00d4ff;
+  text-shadow:
+    0 0 20px rgba(0, 212, 255, 0.8),
+    0 0 40px rgba(0, 212, 255, 0.4);
+  font-family: 'Courier New', monospace;
+  line-height: 1;
+  animation: scoreCount 0.5s ease-out;
+}
+
+@keyframes scoreCount {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.stat-row.main-score .stat-label {
+  font-size: 14px;
+  color: rgba(0, 212, 255, 0.6);
+  letter-spacing: 4px;
+  margin-top: 5px;
+}
+
+.stat-divider {
+  width: 200px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.5), transparent);
+  margin: 25px auto;
+}
+
+.stat-row-group {
+  display: flex;
+  justify-content: center;
+  gap: 50px;
+}
+
+.stat-row.small {
+  flex-direction: column;
+}
+
+.stat-row.small .stat-label {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 2px;
+  margin-bottom: 5px;
+}
+
+.stat-row.small .stat-value {
+  font-size: 28px;
+  color: #fff;
+  font-family: 'Courier New', monospace;
+}
+
+.new-highscore {
+  margin-top: 25px;
+  animation: highscorePulse 0.6s ease-in-out infinite alternate;
+}
+
+.highscore-text {
+  font-size: 24px;
+  font-weight: bold;
+  color: #ffd700;
+  text-shadow:
+    0 0 10px rgba(255, 215, 0, 0.8),
+    0 0 30px rgba(255, 215, 0, 0.5),
+    0 0 50px rgba(255, 215, 0, 0.3);
+  letter-spacing: 3px;
+}
+
+@keyframes highscorePulse {
+  from {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  to {
+    transform: scale(1.08);
+    filter: brightness(1.3);
+  }
+}
+
+.gameover-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px 40px;
+  font-family: 'Courier New', monospace;
+  font-size: 18px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.action-btn.primary {
+  background: linear-gradient(180deg, #00d4ff 0%, #0099cc 100%);
+  color: #000;
+  box-shadow:
+    0 0 20px rgba(0, 212, 255, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.action-btn.primary:hover {
+  transform: scale(1.05);
+  box-shadow:
+    0 0 30px rgba(0, 212, 255, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.action-btn.secondary {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.action-btn.secondary:hover {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.btn-icon {
+  font-size: 14px;
 }
 
 .menu-item {
@@ -1541,12 +1038,6 @@ canvas {
   text-transform: uppercase;
 }
 
-.final-score {
-  color: #ffd700;
-  font-size: 18px;
-  margin-bottom: 10px;
-  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-}
 
 /* Content Viewer */
 .content-viewer {
@@ -1582,28 +1073,6 @@ canvas {
   margin: 20px 0 15px 0;
   padding-bottom: 8px;
   border-bottom: 1px solid rgba(139, 92, 246, 0.3);
-}
-
-.close-btn {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  background: transparent;
-  border: 2px solid #ff4444;
-  color: #ff4444;
-  width: 36px;
-  height: 36px;
-  font-size: 24px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-  z-index: 10;
-}
-
-.close-btn:hover {
-  background: rgba(255, 68, 68, 0.2);
 }
 
 .content-scroll {
@@ -1775,8 +1244,9 @@ canvas {
 }
 
 .back-btn {
-  margin: 15px 25px;
+  margin: 15px 25px 20px 25px;
   flex-shrink: 0;
+  width: calc(100% - 50px);
 }
 
 /* Mobile adjustments */
@@ -1845,6 +1315,7 @@ canvas {
 
   .back-btn {
     margin: 10px 15px 15px 15px;
+    width: calc(100% - 30px);
   }
 }
 </style>

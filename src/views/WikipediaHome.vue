@@ -1,5 +1,5 @@
 <template>
-  <div class="wiki-page">
+  <div class="wiki-page" :class="{ embedded }">
     <div class="wiki-content">
       <div class="wiki-sidebar">
         <div class="wiki-nav-section">
@@ -153,7 +153,7 @@
       </div>
     </div>
 
-    <div class="wiki-footer">
+    <div class="wiki-footer" v-if="!embedded">
       <p>This page was last edited on {{ currentDate }}, by an anonymous user.</p>
       <p>Content is available under <a href="#">CC BY-SA 4.0</a> unless otherwise noted.</p>
       <div class="wiki-footer-links">
@@ -172,6 +172,12 @@ import projects from '@/assets/projects.json';
 
 export default {
   name: 'WikipediaHome',
+  props: {
+    embedded: {
+      type: Boolean,
+      default: false,
+    },
+  },
   data() {
     return {
       resume,
@@ -197,15 +203,19 @@ export default {
     },
   },
   mounted() {
-    const themeToggle = document.querySelector('.theme-toggle');
-    if (themeToggle) {
-      themeToggle.style.display = 'none';
+    if (!this.embedded) {
+      const themeToggle = document.querySelector('.theme-toggle');
+      if (themeToggle) {
+        themeToggle.style.display = 'none';
+      }
     }
   },
   beforeDestroy() {
-    const themeToggle = document.querySelector('.theme-toggle');
-    if (themeToggle) {
-      themeToggle.style.display = '';
+    if (!this.embedded) {
+      const themeToggle = document.querySelector('.theme-toggle');
+      if (themeToggle) {
+        themeToggle.style.display = '';
+      }
     }
   },
 };
@@ -219,6 +229,12 @@ export default {
   font-size: 14px;
   line-height: 1.6;
   color: #202122;
+}
+
+.wiki-page.embedded {
+  min-height: 100%;
+  height: 100%;
+  overflow: auto;
 }
 
 /* Header */

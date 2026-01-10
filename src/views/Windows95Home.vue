@@ -26,6 +26,14 @@
         <img src="../assets/win95/network.svg" alt="GitHub">
         <span>GitHub</span>
       </div>
+      <div class="desktop-icon" @dblclick="openWindow('terminal')">
+        <img src="../assets/win95/terminal.svg" alt="Terminal">
+        <span>Terminal</span>
+      </div>
+      <div class="desktop-icon" @dblclick="openWindow('browser')">
+        <img src="../assets/win95/globe.svg" alt="Internet">
+        <span>Internet</span>
+      </div>
       <div class="desktop-icon recycle" @dblclick="openWindow('recycle')">
         <img src="../assets/win95/recycle.svg" alt="Recycle Bin">
         <span>Recycle Bin</span>
@@ -233,6 +241,30 @@
           </div>
           <div class="explorer-status">4 object(s) - Mistakes were made</div>
         </div>
+
+        <!-- Terminal Window -->
+        <div v-if="win.id === 'terminal'" class="app-window">
+          <TerminalHome :embedded="true" />
+        </div>
+
+        <!-- Browser Window -->
+        <div v-if="win.id === 'browser'" class="browser-window">
+          <div class="browser-toolbar">
+            <button class="toolbar-btn" @click="win.browserUrl = 'wikipedia'">🏠</button>
+            <div class="browser-address">
+              <span>http://</span>
+              <select v-model="win.browserUrl" class="url-select">
+                <option value="wikipedia">en.wikipedia.org/wiki/Soli</option>
+                <option value="newspaper">thedailysoli.com</option>
+              </select>
+            </div>
+            <button class="toolbar-btn">🔄</button>
+          </div>
+          <div class="browser-content">
+            <WikipediaHome v-if="win.browserUrl === 'wikipedia'" :embedded="true" />
+            <NewspaperHome v-if="win.browserUrl === 'newspaper'" :embedded="true" />
+          </div>
+        </div>
       </div>
       <div class="window-resize" @mousedown="startResize($event, win)"></div>
     </div>
@@ -337,9 +369,17 @@
 <script>
 import resume from '@/assets/resume.json';
 import projects from '@/assets/projects.json';
+import TerminalHome from '@/views/TerminalHome.vue';
+import WikipediaHome from '@/views/WikipediaHome.vue';
+import NewspaperHome from '@/views/NewspaperHome.vue';
 
 export default {
   name: 'Windows95Home',
+  components: {
+    TerminalHome,
+    WikipediaHome,
+    NewspaperHome,
+  },
   data() {
     return {
       resume,
@@ -437,6 +477,35 @@ export default {
           height: 300,
           showMenu: false,
           contentClass: '',
+        },
+        {
+          id: 'terminal',
+          title: 'Terminal',
+          icon: require('../assets/win95/terminal.svg'),
+          open: false,
+          minimized: false,
+          maximized: false,
+          x: 80,
+          y: 60,
+          width: 700,
+          height: 500,
+          showMenu: false,
+          contentClass: 'app-container',
+        },
+        {
+          id: 'browser',
+          title: 'Internet Explorer',
+          icon: require('../assets/win95/globe.svg'),
+          open: false,
+          minimized: false,
+          maximized: false,
+          x: 120,
+          y: 80,
+          width: 800,
+          height: 600,
+          showMenu: false,
+          contentClass: 'app-container',
+          browserUrl: 'wikipedia',
         },
       ],
     };
@@ -995,6 +1064,66 @@ export default {
   border-top: 2px solid;
   border-color: #808080 #ffffff #ffffff #808080;
   font-size: 11px;
+}
+
+/* App Windows */
+.window-content.app-container {
+  padding: 0;
+  overflow: hidden;
+}
+
+.app-window {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Browser Window */
+.browser-window {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.browser-toolbar {
+  background: #c0c0c0;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border-bottom: 1px solid #808080;
+  flex-shrink: 0;
+}
+
+.browser-address {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background: white;
+  border: 2px solid;
+  border-color: #808080 #ffffff #ffffff #808080;
+  padding: 2px 4px;
+}
+
+.browser-address span {
+  color: #808080;
+  font-size: 11px;
+}
+
+.url-select {
+  flex: 1;
+  border: none;
+  background: white;
+  font-family: inherit;
+  font-size: 11px;
+  outline: none;
+  cursor: pointer;
+}
+
+.browser-content {
+  flex: 1;
+  overflow: hidden;
+  background: white;
 }
 
 /* Mail Window */

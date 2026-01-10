@@ -1,5 +1,5 @@
 <template>
-  <div class="newspaper" :class="{ sepia: isSepia }">
+  <div class="newspaper" :class="{ sepia: isSepia, embedded }">
     <!-- Newspaper Container -->
     <div class="paper">
       <!-- ==================== MASTHEAD ==================== -->
@@ -201,7 +201,7 @@
       <div class="rule"></div>
 
       <!-- ==================== FOOTER ==================== -->
-      <footer class="paper-footer">
+      <footer class="paper-footer" v-if="!embedded">
         <div class="footer-text">
           <span>© {{ currentYear }} The Daily Soli</span>
           <span class="footer-divider">•</span>
@@ -232,6 +232,12 @@ import pins from '@/assets/pins.json';
 
 export default {
   name: 'NewspaperHome',
+  props: {
+    embedded: {
+      type: Boolean,
+      default: false,
+    },
+  },
   data() {
     return {
       experience: resume.experience,
@@ -280,19 +286,23 @@ export default {
     if (saved) {
       this.localTheme = saved;
     }
-    // Save that user visited newspaper version
-    localStorage.setItem('homeVersion', 'newspaper');
-    // Hide the global theme toggle (we have our own)
-    const globalToggle = document.querySelector('.theme-toggle');
-    if (globalToggle) {
-      globalToggle.style.display = 'none';
+    if (!this.embedded) {
+      // Save that user visited newspaper version
+      localStorage.setItem('homeVersion', 'newspaper');
+      // Hide the global theme toggle (we have our own)
+      const globalToggle = document.querySelector('.theme-toggle');
+      if (globalToggle) {
+        globalToggle.style.display = 'none';
+      }
     }
   },
   beforeDestroy() {
-    // Show the global theme toggle again when leaving
-    const globalToggle = document.querySelector('.theme-toggle');
-    if (globalToggle) {
-      globalToggle.style.display = '';
+    if (!this.embedded) {
+      // Show the global theme toggle again when leaving
+      const globalToggle = document.querySelector('.theme-toggle');
+      if (globalToggle) {
+        globalToggle.style.display = '';
+      }
     }
   },
   methods: {
@@ -336,6 +346,18 @@ export default {
   background: var(--paper-bg);
   padding: 20px;
   box-sizing: border-box;
+}
+
+.newspaper.embedded {
+  min-height: 100%;
+  height: 100%;
+  overflow: auto;
+  padding: 10px;
+}
+
+.newspaper.embedded .paper {
+  box-shadow: none;
+  border: none;
 }
 
 .paper {
