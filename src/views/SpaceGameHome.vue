@@ -1,17 +1,16 @@
 <template>
-  <div class="space-game" ref="gameContainer">
+  <div class="space-game" :class="{ embedded }" ref="gameContainer">
     <canvas ref="canvas"></canvas>
 
     <!-- HUD -->
     <div class="hud">
       <div class="hud-left">
         <button class="menu-btn" @click="toggleMenu">MENU</button>
-        <button class="theme-btn" @click="toggleTheme" :title="isDarkTheme ? 'Switch to light' : 'Switch to dark'">
-          {{ isDarkTheme ? '☀' : '☾' }}
-        </button>
+        <!-- Audio button hidden - not working reliably
         <button class="sound-btn" @click="toggleSound" :title="audio.enabled ? 'Mute sounds' : 'Enable sounds'">
           {{ audio.enabled ? '🔊' : '🔇' }}
         </button>
+        -->
       </div>
       <div class="hud-right" :style="gameplay.getHudRightStyle()">
         <div class="stat">SCORE: {{ gameplay.score }}</div>
@@ -36,8 +35,8 @@
         <button @click="showContent('resume')" class="menu-item">Resume/CV</button>
         <button @click="showContent('projects')" class="menu-item">Projects</button>
         <button @click="showContent('pins')" class="menu-item">Pins</button>
-        <div class="menu-divider"></div>
-        <div class="menu-submenu">
+        <div class="menu-divider" v-if="!embedded"></div>
+        <div class="menu-submenu" v-if="!embedded">
           <span class="menu-label">Other Homepages</span>
           <a href="/animation" target="_blank" class="menu-item small">Animation</a>
           <a href="/terminal" target="_blank" class="menu-item small">Terminal</a>
@@ -132,9 +131,10 @@
 
     <!-- Game Over Screen -->
     <div class="menu-overlay gameover-overlay" v-if="gameState === 'gameover' && !contentView">
-      <div class="gameover-panel">
+      <div class="gameover-panel" :class="{ 'new-record': isNewHighScore }">
         <div class="gameover-title">
-          <span class="glitch" data-text="GAME OVER">GAME OVER</span>
+          <span v-if="isNewHighScore" class="glitch gold" data-text="NEW HIGH SCORE!">NEW HIGH SCORE!</span>
+          <span v-else class="glitch" data-text="GAME OVER">GAME OVER</span>
         </div>
 
         <div class="gameover-stats">
@@ -150,14 +150,10 @@
               <span class="stat-label">LEVEL</span>
               <span class="stat-value">{{ gameplay.level }}</span>
             </div>
-            <div class="stat-row small">
+            <div class="stat-row small" v-if="!isNewHighScore">
               <span class="stat-label">HIGH SCORE</span>
               <span class="stat-value">{{ highScore.toLocaleString() }}</span>
             </div>
-          </div>
-
-          <div class="new-highscore" v-if="isNewHighScore">
-            <span class="highscore-text">NEW HIGH SCORE!</span>
           </div>
         </div>
 
@@ -212,6 +208,13 @@ import {
 export default {
   name: 'SpaceGameHome',
 
+  props: {
+    embedded: {
+      type: Boolean,
+      default: false,
+    },
+  },
+
   data() {
     return {
       // Canvas
@@ -264,7 +267,10 @@ export default {
   },
 
   mounted() {
-    this.init();
+    // Use nextTick to ensure container has dimensions when embedded
+    this.$nextTick(() => {
+      this.init();
+    });
   },
 
   beforeDestroy() {
@@ -276,11 +282,13 @@ export default {
       this.canvas = this.$refs.canvas;
       this.ctx = this.canvas.getContext('2d');
 
-      // Fullscreen setup
-      document.body.style.overflow = 'hidden';
-      document.body.style.margin = '0';
-      document.documentElement.style.overflow = 'hidden';
-      document.documentElement.style.margin = '0';
+      // Fullscreen setup (only when standalone)
+      if (!this.embedded) {
+        document.body.style.overflow = 'hidden';
+        document.body.style.margin = '0';
+        document.documentElement.style.overflow = 'hidden';
+        document.documentElement.style.margin = '0';
+      }
 
       // Load assets
       this.loadSprites();
@@ -296,6 +304,14 @@ export default {
       // Setup canvas
       this.resize();
       window.addEventListener('resize', this.resize);
+
+      // For embedded mode, observe container size changes (e.g., window resize in Win95)
+      if (this.embedded && typeof ResizeObserver !== 'undefined') {
+        this.resizeObserver = new ResizeObserver(() => {
+          this.resize();
+        });
+        this.resizeObserver.observe(this.$refs.gameContainer);
+      }
 
       // Initialize systems
       this.audio.init();
@@ -360,18 +376,29 @@ export default {
         cancelAnimationFrame(this.animationId);
       }
       window.removeEventListener('resize', this.resize);
+      if (this.resizeObserver) {
+        this.resizeObserver.disconnect();
+      }
       this.input.cleanup();
       this.audio.cleanup();
 
-      document.body.style.overflow = '';
-      document.body.style.margin = '';
-      document.documentElement.style.overflow = '';
-      document.documentElement.style.margin = '';
+      if (!this.embedded) {
+        document.body.style.overflow = '';
+        document.body.style.margin = '';
+        document.documentElement.style.overflow = '';
+        document.documentElement.style.margin = '';
+      }
     },
 
     resize() {
-      this.width = window.innerWidth;
-      this.height = window.innerHeight;
+      if (this.embedded) {
+        const container = this.$refs.gameContainer;
+        this.width = container.clientWidth || 800;
+        this.height = container.clientHeight || 600;
+      } else {
+        this.width = window.innerWidth;
+        this.height = window.innerHeight;
+      }
       this.canvas.width = this.width;
       this.canvas.height = this.height;
 
@@ -379,10 +406,11 @@ export default {
         this.ship.minY = this.ship.height / 2 + 60;
         this.ship.maxY = this.height - this.ship.height / 2 - 20;
 
-        if (this.ship.x === 0) {
+        // Always reposition ship to be visible
+        if (this.ship.x <= 0 || this.ship.x > this.width) {
           this.ship.x = this.width / 2;
         }
-        if (this.ship.y === 0 || this.ship.y > this.ship.maxY) {
+        if (this.ship.y <= 0 || this.ship.y > this.ship.maxY) {
           this.ship.y = this.ship.maxY - 40;
         }
       }
@@ -412,6 +440,9 @@ export default {
         if (this.audio.enabled) {
           this.audio.startEngine();
         }
+      } else if (this.gameState === 'gameover') {
+        // From game over, go to paused menu
+        this.gameState = 'paused';
       }
     },
 
@@ -512,15 +543,15 @@ export default {
         return;
       }
 
-      // Check close calls
-      this.gameplay.checkCloseCalls(this.ship, this.obstacles, {
+      // Check close calls (pass screen width for relative distance calculation)
+      this.gameplay.checkCloseCalls(this.ship, this.obstacles, this.width, {
         onCloseCall: () => {
           this.audio.playCloseCall();
         },
       });
 
-      // Check orbits
-      this.gameplay.checkOrbits(this.ship, this.obstacles, {
+      // Check orbits (pass screen width for relative distance calculation)
+      this.gameplay.checkOrbits(this.ship, this.obstacles, this.width, {
         onOrbit: () => {
           this.audio.playCloseCall(); // Play sound on orbit completion
         },
@@ -592,30 +623,6 @@ export default {
 };
 </script>
 
-<style>
-/* Global overrides for full-screen game */
-html, body {
-  margin: 0 !important;
-  padding: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  overflow: hidden !important;
-  background: #0a0a1a !important;
-}
-
-#app {
-  width: 100% !important;
-  height: 100% !important;
-  min-height: 100vh !important;
-  background: #0a0a1a !important;
-}
-
-/* Hide global theme toggle on space game */
-#app > .theme-toggle {
-  display: none !important;
-}
-</style>
-
 <style scoped>
 .space-game {
   position: fixed;
@@ -630,6 +637,12 @@ html, body {
   margin: 0;
   padding: 0;
   background: #0a0a1a;
+}
+
+.space-game.embedded {
+  position: relative;
+  width: 100%;
+  height: 100%;
 }
 
 canvas {
@@ -652,6 +665,10 @@ canvas {
   justify-content: space-between;
   align-items: flex-start;
   pointer-events: none;
+}
+
+.embedded .hud {
+  position: absolute;
 }
 
 .hud-left,
@@ -746,6 +763,10 @@ canvas {
   gap: 20px;
 }
 
+.embedded .controls-legend {
+  position: absolute;
+}
+
 /* Menu overlay */
 .menu-overlay {
   position: fixed;
@@ -758,6 +779,12 @@ canvas {
   justify-content: center;
   align-items: center;
   z-index: 100;
+}
+
+.embedded .menu-overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
 }
 
 .menu-panel {
@@ -793,6 +820,15 @@ canvas {
   animation: panelAppear 0.5s ease-out;
 }
 
+/* Gold theme for new high score */
+.gameover-panel.new-record {
+  border: 2px solid rgba(255, 215, 0, 0.6);
+  box-shadow:
+    0 0 80px rgba(255, 215, 0, 0.4),
+    0 0 120px rgba(255, 180, 0, 0.2),
+    inset 0 0 60px rgba(255, 215, 0, 0.05);
+}
+
 @keyframes panelAppear {
   from {
     opacity: 0;
@@ -821,6 +857,34 @@ canvas {
   letter-spacing: 8px;
   position: relative;
   animation: textGlow 2s ease-in-out infinite alternate;
+}
+
+/* Gold glitch for new high score */
+.glitch.gold {
+  color: #ffd700;
+  font-size: 42px;
+  text-shadow:
+    0 0 10px #ffd700,
+    0 0 20px #ffd700,
+    0 0 40px #ffaa00,
+    0 0 80px #ff8800;
+  animation: goldGlow 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes goldGlow {
+  from {
+    text-shadow:
+      0 0 10px #ffd700,
+      0 0 20px #ffd700,
+      0 0 40px #ffaa00;
+  }
+  to {
+    text-shadow:
+      0 0 20px #ffd700,
+      0 0 40px #ffd700,
+      0 0 60px #ffaa00,
+      0 0 100px #ff8800;
+  }
 }
 
 @keyframes textGlow {

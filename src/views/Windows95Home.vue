@@ -34,6 +34,10 @@
         <img src="../assets/win95/globe.svg" alt="Internet">
         <span>Internet</span>
       </div>
+      <div class="desktop-icon" @dblclick="openWindow('spacegame')">
+        <img src="../assets/space/spaceship.png" alt="Space Game" class="space-icon">
+        <span>Space Game</span>
+      </div>
       <div class="desktop-icon recycle" @dblclick="openWindow('recycle')">
         <img src="../assets/win95/recycle.svg" alt="Recycle Bin">
         <span>Recycle Bin</span>
@@ -80,7 +84,7 @@
             <img src="../assets/win95/computer.svg" class="about-icon">
             <div class="about-title">
               <h2>soli</h2>
-              <p>ai whisperer</p>
+              <p>software engineer</p>
             </div>
           </div>
           <div class="about-info">
@@ -115,7 +119,7 @@
           <div class="doc-body">
             <h1>CURRICULUM VITAE</h1>
             <h2>Soli</h2>
-            <p><strong>Current:</strong> AI Whisperer @ Berlin</p>
+            <p><strong>Current:</strong> Software Engineer @ Berlin</p>
             <hr>
             <h3>EXPERIENCE</h3>
             <div v-for="(exp, i) in resume.experience" :key="'exp-'+i" class="resume-item">
@@ -147,7 +151,9 @@
               v-for="(project, i) in projects"
               :key="'proj-'+i"
               class="folder-item"
-              @dblclick="project.link ? openExternalLink(project.link) : null"
+              :class="{ clickable: project.status !== 'graveyard' && project.link }"
+              @dblclick="project.status !== 'graveyard' && project.link ? openExternalLink(project.link) : null"
+              :title="project.description"
             >
               <img :src="project.status === 'graveyard' ? require('../assets/win95/doc.svg') : require('../assets/win95/folder.svg')">
               <span>{{ project.title }}{{ project.status === 'graveyard' ? '.old' : '' }}</span>
@@ -265,6 +271,11 @@
             <NewspaperHome v-if="win.browserUrl === 'newspaper'" :embedded="true" />
           </div>
         </div>
+
+        <!-- Space Game Window - only mount when open and not minimized -->
+        <div v-if="win.id === 'spacegame'" class="app-window">
+          <SpaceGameHome v-if="win.open && !win.minimized" :embedded="true" />
+        </div>
       </div>
       <div class="window-resize" @mousedown="startResize($event, win)"></div>
     </div>
@@ -372,6 +383,7 @@ import projects from '@/assets/projects.json';
 import TerminalHome from '@/views/TerminalHome.vue';
 import WikipediaHome from '@/views/WikipediaHome.vue';
 import NewspaperHome from '@/views/NewspaperHome.vue';
+import SpaceGameHome from '@/views/SpaceGameHome.vue';
 
 export default {
   name: 'Windows95Home',
@@ -379,6 +391,7 @@ export default {
     TerminalHome,
     WikipediaHome,
     NewspaperHome,
+    SpaceGameHome,
   },
   data() {
     return {
@@ -389,6 +402,7 @@ export default {
       shuttingDown: false,
       startMenuOpen: false,
       activeWindow: null,
+      zIndexCounter: 10,
       currentTime: '',
       dragging: null,
       resizing: null,
@@ -507,6 +521,20 @@ export default {
           contentClass: 'app-container',
           browserUrl: 'wikipedia',
         },
+        {
+          id: 'spacegame',
+          title: 'Space Game',
+          icon: require('../assets/space/spaceship.png'),
+          open: false,
+          minimized: false,
+          maximized: false,
+          x: 50,
+          y: 30,
+          width: 900,
+          height: 650,
+          showMenu: false,
+          contentClass: 'app-container',
+        },
       ],
     };
   },
@@ -570,6 +598,8 @@ export default {
       if (win) {
         win.open = true;
         win.minimized = false;
+        this.zIndexCounter += 1;
+        win.zIndex = this.zIndexCounter;
         this.activeWindow = id;
       }
       this.closeStartMenu();
@@ -594,11 +624,18 @@ export default {
       win.maximized = !win.maximized;
     },
     focusWindow(id) {
+      const win = this.windows.find(w => w.id === id);
+      if (win) {
+        this.zIndexCounter += 1;
+        win.zIndex = this.zIndexCounter;
+      }
       this.activeWindow = id;
     },
     toggleWindowFromTaskbar(win) {
       if (win.minimized) {
         win.minimized = false;
+        this.zIndexCounter += 1;
+        win.zIndex = this.zIndexCounter;
         this.activeWindow = win.id;
       } else if (this.activeWindow === win.id) {
         win.minimized = true;
@@ -606,6 +643,8 @@ export default {
         const lastVisible = visibleWindows[visibleWindows.length - 1];
         this.activeWindow = lastVisible ? lastVisible.id : null;
       } else {
+        this.zIndexCounter += 1;
+        win.zIndex = this.zIndexCounter;
         this.activeWindow = win.id;
       }
     },
@@ -616,6 +655,7 @@ export default {
           top: '0',
           width: '100%',
           height: 'calc(100% - 40px)',
+          zIndex: win.zIndex || 10,
         };
       }
       return {
@@ -623,6 +663,7 @@ export default {
         top: `${win.y}px`,
         width: `${win.width}px`,
         height: `${win.height}px`,
+        zIndex: win.zIndex || 10,
       };
     },
     startDrag(e, win) {
@@ -722,6 +763,13 @@ export default {
   width: 32px;
   height: 32px;
   image-rendering: pixelated;
+}
+
+.desktop-icon img.space-icon {
+  width: 40px;
+  height: 40px;
+  image-rendering: auto;
+  filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.5));
 }
 
 .desktop-icon span {
@@ -1036,8 +1084,12 @@ export default {
   flex-direction: column;
   align-items: center;
   width: 70px;
-  cursor: pointer;
+  cursor: default;
   padding: 4px;
+}
+
+.folder-item.clickable {
+  cursor: pointer;
 }
 
 .folder-item img {
@@ -1053,7 +1105,7 @@ export default {
   word-break: break-all;
 }
 
-.folder-item:hover span {
+.folder-item.clickable:hover span {
   background: #000080;
   color: white;
 }

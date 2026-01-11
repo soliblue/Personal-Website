@@ -20,12 +20,7 @@ export default new Router({
   routes: [
     {
       path: '/',
-      beforeEnter: (to, from, next) => {
-        // Randomly choose between all homepage versions
-        const versions = ['/animation', '/terminal', '/newspaper', '/windows95', '/wikipedia', '/space'];
-        const version = versions[Math.floor(Math.random() * versions.length)];
-        next(version);
-      },
+      redirect: '/windows95',
     },
     {
       path: '/animation',

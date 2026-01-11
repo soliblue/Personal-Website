@@ -1,6 +1,6 @@
 // Physics system - movement, collision detection
 
-import { OBSTACLE_CONFIG } from './config.js';
+import { OBSTACLE_CONFIG, getScaleFactor } from './config.js';
 import { createObstacle } from './entities.js';
 
 export function updateShip(ship, keys, touchTarget, width, dt) {
@@ -84,7 +84,12 @@ export function spawnObstacles(obstacles, state, width, level, dt) {
 
     // Speed doubles every 10 levels (exponential growth)
     const speed = OBSTACLE_CONFIG.baseSpeed * Math.pow(2, (level - 1) / 10);
-    const size = OBSTACLE_CONFIG.minSize + Math.random() * (OBSTACLE_CONFIG.maxSize - OBSTACLE_CONFIG.minSize);
+
+    // Scale down for mobile, keep original size for desktop
+    const scale = getScaleFactor(width);
+    const minSize = OBSTACLE_CONFIG.minSize * scale;
+    const maxSize = OBSTACLE_CONFIG.maxSize * scale;
+    const size = minSize + Math.random() * (maxSize - minSize);
 
     obstacles.push(createObstacle(
       Math.random() * (width - size) + size / 2,

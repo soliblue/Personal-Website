@@ -1,6 +1,6 @@
 <template>
   <div id="app" :class="{ dark: isDark }">
-    <button class="theme-toggle" @click="toggleTheme" :title="isDark ? 'Switch to light mode' : 'Switch to dark mode'">
+    <button v-if="!hideThemeToggle" class="theme-toggle" @click="toggleTheme" :title="isDark ? 'Switch to light mode' : 'Switch to dark mode'">
       <svg v-if="isDark" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="5"></circle>
         <line x1="12" y1="1" x2="12" y2="3"></line>
@@ -29,6 +29,13 @@ export default {
     return {
       isDark: false,
     };
+  },
+  computed: {
+    hideThemeToggle() {
+      // Hide on space game and windows95 (has its own UI)
+      const route = this.$route.path;
+      return route === '/space' || route === '/windows95';
+    },
   },
   mounted() {
     const saved = localStorage.getItem('theme');

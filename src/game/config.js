@@ -23,6 +23,9 @@ export const THEMES = {
   },
 };
 
+// Reference width for scaling - sizes stay fixed above this, scale down below
+export const REFERENCE_WIDTH = 500;
+
 export const SHIP_CONFIG = {
   width: 40,
   height: 50,
@@ -40,11 +43,17 @@ export const OBSTACLE_CONFIG = {
 
 export const STREAK_CONFIG = {
   decayTime: 90, // frames before streak starts decaying (1.5x longer)
-  closeCallDistance: 160, // pixels (doubled for easier streaks)
+  closeCallDistance: 160, // pixels
   dangerDistance: 80, // extra close = better bonus
   maxMultiplier: 10,
   multiplierPerStreak: 0.5,
 };
+
+// Helper to scale sizes for mobile - only scales DOWN, never up
+export function getScaleFactor(screenWidth) {
+  if (screenWidth >= REFERENCE_WIDTH) return 1;
+  return screenWidth / REFERENCE_WIDTH;
+}
 
 export const PARTICLE_CONFIG = {
   maxTrailParticles: 50,

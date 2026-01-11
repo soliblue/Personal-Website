@@ -7,7 +7,7 @@
         <span>l</span>
         <span>i</span>
       </h2>
-      <p class="tagline">ai whisperer</p>
+      <p class="tagline">software engineer</p>
       <div class="social-icons animated fadeIn">
         <a href="https://github.com/soliblue" target="_blank">
           <img src="../assets/github.png" class="social-links" >

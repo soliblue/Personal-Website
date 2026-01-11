@@ -1,13 +1,16 @@
 // Entity creation and initialization
 
-import { SHIP_CONFIG } from './config.js';
+import { SHIP_CONFIG, getScaleFactor } from './config.js';
 
-export function createShip(width, height) {
+export function createShip(screenWidth, screenHeight) {
+  // Scale down for mobile, keep original size for desktop
+  const scale = getScaleFactor(screenWidth);
+
   return {
-    x: width / 2,
-    y: height - 100,
-    width: SHIP_CONFIG.width,
-    height: SHIP_CONFIG.height,
+    x: screenWidth / 2,
+    y: screenHeight - 100,
+    width: SHIP_CONFIG.width * scale,
+    height: SHIP_CONFIG.height * scale,
     speed: SHIP_CONFIG.speed,
     velocityX: 0,
     velocityY: 0,

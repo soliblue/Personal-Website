@@ -7,7 +7,7 @@
       <a href="https://cal.com/solimeet/15min" target="_blank">book a call</a>
     </div>
     <div class="terminal">
-      <div class="terminal-header">
+      <div class="terminal-header" v-if="!embedded">
         <div class="terminal-buttons">
           <span class="btn close"></span>
           <span class="btn minimize"></span>
@@ -229,18 +229,30 @@ export default {
       if (input.startsWith('/')) {
         const cmd = input.toLowerCase();
         if (cmd === '/projects') {
-          this.openModal('projects');
+          this.messages.push({
+            role: 'assistant',
+            content: this.formatProjectsForTerminal(),
+          });
+          this.scrollToBottom();
           return;
         } else if (cmd === '/resume') {
-          this.openModal('resume');
+          this.messages.push({
+            role: 'assistant',
+            content: this.formatResumeForTerminal(),
+          });
+          this.scrollToBottom();
           return;
         } else if (cmd === '/pins') {
-          this.openModal('pins');
+          this.messages.push({
+            role: 'assistant',
+            content: this.formatPinsForTerminal(),
+          });
+          this.scrollToBottom();
           return;
         } else if (cmd === '/help') {
           this.messages.push({
             role: 'assistant',
-            content: 'Available commands:\n\n/projects - View Soli\'s projects\n/resume - View Soli\'s resume\n/pins - View Soli\'s favorite quotes & books\n/help - Show this help\n\nOr just ask me anything about Soli!',
+            content: 'Available commands:\n\n`/projects` - View Soli\'s projects\n`/resume` - View Soli\'s resume\n`/pins` - View Soli\'s favorite quotes & books\n`/help` - Show this help\n\nOr just ask me anything about Soli!',
           });
           this.scrollToBottom();
           return;
@@ -366,6 +378,63 @@ export default {
       this.showSuggestions = false;
       this.suggestions = [];
       this.selectedSuggestion = 0;
+    },
+    formatResumeForTerminal() {
+      let output = '## RESUME\n\n';
+      output += '### Experience\n';
+      this.resume.experience.forEach((job) => {
+        output += `\n**${job.title}** @ ${job.subtitle}\n`;
+        output += `${job.start} - ${job.end || 'Present'}`;
+        if (job.location) output += ` • ${job.location}`;
+        output += '\n';
+        if (job.description) output += `${job.description}\n`;
+      });
+      output += '\n### Education\n';
+      this.resume.education.forEach((edu) => {
+        output += `\n**${edu.title}**\n`;
+        output += `${edu.subtitle} • ${edu.start} - ${edu.end || 'Present'}\n`;
+      });
+      output += '\n### Languages\n';
+      output += this.resume.languages.map(l => `${l.name} (${l.level})`).join(', ');
+      return output;
+    },
+    formatProjectsForTerminal() {
+      let output = '## PROJECTS\n\n';
+      const live = this.projects.filter(p => p.status === 'live');
+      const graveyard = this.projects.filter(p => p.status === 'graveyard');
+      output += '### Live\n';
+      live.forEach((p) => {
+        output += `\n**${p.title}** (${p.year})\n`;
+        output += `${p.subtitle}\n`;
+        output += `${p.description}\n`;
+        if (p.link) output += `[Visit](${p.link})\n`;
+      });
+      if (graveyard.length) {
+        output += '\n### Graveyard\n';
+        graveyard.forEach((p) => {
+          output += `\n**${p.title}** (${p.year})\n`;
+          output += `${p.description}\n`;
+        });
+      }
+      return output;
+    },
+    formatPinsForTerminal() {
+      let output = '## PINS\n\n';
+      const quotes = this.pins.filter(p => p.type === 'quote');
+      const books = this.pins.filter(p => p.type === 'book');
+      if (quotes.length) {
+        output += '### Quotes\n';
+        quotes.forEach((q) => {
+          output += `\n*"${q.message}"*\n— ${q.author}\n`;
+        });
+      }
+      if (books.length) {
+        output += '\n### Books\n';
+        books.forEach((b) => {
+          output += `\n**${b.title}** by ${b.author}\n`;
+        });
+      }
+      return output;
     },
     openModal(name) {
       this.activeModal = name;

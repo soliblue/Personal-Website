@@ -1,12 +1,12 @@
 // Gameplay systems - scoring, streaks, level progression, celebrations
 
-import { STREAK_CONFIG, LEVEL_CONFIG, getStreakHue } from './config.js';
+import { STREAK_CONFIG, LEVEL_CONFIG, getStreakHue, getScaleFactor } from './config.js';
 import { createTrailParticle, createScorePopup, createExplosionParticles } from './entities.js';
 
-// Orbit detection config
+// Orbit detection config - fixed sizes, scaled for mobile
 const ORBIT_CONFIG = {
-  maxDistance: 150, // Max distance to track orbit
-  minDistance: 40, // Min distance (too close = collision territory)
+  maxDistance: 150, // pixels
+  minDistance: 40, // pixels
   requiredAngle: Math.PI * 2, // Full circle (360 degrees)
   basePoints: 200, // Base points for completing an orbit
 };
@@ -84,8 +84,11 @@ export class GameplaySystem {
     this.distance += dt * this.multiplier;
     this.score = Math.floor(this.distance);
 
-    // Check for level up
-    const newLevel = Math.floor(this.distance / LEVEL_CONFIG.pointsPerLevel) + 1;
+    // Check for level up - each level requires more points than the last
+    // Level N requires (basePoints * N) points, so total = basePoints * N*(N-1)/2
+    // Solving for N: N = (1 + sqrt(1 + 8*score/basePoints)) / 2
+    const base = LEVEL_CONFIG.pointsPerLevel;
+    const newLevel = Math.floor((1 + Math.sqrt(1 + 8 * this.score / base)) / 2);
     if (newLevel > this.level) {
       this.level = newLevel;
       this.triggerLevelUp(newLevel);
@@ -109,11 +112,16 @@ export class GameplaySystem {
     }
   }
 
-  checkCloseCalls(ship, obstacles, callbacks = {}) {
+  checkCloseCalls(ship, obstacles, screenWidth, callbacks = {}) {
     const shipX = ship.x;
     const shipY = ship.y;
     let closestDistance = Infinity;
     let isCloseToAny = false;
+
+    // Scale distances for mobile, keep original for desktop
+    const scale = getScaleFactor(screenWidth);
+    const closeCallDistance = STREAK_CONFIG.closeCallDistance * scale;
+    const dangerDistance = STREAK_CONFIG.dangerDistance * scale;
 
     // Track obstacles for "threading the needle" detection
     const nearbyObstacles = [];
@@ -131,7 +139,7 @@ export class GameplaySystem {
         nearbyObstacles.push({ obs, dx, gap, distance });
       }
 
-      if (gap > 0 && gap < STREAK_CONFIG.closeCallDistance) {
+      if (gap > 0 && gap < closeCallDistance) {
         isCloseToAny = true;
         closestDistance = Math.min(closestDistance, gap);
 
@@ -140,7 +148,7 @@ export class GameplaySystem {
           obs.closeCallCounted = true;
 
           // Calculate bonus
-          const closenessBonus = 1 - (gap / STREAK_CONFIG.closeCallDistance);
+          const closenessBonus = 1 - (gap / closeCallDistance);
           const basePoints = Math.floor(50 + closenessBonus * 50);
 
           // Increment streak
@@ -162,7 +170,7 @@ export class GameplaySystem {
           obs.flashIntensity = 1.0;
 
           // Screen shake on very close calls
-          if (gap < STREAK_CONFIG.dangerDistance) {
+          if (gap < dangerDistance) {
             this.screenShakeIntensity = 0.5;
           }
 
@@ -194,7 +202,7 @@ export class GameplaySystem {
 
         // If the gap between obstacles is small (less than 2x closeCallDistance)
         // and ship is between them, award a threading bonus
-        if (gapBetween < STREAK_CONFIG.closeCallDistance * 2.5) {
+        if (gapBetween < closeCallDistance * 2.5) {
           // Check if either obstacle has already been counted by normal close call
           const leftCounted = left.obs.closeCallCounted;
           const rightCounted = right.obs.closeCallCounted;
@@ -204,11 +212,11 @@ export class GameplaySystem {
             // Mark both as counted if not already
             if (!leftCounted) {
               left.obs.closeCallCounted = true;
-              this.awardThreadingBonus(left.obs, left.gap, callbacks);
+              this.awardThreadingBonus(left.obs, left.gap, closeCallDistance, callbacks);
             }
             if (!rightCounted) {
               right.obs.closeCallCounted = true;
-              this.awardThreadingBonus(right.obs, right.gap, callbacks);
+              this.awardThreadingBonus(right.obs, right.gap, closeCallDistance, callbacks);
             }
           }
         }
@@ -216,14 +224,14 @@ export class GameplaySystem {
     }
 
     // Extra fire intensity when very close
-    if (isCloseToAny && closestDistance < STREAK_CONFIG.dangerDistance) {
+    if (isCloseToAny && closestDistance < dangerDistance) {
       this.fireIntensity = Math.min(this.fireIntensity + 0.05, 1);
     }
   }
 
-  awardThreadingBonus(obs, gap, callbacks) {
+  awardThreadingBonus(obs, gap, closeCallDistance, callbacks) {
     // Threading the needle bonus - higher points for tight squeezes
-    const closenessBonus = Math.max(0, 1 - (gap / (STREAK_CONFIG.closeCallDistance * 1.5)));
+    const closenessBonus = Math.max(0, 1 - (gap / (closeCallDistance * 1.5)));
     const basePoints = Math.floor(75 + closenessBonus * 75); // Higher base for threading
 
     // Increment streak
@@ -261,9 +269,14 @@ export class GameplaySystem {
     }
   }
 
-  checkOrbits(ship, obstacles, callbacks = {}) {
+  checkOrbits(ship, obstacles, screenWidth, callbacks = {}) {
     const shipX = ship.x;
     const shipY = ship.y;
+
+    // Scale distances for mobile, keep original for desktop
+    const scale = getScaleFactor(screenWidth);
+    const minDistance = ORBIT_CONFIG.minDistance * scale;
+    const maxDistance = ORBIT_CONFIG.maxDistance * scale;
 
     for (const obs of obstacles) {
       const dx = shipX - obs.x;
@@ -271,7 +284,7 @@ export class GameplaySystem {
       const distance = Math.sqrt(dx * dx + dy * dy);
 
       // Check if ship is in orbit range
-      if (distance > ORBIT_CONFIG.minDistance && distance < ORBIT_CONFIG.maxDistance) {
+      if (distance > minDistance && distance < maxDistance) {
         // Calculate current angle from obstacle to ship
         const currentAngle = Math.atan2(dy, dx);
 
@@ -310,7 +323,7 @@ export class GameplaySystem {
 
           // Check if orbit complete
           if (obs.orbitTracking.totalAngle >= ORBIT_CONFIG.requiredAngle) {
-            this.awardOrbitBonus(obs, distance, callbacks);
+            this.awardOrbitBonus(obs, distance, scale, callbacks);
             // Reset for another orbit
             obs.orbitTracking.totalAngle = 0;
           }
@@ -324,10 +337,11 @@ export class GameplaySystem {
     }
   }
 
-  awardOrbitBonus(obs, distance, callbacks) {
+  awardOrbitBonus(obs, distance, scale, callbacks) {
     // Closer orbit = more points
-    const closenessBonus = 1 - ((distance - ORBIT_CONFIG.minDistance) /
-      (ORBIT_CONFIG.maxDistance - ORBIT_CONFIG.minDistance));
+    const minDist = ORBIT_CONFIG.minDistance * scale;
+    const maxDist = ORBIT_CONFIG.maxDistance * scale;
+    const closenessBonus = 1 - ((distance - minDist) / (maxDist - minDist));
     const basePoints = Math.floor(ORBIT_CONFIG.basePoints + closenessBonus * 100);
 
     // Big streak bonus for orbiting

@@ -285,24 +285,30 @@ export function renderLevelUpCelebration(ctx, width, height, level, progress) {
 
 // Progress bar to next level
 export function renderProgressBar(ctx, width, score, level, pointsPerLevel) {
-  const barWidth = 200;
+  // Full-width progress bar at top of screen
   const barHeight = 4;
-  const barX = width / 2 - barWidth / 2;
-  const barY = 10;
+  const barX = 0;
+  const barY = 0;
+  const barWidth = width;
 
-  const currentLevelStart = (level - 1) * pointsPerLevel;
-  const progress = (score - currentLevelStart) / pointsPerLevel;
+  // Levels require increasing points: level N needs (basePoints * N) points
+  // Total to reach level N = basePoints * N*(N-1)/2
+  const scoreForCurrentLevel = pointsPerLevel * level * (level - 1) / 2;
+  const scoreForNextLevel = pointsPerLevel * (level + 1) * level / 2;
+  const pointsNeededThisLevel = scoreForNextLevel - scoreForCurrentLevel;
+  const progress = (score - scoreForCurrentLevel) / pointsNeededThisLevel;
 
   ctx.save();
 
-  // Background
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+  // Background - subtle dark strip
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
   ctx.fillRect(barX, barY, barWidth, barHeight);
 
-  // Progress fill
+  // Progress fill - full width gradient
   const gradient = ctx.createLinearGradient(barX, 0, barX + barWidth, 0);
   gradient.addColorStop(0, '#00d4ff');
-  gradient.addColorStop(1, '#00ffaa');
+  gradient.addColorStop(0.5, '#00ffaa');
+  gradient.addColorStop(1, '#00d4ff');
   ctx.fillStyle = gradient;
   ctx.fillRect(barX, barY, barWidth * Math.min(progress, 1), barHeight);
 

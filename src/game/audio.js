@@ -31,34 +31,13 @@ export class AudioSystem {
     }
   }
 
+  // Engine hum disabled - was annoying
   startEngine() {
-    if (!this.enabled || !this.audioContext) return;
-    this.resume();
-
-    if (this.engineOscillator) return;
-
-    this.engineOscillator = this.audioContext.createOscillator();
-    this.engineGain = this.audioContext.createGain();
-
-    this.engineOscillator.type = 'sawtooth';
-    this.engineOscillator.frequency.setValueAtTime(55, this.audioContext.currentTime);
-    this.engineGain.gain.setValueAtTime(0.08, this.audioContext.currentTime);
-
-    this.engineOscillator.connect(this.engineGain);
-    this.engineGain.connect(this.audioContext.destination);
-    this.engineOscillator.start();
+    // Disabled
   }
 
   stopEngine() {
-    if (this.engineOscillator) {
-      this.engineOscillator.stop();
-      this.engineOscillator.disconnect();
-      this.engineOscillator = null;
-    }
-    if (this.engineGain) {
-      this.engineGain.disconnect();
-      this.engineGain = null;
-    }
+    // Disabled
   }
 
   playCloseCall() {
