@@ -729,8 +729,9 @@ export default {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  /* Compensate for body zoom: 0.9 - Chrome calculates viewport units before zoom is applied */
+  width: calc(100vw / 0.9);
+  height: calc(100vh / 0.9);
   background: #008080;
   font-family: 'MS Sans Serif', 'Segoe UI', Tahoma, sans-serif;
   font-size: 11px;
@@ -1432,8 +1433,8 @@ export default {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  width: calc(100vw / 0.9);
+  height: calc(100vh / 0.9);
   background: #000;
   display: flex;
   align-items: center;
@@ -1476,8 +1477,8 @@ export default {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  width: calc(100vw / 0.9);
+  height: calc(100vh / 0.9);
   background: #000;
   display: flex;
   align-items: center;
