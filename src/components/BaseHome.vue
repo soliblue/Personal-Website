@@ -82,6 +82,22 @@
         </svg>
         <span>space</span>
       </router-link>
+      <router-link to="/code-hop" class="floating-btn left">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <circle cx="14" cy="10" r="6"/>
+          <path d="M5 19c2-5 6-7 10-6-3 2-4 5-2 8-3 1-6 0-8-2Z"/>
+          <path d="M5 15h5"/>
+        </svg>
+        <span>hop</span>
+      </router-link>
     </div>
   </div>
 </template>

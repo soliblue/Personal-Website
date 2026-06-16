@@ -136,6 +136,7 @@
           <li><router-link to="/terminal">Terminal version of this page</router-link></li>
           <li><router-link to="/windows95">Windows 95 version of this page</router-link></li>
           <li><router-link to="/newspaper">Newspaper version of this page</router-link></li>
+          <li><router-link to="/code-hop">Code Hop arcade game</router-link></li>
         </ul>
 
         <h2 id="references">References <span class="wiki-edit">[<a href="#">edit</a>]</span></h2>
@@ -160,7 +161,9 @@
         <router-link to="/animation">Animation</router-link> ·
         <router-link to="/terminal">Terminal</router-link> ·
         <router-link to="/newspaper">Newspaper</router-link> ·
-        <router-link to="/windows95">Windows 95</router-link>
+        <router-link to="/windows95">Windows 95</router-link> ·
+        <router-link to="/space">Space Game</router-link> ·
+        <router-link to="/code-hop">Code Hop</router-link>
       </div>
     </div>
   </div>

@@ -38,6 +38,10 @@
         <img src="../assets/space/spaceship.png" alt="Space Game" class="space-icon">
         <span>Space Game</span>
       </div>
+      <div class="desktop-icon" @dblclick="openWindow('codehop')">
+        <img src="../assets/codehop/icon.svg" alt="Code Hop" class="codehop-icon">
+        <span>Code Hop</span>
+      </div>
       <div class="desktop-icon recycle" @dblclick="openWindow('recycle')">
         <img src="../assets/win95/recycle.svg" alt="Recycle Bin">
         <span>Recycle Bin</span>
@@ -276,6 +280,11 @@
         <div v-if="win.id === 'spacegame'" class="app-window">
           <SpaceGameHome v-if="win.open && !win.minimized" :embedded="true" />
         </div>
+
+        <!-- Code Hop Window - only mount when open and not minimized -->
+        <div v-if="win.id === 'codehop'" class="app-window">
+          <CodeHopHome v-if="win.open && !win.minimized" :embedded="true" />
+        </div>
       </div>
       <div class="window-resize" @mousedown="startResize($event, win)"></div>
     </div>
@@ -331,6 +340,14 @@
           <img src="../assets/win95/mail.svg">
           <span>Contact</span>
         </div>
+        <div class="menu-item-row" @click="openWindow('spacegame')">
+          <img src="../assets/space/spaceship.png">
+          <span>Space Game</span>
+        </div>
+        <div class="menu-item-row" @click="openWindow('codehop')">
+          <img src="../assets/codehop/icon.svg">
+          <span>Code Hop</span>
+        </div>
         <div class="menu-divider"></div>
         <div class="menu-item-row" @click="navigateTo('/terminal')">
           <img src="../assets/win95/terminal.svg">
@@ -384,6 +401,8 @@ import TerminalHome from '@/views/TerminalHome.vue';
 import WikipediaHome from '@/views/WikipediaHome.vue';
 import NewspaperHome from '@/views/NewspaperHome.vue';
 import SpaceGameHome from '@/views/SpaceGameHome.vue';
+import CodeHopHome from '@/views/CodeHopHome';
+import codeHopIcon from '@/assets/codehop/icon.svg';
 
 export default {
   name: 'Windows95Home',
@@ -392,6 +411,7 @@ export default {
     WikipediaHome,
     NewspaperHome,
     SpaceGameHome,
+    CodeHopHome,
   },
   data() {
     return {
@@ -530,6 +550,20 @@ export default {
           maximized: false,
           x: 50,
           y: 30,
+          width: 900,
+          height: 650,
+          showMenu: false,
+          contentClass: 'app-container',
+        },
+        {
+          id: 'codehop',
+          title: 'Code Hop',
+          icon: codeHopIcon,
+          open: false,
+          minimized: false,
+          maximized: false,
+          x: 80,
+          y: 45,
           width: 900,
           height: 650,
           showMenu: false,
@@ -769,6 +803,13 @@ export default {
 .desktop-icon img.space-icon {
   width: 40px;
   height: 40px;
+  image-rendering: auto;
+  filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.5));
+}
+
+.desktop-icon img.codehop-icon {
+  width: 38px;
+  height: 38px;
   image-rendering: auto;
   filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.5));
 }

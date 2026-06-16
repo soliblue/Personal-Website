@@ -135,6 +135,61 @@ test.describe('site smoke', () => {
     expect(errors).toEqual([]);
   });
 
+  test('Code Hop route draws a playable canvas and starts cleanly', async ({ page }) => {
+    test.skip(test.info().project.name !== 'chromium', 'Canvas pixel check is covered once.');
+    const errors = collectPageErrors(page);
+
+    await page.goto('/code-hop');
+    await expect(page.locator('.code-hop canvas')).toBeVisible();
+    await expect(page.locator('.panel')).toContainText('CODE HOP');
+    await page.waitForTimeout(500);
+
+    const canvasState = await page.evaluate(() => {
+      const canvas = document.querySelector('.code-hop canvas');
+      const context = canvas.getContext('2d');
+      const image = context.getImageData(0, 0, Math.min(canvas.width, 100), 100).data;
+      let nonTransparent = 0;
+
+      for (let index = 3; index < image.length; index += 16) {
+        if (image[index] > 0) nonTransparent += 1;
+      }
+
+      return {
+        width: canvas.width,
+        height: canvas.height,
+        nonTransparent,
+      };
+    });
+
+    expect(canvasState.width).toBeGreaterThan(300);
+    expect(canvasState.height).toBeGreaterThan(300);
+    expect(canvasState.nonTransparent).toBeGreaterThan(0);
+
+    await page.locator('.code-hop .panel button.primary').click();
+    await expect(page.locator('.code-hop .overlay')).toBeHidden();
+    await page.keyboard.press('Space');
+    await page.waitForTimeout(800);
+    await expect(page.locator('.hud-stats')).toContainText('SCORE:');
+    await expect(page.locator('.hud-stats')).toContainText('SPEED:');
+    expect(errors).toEqual([]);
+  });
+
+  test('Windows 95 opens Code Hop as an embedded desktop game', async ({ page }) => {
+    test.skip(test.info().project.name !== 'chromium', 'Desktop shell flow is covered once.');
+    const errors = collectPageErrors(page);
+
+    await page.goto('/windows95');
+    await expect(page.locator('.boot-screen')).toBeHidden({ timeout: 8000 });
+    await page.locator('.desktop-icon', { hasText: 'Code Hop' }).dblclick();
+
+    await expect(page.locator('.titlebar-text', { hasText: 'Code Hop' })).toBeVisible();
+    await expect(page.locator('.code-hop.embedded canvas')).toBeVisible();
+    await page.locator('.code-hop.embedded .panel button.primary').click();
+    await expect(page.locator('.code-hop.embedded .overlay')).toBeHidden();
+    await expect(page.locator('.code-hop.embedded .hud-stats')).toContainText('CODE HOP');
+    expect(errors).toEqual([]);
+  });
+
   test('Projects mobile viewport does not horizontally overflow', async ({ page }) => {
     test.skip(test.info().project.name !== 'mobile-chrome', 'Mobile layout check only.');
     const errors = collectPageErrors(page);

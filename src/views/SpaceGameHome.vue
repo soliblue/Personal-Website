@@ -43,6 +43,7 @@
           <a href="/newspaper" target="_blank" class="menu-item small">Newspaper</a>
           <a href="/windows95" target="_blank" class="menu-item small">Windows 95</a>
           <a href="/wikipedia" target="_blank" class="menu-item small">Wikipedia</a>
+          <a href="/code-hop" target="_blank" class="menu-item small">Code Hop</a>
         </div>
       </div>
     </div>
@@ -641,8 +642,9 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  width: 100vw;
-  height: 100vh;
+  /* Compensate for body zoom: 0.9 - Chrome calculates viewport units before zoom is applied */
+  width: calc(100vw / 0.9);
+  height: calc(100vh / 0.9);
   overflow: hidden;
   font-family: 'Courier New', monospace;
   margin: 0;

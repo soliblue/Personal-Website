@@ -218,6 +218,10 @@
           <router-link to="/windows95" class="footer-link">Windows 95 Home</router-link>
           <span class="footer-divider">|</span>
           <router-link to="/wikipedia" class="footer-link">Wikipedia Home</router-link>
+          <span class="footer-divider">|</span>
+          <router-link to="/space" class="footer-link">Space Game</router-link>
+          <span class="footer-divider">|</span>
+          <router-link to="/code-hop" class="footer-link">Code Hop</router-link>
         </div>
       </footer>
     </div>

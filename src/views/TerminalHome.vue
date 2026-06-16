@@ -95,6 +95,38 @@
         </svg>
         <span>wiki</span>
       </router-link>
+      <router-link to="/space" class="floating-btn">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="m12 15-3-3c1-3 5-9 13-10 0 3-1 8-6 11a22 22 0 0 1-4 2z"/>
+          <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/>
+          <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>
+        </svg>
+        <span>space</span>
+      </router-link>
+      <router-link to="/code-hop" class="floating-btn">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <circle cx="14" cy="10" r="6"/>
+          <path d="M5 19c2-5 6-7 10-6-3 2-4 5-2 8-3 1-6 0-8-2Z"/>
+          <path d="M5 15h5"/>
+        </svg>
+        <span>hop</span>
+      </router-link>
     </div>
 
     <!-- Modal -->

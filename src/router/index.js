@@ -10,6 +10,7 @@ import NewspaperHome from '@/views/NewspaperHome';
 import Windows95Home from '@/views/Windows95Home';
 import WikipediaHome from '@/views/WikipediaHome';
 import SpaceGameHome from '@/views/SpaceGameHome';
+import CodeHopHome from '@/views/CodeHopHome';
 import AppDoc from '@/views/AppDoc';
 
 Vue.use(Router);
@@ -72,6 +73,15 @@ export default new Router({
       component: SpaceGameHome,
       beforeEnter: (to, from, next) => {
         localStorage.setItem('homeVersion', 'space');
+        next();
+      },
+    },
+    {
+      path: '/code-hop',
+      name: 'CodeHopHome',
+      component: CodeHopHome,
+      beforeEnter: (to, from, next) => {
+        localStorage.setItem('homeVersion', 'code-hop');
         next();
       },
     },

@@ -32,9 +32,9 @@ export default {
   },
   computed: {
     hideThemeToggle() {
-      // Hide on space game and windows95 (has its own UI)
+      // Hide on full-screen app modes that have their own UI
       const route = this.$route.path;
-      return route === '/space' || route === '/windows95';
+      return route === '/space' || route === '/code-hop' || route === '/windows95';
     },
   },
   mounted() {
