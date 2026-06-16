@@ -15,9 +15,9 @@
 
     <div class="hop-hud">
       <div class="hud-brand">
-        <span class="clawd-mark" aria-hidden="true"></span>
+        <span class="claude-mark" aria-hidden="true"></span>
         <div>
-          <strong>CLAWD HOP</strong>
+          <strong>CLAUDE HOPS</strong>
           <span>WORLD {{ worldLabel }}</span>
         </div>
       </div>
@@ -36,7 +36,7 @@
     <div v-if="gameState !== 'playing'" class="overlay">
       <div class="panel">
         <div class="panel-kicker">CLAUDE CODE PRESENTS</div>
-        <h1>CLAWD HOP</h1>
+        <h1>CLAUDE HOPS</h1>
         <p v-if="gameState === 'ready'">WORLD 1-1 / BUG BLOCK ROAD</p>
         <p v-else-if="gameState === 'paused'">PAUSED / FLOPPY STILL SPINNING</p>
         <p v-else>CRASH AT {{ score }} / BEST {{ bestScore }}</p>
@@ -59,7 +59,9 @@
 
 <script>
 /* eslint-disable no-mixed-operators, no-param-reassign */
-const BEST_SCORE_KEY = 'clawdHopBest';
+import claudeHopsSprite from '@/assets/codehop/claude-hops-mascot.png';
+
+const BEST_SCORE_KEY = 'claudeHopsBest';
 
 const OBSTACLE_TYPES = [
   {
@@ -149,6 +151,8 @@ export default {
       passed: 0,
       spawnTimer: 1.25,
       player: null,
+      spriteImage: null,
+      spriteLoaded: false,
       obstacles: [],
       clouds: [],
       particles: [],
@@ -180,6 +184,7 @@ export default {
       this.canvas = this.$refs.canvas;
       this.ctx = this.canvas.getContext('2d');
       this.bestScore = parseInt(localStorage.getItem(BEST_SCORE_KEY) || '0', 10);
+      this.loadSprite();
 
       if (!this.embedded) {
         document.body.style.overflow = 'hidden';
@@ -201,6 +206,15 @@ export default {
       }
 
       this.animationId = requestAnimationFrame(this.gameLoop);
+    },
+
+    loadSprite() {
+      const image = new Image();
+      image.onload = () => {
+        this.spriteLoaded = true;
+      };
+      image.src = claudeHopsSprite;
+      this.spriteImage = image;
     },
 
     cleanup() {
@@ -305,17 +319,18 @@ export default {
     },
 
     updateIdle(delta) {
-      this.floorOffset = (this.floorOffset + 28 * delta) % (this.tile * 2);
-      this.updateClouds(delta, 55);
+      this.updateClouds(delta, 12);
       this.updateParticles(delta);
     },
 
     updateGame(delta) {
       this.elapsed += delta;
       this.speed = clamp(225 + this.elapsed * 10 + this.passed * 8, 225, 520);
-      this.floorOffset = (this.floorOffset + this.speed * delta) % (this.tile * 2);
+      this.floorOffset = (
+        this.floorOffset + this.speed * 0.55 * delta
+      ) % (this.tile * 2);
 
-      this.updateClouds(delta, this.speed);
+      this.updateClouds(delta, 48);
       this.updatePlayer(delta);
       this.updateObstacles(delta);
       this.updateParticles(delta);
@@ -329,7 +344,11 @@ export default {
         cloud.x -= pace * cloud.speed * delta;
         if (cloud.x + cloud.width < -20) {
           cloud.x = this.width + cloud.width + Math.random() * 120;
-          cloud.y = clamp(36 + Math.random() * this.groundY * 0.28, 28, this.groundY - 140);
+          cloud.y = clamp(
+            36 + Math.random() * this.groundY * 0.28,
+            28,
+            this.groundY - 140,
+          );
         }
       });
     },
@@ -527,9 +546,8 @@ export default {
       this.drawDistantBlocks();
       this.drawGround();
       this.obstacles.forEach(this.drawObstacle);
-      this.drawClawd();
+      this.drawClaude();
       this.drawParticles();
-      this.drawScanlines();
     },
 
     drawSky() {
@@ -537,12 +555,7 @@ export default {
       this.block(0, this.height * 0.34, this.width, this.height * 0.16, '#b6cba9');
       this.block(0, this.height * 0.5, this.width, this.groundY - this.height * 0.5, '#d7b76f');
 
-      const step = Math.max(18, this.tile);
-      for (let y = 22; y < this.groundY - 150; y += step) {
-        for (let x = (y / step % 2) * step; x < this.width; x += step * 2) {
-          this.block(x, y, 3 * this.scale, 3 * this.scale, 'rgba(255,255,255,0.28)');
-        }
-      }
+      this.block(0, this.groundY - 2 * this.scale, this.width, 2 * this.scale, '#b18f55');
     },
 
     drawClouds() {
@@ -557,8 +570,8 @@ export default {
 
     drawDistantBlocks() {
       const baseY = this.groundY - 78 * this.scale;
-      const offset = (this.floorOffset * 0.23) % (this.tile * 4);
-      for (let x = -this.tile * 4 - offset; x < this.width + this.tile * 4; x += this.tile * 4) {
+      const gap = this.tile * 5.2;
+      for (let x = -this.tile; x < this.width + gap; x += gap) {
         this.block(x, baseY + this.tile, this.tile * 3, this.tile, '#6f7a68');
         this.block(x + this.tile, baseY, this.tile * 2, this.tile, '#778872');
         this.block(x + this.tile * 2, baseY - this.tile * 0.65, this.tile, this.tile * 0.65, '#59675a');
@@ -658,7 +671,7 @@ export default {
       }
     },
 
-    drawClawd() {
+    drawClaude() {
       const player = this.player;
       if (!player) return;
       const unit = player.width / 16;
@@ -666,6 +679,31 @@ export default {
       const bob = player.grounded ? Math.sin(player.runFrame) * unit * 0.18 : -unit * 0.35;
       const x = player.x;
       const y = player.y + bob;
+
+      if (this.spriteLoaded && this.spriteImage) {
+        const ctx = this.ctx;
+        ctx.save();
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(
+          this.spriteImage,
+          Math.round(x),
+          Math.round(y),
+          player.width,
+          player.height,
+        );
+        ctx.restore();
+        if (player.grounded) {
+          this.block(
+            x + unit * 2,
+            this.groundY + unit * 0.22,
+            unit * 12,
+            unit * 0.5,
+            'rgba(45, 30, 24, 0.3)',
+          );
+        }
+        return;
+      }
+
       const outline = '#fff9f0';
       const orange = '#d87655';
       const shade = '#bd6049';
@@ -689,8 +727,8 @@ export default {
       this.block(x + unit * 12.8, y + unit * 1.15, unit * 0.8, unit * 8.1, shade);
 
       const eyeY = y + (player.grounded ? unit * 3.5 : unit * 3.15);
-      this.drawClawdEye(x + unit * 3.2, eyeY, unit, 'right');
-      this.drawClawdEye(x + unit * 10.2, eyeY, unit, 'left');
+      this.drawClaudeEye(x + unit * 3.2, eyeY, unit, 'right');
+      this.drawClaudeEye(x + unit * 10.2, eyeY, unit, 'left');
 
       const stepA = player.grounded && run ? unit * 0.25 : 0;
       const stepB = player.grounded && !run ? unit * 0.25 : 0;
@@ -704,7 +742,7 @@ export default {
       }
     },
 
-    drawClawdEye(x, y, unit, direction) {
+    drawClaudeEye(x, y, unit, direction) {
       const ctx = this.ctx;
       const flip = direction === 'left' ? -1 : 1;
       ctx.save();
@@ -732,15 +770,6 @@ export default {
         this.block(particle.x, particle.y, particle.size, particle.size, particle.color);
         ctx.restore();
       });
-    },
-
-    drawScanlines() {
-      this.ctx.save();
-      this.ctx.fillStyle = 'rgba(30, 28, 35, 0.08)';
-      for (let y = 0; y < this.height; y += 4) {
-        this.ctx.fillRect(0, Math.round(y), this.width, 1);
-      }
-      this.ctx.restore();
     },
 
     block(x, y, width, height, color) {
@@ -793,8 +822,9 @@ canvas {
   left: 16px;
   right: 16px;
   z-index: 4;
-  display: grid;
-  grid-template-columns: auto minmax(260px, 1fr) auto;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
   gap: 12px;
   align-items: start;
   pointer-events: none;
@@ -835,7 +865,7 @@ canvas {
   line-height: 1.1;
 }
 
-.hud-brand span:not(.clawd-mark) {
+.hud-brand span:not(.claude-mark) {
   display: block;
   margin-top: 3px;
   color: #6a3b25;
@@ -843,7 +873,7 @@ canvas {
   font-weight: 700;
 }
 
-.clawd-mark {
+.claude-mark {
   position: relative;
   width: 36px;
   height: 31px;
@@ -866,22 +896,30 @@ canvas {
   image-rendering: pixelated;
 }
 
-.clawd-mark::before,
-.clawd-mark::after {
+.claude-mark::before,
+.claude-mark::after {
   content: "";
   position: absolute;
   top: 12px;
   width: 8px;
   height: 8px;
   background: #050505;
-  clip-path: polygon(0 0, 100% 36%, 100% 66%, 0 100%, 0 70%, 56% 50%, 0 30%);
+  clip-path: polygon(
+    0 0,
+    100% 36%,
+    100% 66%,
+    0 100%,
+    0 70%,
+    56% 50%,
+    0 30%
+  );
 }
 
-.clawd-mark::before {
+.claude-mark::before {
   left: 8px;
 }
 
-.clawd-mark::after {
+.claude-mark::after {
   left: 22px;
   transform: scaleX(-1);
 }
@@ -896,6 +934,7 @@ canvas {
   color: #21170f;
   font-size: 15px;
   font-weight: 700;
+  margin-left: auto;
 }
 
 .hud-button,
@@ -956,7 +995,7 @@ canvas {
 h1 {
   margin: 0;
   color: #b95130;
-  font-size: 64px;
+  font-size: 56px;
   line-height: 0.9;
   text-shadow: 4px 4px 0 #3f2419;
 }
@@ -1010,18 +1049,14 @@ h1 {
 }
 
 @media (max-width: 720px) {
-  .hop-hud {
-    grid-template-columns: 1fr auto;
-  }
-
   .hud-stats {
-    grid-column: 1 / -1;
-    grid-row: 2;
+    flex-basis: 100%;
     justify-content: flex-start;
+    margin-left: 0;
   }
 
   h1 {
-    font-size: 42px;
+    font-size: 38px;
   }
 
   .panel {

@@ -136,7 +136,7 @@
           <li><router-link to="/terminal">Terminal version of this page</router-link></li>
           <li><router-link to="/windows95">Windows 95 version of this page</router-link></li>
           <li><router-link to="/newspaper">Newspaper version of this page</router-link></li>
-          <li><router-link to="/code-hop">Clawd Hop arcade game</router-link></li>
+          <li><router-link to="/code-hop">Claude Hops arcade game</router-link></li>
         </ul>
 
         <h2 id="references">References <span class="wiki-edit">[<a href="#">edit</a>]</span></h2>
@@ -163,7 +163,7 @@
         <router-link to="/newspaper">Newspaper</router-link> ·
         <router-link to="/windows95">Windows 95</router-link> ·
         <router-link to="/space">Space Game</router-link> ·
-        <router-link to="/code-hop">Clawd Hop</router-link>
+        <router-link to="/code-hop">Claude Hops</router-link>
       </div>
     </div>
   </div>

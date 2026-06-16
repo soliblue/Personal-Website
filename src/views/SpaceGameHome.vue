@@ -43,7 +43,7 @@
           <a href="/newspaper" target="_blank" class="menu-item small">Newspaper</a>
           <a href="/windows95" target="_blank" class="menu-item small">Windows 95</a>
           <a href="/wikipedia" target="_blank" class="menu-item small">Wikipedia</a>
-          <a href="/code-hop" target="_blank" class="menu-item small">Clawd Hop</a>
+          <a href="/code-hop" target="_blank" class="menu-item small">Claude Hops</a>
         </div>
       </div>
     </div>

@@ -39,8 +39,12 @@
         <span>Space Game</span>
       </div>
       <div class="desktop-icon" @dblclick="openWindow('codehop')">
-        <img src="../assets/codehop/icon.svg" alt="Clawd Hop" class="codehop-icon">
-        <span>Clawd Hop</span>
+        <img
+          src="../assets/codehop/claude-hops-mascot.png"
+          alt="Claude Hops"
+          class="codehop-icon"
+        >
+        <span>Claude Hops</span>
       </div>
       <div class="desktop-icon recycle" @dblclick="openWindow('recycle')">
         <img src="../assets/win95/recycle.svg" alt="Recycle Bin">
@@ -281,7 +285,7 @@
           <SpaceGameHome v-if="win.open && !win.minimized" :embedded="true" />
         </div>
 
-        <!-- Clawd Hop Window - only mount when open and not minimized -->
+        <!-- Claude Hops Window - only mount when open and not minimized -->
         <div v-if="win.id === 'codehop'" class="app-window">
           <CodeHopHome v-if="win.open && !win.minimized" :embedded="true" />
         </div>
@@ -345,8 +349,8 @@
           <span>Space Game</span>
         </div>
         <div class="menu-item-row" @click="openWindow('codehop')">
-          <img src="../assets/codehop/icon.svg">
-          <span>Clawd Hop</span>
+          <img src="../assets/codehop/claude-hops-mascot.png">
+          <span>Claude Hops</span>
         </div>
         <div class="menu-divider"></div>
         <div class="menu-item-row" @click="navigateTo('/terminal')">
@@ -402,7 +406,7 @@ import WikipediaHome from '@/views/WikipediaHome.vue';
 import NewspaperHome from '@/views/NewspaperHome.vue';
 import SpaceGameHome from '@/views/SpaceGameHome.vue';
 import CodeHopHome from '@/views/CodeHopHome';
-import codeHopIcon from '@/assets/codehop/icon.svg';
+import codeHopIcon from '@/assets/codehop/claude-hops-mascot.png';
 
 export default {
   name: 'Windows95Home',
@@ -557,7 +561,7 @@ export default {
         },
         {
           id: 'codehop',
-          title: 'Clawd Hop',
+          title: 'Claude Hops',
           icon: codeHopIcon,
           open: false,
           minimized: false,

@@ -102,7 +102,7 @@
             stroke="currentColor"
           />
         </svg>
-        <span>clawd</span>
+        <span>hops</span>
       </router-link>
     </div>
   </div>

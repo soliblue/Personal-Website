@@ -135,13 +135,13 @@ test.describe('site smoke', () => {
     expect(errors).toEqual([]);
   });
 
-  test('Clawd Hop route draws a playable canvas and jumps cleanly', async ({ page }) => {
+  test('Claude Hops route draws a playable canvas and jumps cleanly', async ({ page }) => {
     test.skip(test.info().project.name !== 'chromium', 'Canvas pixel check is covered once.');
     const errors = collectPageErrors(page);
 
     await page.goto('/code-hop');
     await expect(page.locator('.code-hop canvas')).toBeVisible();
-    await expect(page.locator('.panel')).toContainText('CLAWD HOP');
+    await expect(page.locator('.panel')).toContainText('CLAUDE HOPS');
     await page.waitForTimeout(500);
 
     const canvasState = await page.evaluate(() => {
@@ -176,19 +176,19 @@ test.describe('site smoke', () => {
     expect(errors).toEqual([]);
   });
 
-  test('Windows 95 opens Clawd Hop as an embedded desktop game', async ({ page }) => {
+  test('Windows 95 opens Claude Hops as an embedded desktop game', async ({ page }) => {
     test.skip(test.info().project.name !== 'chromium', 'Desktop shell flow is covered once.');
     const errors = collectPageErrors(page);
 
     await page.goto('/windows95');
     await expect(page.locator('.boot-screen')).toBeHidden({ timeout: 8000 });
-    await page.locator('.desktop-icon', { hasText: 'Clawd Hop' }).dblclick();
+    await page.locator('.desktop-icon', { hasText: 'Claude Hops' }).dblclick();
 
-    await expect(page.locator('.titlebar-text', { hasText: 'Clawd Hop' })).toBeVisible();
+    await expect(page.locator('.titlebar-text', { hasText: 'Claude Hops' })).toBeVisible();
     await expect(page.locator('.code-hop.embedded canvas')).toBeVisible();
     await page.locator('.code-hop.embedded .panel button.primary').click();
     await expect(page.locator('.code-hop.embedded .overlay')).toBeHidden();
-    await expect(page.locator('.code-hop.embedded .hud-brand')).toContainText('CLAWD HOP');
+    await expect(page.locator('.code-hop.embedded .hud-brand')).toContainText('CLAUDE HOPS');
     expect(errors).toEqual([]);
   });
 
