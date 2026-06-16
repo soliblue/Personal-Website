@@ -135,13 +135,13 @@ test.describe('site smoke', () => {
     expect(errors).toEqual([]);
   });
 
-  test('Code Hop route draws a playable canvas and starts cleanly', async ({ page }) => {
+  test('Clawd Hop route draws a playable canvas and jumps cleanly', async ({ page }) => {
     test.skip(test.info().project.name !== 'chromium', 'Canvas pixel check is covered once.');
     const errors = collectPageErrors(page);
 
     await page.goto('/code-hop');
     await expect(page.locator('.code-hop canvas')).toBeVisible();
-    await expect(page.locator('.panel')).toContainText('CODE HOP');
+    await expect(page.locator('.panel')).toContainText('CLAWD HOP');
     await page.waitForTimeout(500);
 
     const canvasState = await page.evaluate(() => {
@@ -168,25 +168,27 @@ test.describe('site smoke', () => {
     await page.locator('.code-hop .panel button.primary').click();
     await expect(page.locator('.code-hop .overlay')).toBeHidden();
     await page.keyboard.press('Space');
-    await page.waitForTimeout(800);
+    await expect.poll(async () => page.locator('.code-hop').getAttribute('data-airborne')).toBe('true');
+    await page.waitForTimeout(900);
+    await expect(page.locator('.code-hop')).toHaveAttribute('data-state', 'playing');
     await expect(page.locator('.hud-stats')).toContainText('SCORE:');
     await expect(page.locator('.hud-stats')).toContainText('SPEED:');
     expect(errors).toEqual([]);
   });
 
-  test('Windows 95 opens Code Hop as an embedded desktop game', async ({ page }) => {
+  test('Windows 95 opens Clawd Hop as an embedded desktop game', async ({ page }) => {
     test.skip(test.info().project.name !== 'chromium', 'Desktop shell flow is covered once.');
     const errors = collectPageErrors(page);
 
     await page.goto('/windows95');
     await expect(page.locator('.boot-screen')).toBeHidden({ timeout: 8000 });
-    await page.locator('.desktop-icon', { hasText: 'Code Hop' }).dblclick();
+    await page.locator('.desktop-icon', { hasText: 'Clawd Hop' }).dblclick();
 
-    await expect(page.locator('.titlebar-text', { hasText: 'Code Hop' })).toBeVisible();
+    await expect(page.locator('.titlebar-text', { hasText: 'Clawd Hop' })).toBeVisible();
     await expect(page.locator('.code-hop.embedded canvas')).toBeVisible();
     await page.locator('.code-hop.embedded .panel button.primary').click();
     await expect(page.locator('.code-hop.embedded .overlay')).toBeHidden();
-    await expect(page.locator('.code-hop.embedded .hud-stats')).toContainText('CODE HOP');
+    await expect(page.locator('.code-hop.embedded .hud-brand')).toContainText('CLAWD HOP');
     expect(errors).toEqual([]);
   });
 

@@ -39,8 +39,8 @@
         <span>Space Game</span>
       </div>
       <div class="desktop-icon" @dblclick="openWindow('codehop')">
-        <img src="../assets/codehop/icon.svg" alt="Code Hop" class="codehop-icon">
-        <span>Code Hop</span>
+        <img src="../assets/codehop/icon.svg" alt="Clawd Hop" class="codehop-icon">
+        <span>Clawd Hop</span>
       </div>
       <div class="desktop-icon recycle" @dblclick="openWindow('recycle')">
         <img src="../assets/win95/recycle.svg" alt="Recycle Bin">
@@ -281,7 +281,7 @@
           <SpaceGameHome v-if="win.open && !win.minimized" :embedded="true" />
         </div>
 
-        <!-- Code Hop Window - only mount when open and not minimized -->
+        <!-- Clawd Hop Window - only mount when open and not minimized -->
         <div v-if="win.id === 'codehop'" class="app-window">
           <CodeHopHome v-if="win.open && !win.minimized" :embedded="true" />
         </div>
@@ -346,7 +346,7 @@
         </div>
         <div class="menu-item-row" @click="openWindow('codehop')">
           <img src="../assets/codehop/icon.svg">
-          <span>Code Hop</span>
+          <span>Clawd Hop</span>
         </div>
         <div class="menu-divider"></div>
         <div class="menu-item-row" @click="navigateTo('/terminal')">
@@ -557,7 +557,7 @@ export default {
         },
         {
           id: 'codehop',
-          title: 'Code Hop',
+          title: 'Clawd Hop',
           icon: codeHopIcon,
           open: false,
           minimized: false,

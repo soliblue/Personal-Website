@@ -121,11 +121,17 @@
           stroke="currentColor"
           stroke-width="2"
         >
-          <circle cx="14" cy="10" r="6"/>
-          <path d="M5 19c2-5 6-7 10-6-3 2-4 5-2 8-3 1-6 0-8-2Z"/>
-          <path d="M5 15h5"/>
+          <path
+            d="M5 3.5h14v3h1.5v10H18v4h-3.5v-4h-5v4H6v-4H3.5v-10H5z"
+            fill="#d87655"
+            stroke="currentColor"
+          />
+          <path
+            d="M7.5 9.5 11 11l-3.5 1.5M16.5 9.5 13 11l3.5 1.5"
+            stroke="currentColor"
+          />
         </svg>
-        <span>hop</span>
+        <span>clawd</span>
       </router-link>
     </div>
 
