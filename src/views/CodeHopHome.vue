@@ -704,17 +704,9 @@ export default {
         return;
       }
 
-      const outline = '#fff9f0';
       const orange = '#d87655';
       const shade = '#bd6049';
       const highlight = '#e39875';
-
-      this.block(x + unit * 2, y, unit * 12, unit * 1.1, outline);
-      this.block(x + unit, y + unit, unit * 14, unit * 9, outline);
-      this.block(x, y + unit * 3.2, unit * 2.1, unit * 4, outline);
-      this.block(x + unit * 13.9, y + unit * 3.2, unit * 2.1, unit * 4, outline);
-      this.block(x + unit, y + unit * 9.2, unit * 6, unit * 3.2, outline);
-      this.block(x + unit * 9, y + unit * 9.2, unit * 6, unit * 3.2, outline);
 
       this.block(x + unit * 2.4, y + unit * 1.05, unit * 11.2, unit * 8.2, orange);
       this.block(x + unit * 0.65, y + unit * 4.15, unit * 1.95, unit * 2.35, orange);
@@ -879,12 +871,6 @@ canvas {
   height: 31px;
   display: inline-block;
   background:
-    linear-gradient(#fff9f0 0 0) 6px 0 / 24px 3px,
-    linear-gradient(#fff9f0 0 0) 3px 3px / 30px 21px,
-    linear-gradient(#fff9f0 0 0) 0 10px / 6px 12px,
-    linear-gradient(#fff9f0 0 0) 30px 10px / 6px 12px,
-    linear-gradient(#fff9f0 0 0) 3px 24px / 12px 7px,
-    linear-gradient(#fff9f0 0 0) 21px 24px / 12px 7px,
     linear-gradient(#d87655 0 0) 8px 3px / 20px 21px,
     linear-gradient(#d87655 0 0) 3px 13px / 8px 7px,
     linear-gradient(#d87655 0 0) 25px 13px / 8px 7px,
