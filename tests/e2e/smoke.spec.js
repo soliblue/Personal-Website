@@ -18,13 +18,25 @@ test.describe('site smoke', () => {
     await expect(page).toHaveURL(/\/windows95$/);
     await expect(page.locator('.boot-screen')).toBeHidden({ timeout: 8000 });
     await expect(page.locator('.titlebar-text', { hasText: 'About Me' })).toBeVisible();
+    await expect(page.locator('.desktop-icon', { hasText: 'World Pins' })).toHaveCount(0);
 
     await page.getByRole('button', { name: /start/i }).click();
     await expect(page.locator('.start-menu')).toBeVisible();
+    await expect(page.locator('.start-menu')).not.toContainText('World Pins');
     await page.locator('.menu-item-row', { hasText: 'Projects' }).click();
 
     await expect(page.locator('.titlebar-text', { hasText: 'Projects' })).toBeVisible();
     await expect(page.getByText('9 object(s)')).toBeVisible();
+    expect(errors).toEqual([]);
+  });
+
+  test('Pins route remains available as a standalone page', async ({ page }) => {
+    const errors = collectPageErrors(page);
+
+    await page.goto('/pins');
+    await expect(page).toHaveURL(/\/pins$/);
+    await expect(page.locator('.pin-card')).toHaveCount(15);
+    await expect(page.locator('.pin-card').first()).toContainText('Aldous Huxley');
     expect(errors).toEqual([]);
   });
 

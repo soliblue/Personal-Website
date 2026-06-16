@@ -10,10 +10,6 @@
         <img src="../assets/win95/folder.svg" alt="Projects">
         <span>Projects</span>
       </div>
-      <div class="desktop-icon" @dblclick="openWindow('pins')">
-        <img src="../assets/win95/globe.svg" alt="Pins">
-        <span>World Pins</span>
-      </div>
       <div class="desktop-icon" @dblclick="openWindow('about')">
         <img src="../assets/win95/computer.svg" alt="About">
         <span>About Me</span>
@@ -170,41 +166,6 @@
           <div class="explorer-status">{{ projects.length }} object(s)</div>
         </div>
 
-        <!-- Pins Window -->
-        <div v-if="win.id === 'pins'" class="explorer-content">
-          <div class="explorer-toolbar">
-            <button class="toolbar-btn">🌍</button>
-            <span class="address-bar">C:\Places\</span>
-          </div>
-          <div class="explorer-body">
-            <div class="folder-item">
-              <img src="../assets/win95/folder.svg">
-              <span>Berlin</span>
-            </div>
-            <div class="folder-item">
-              <img src="../assets/win95/folder.svg">
-              <span>Montreal</span>
-            </div>
-            <div class="folder-item">
-              <img src="../assets/win95/folder.svg">
-              <span>Dubai</span>
-            </div>
-            <div class="folder-item">
-              <img src="../assets/win95/folder.svg">
-              <span>Tokyo</span>
-            </div>
-            <div class="folder-item">
-              <img src="../assets/win95/folder.svg">
-              <span>Paris</span>
-            </div>
-            <div class="folder-item">
-              <img src="../assets/win95/folder.svg">
-              <span>London</span>
-            </div>
-          </div>
-          <div class="explorer-status">6 object(s) - Places I've loved</div>
-        </div>
-
         <!-- Contact Window -->
         <div v-if="win.id === 'contact'" class="mail-content">
           <div class="mail-header">
@@ -335,10 +296,6 @@
         <div class="menu-item-row" @click="openWindow('projects')">
           <img src="../assets/win95/folder.svg">
           <span>Projects</span>
-        </div>
-        <div class="menu-item-row" @click="openWindow('pins')">
-          <img src="../assets/win95/globe.svg">
-          <span>World Pins</span>
         </div>
         <div class="menu-item-row" @click="openWindow('contact')">
           <img src="../assets/win95/mail.svg">
@@ -471,20 +428,6 @@ export default {
           y: 120,
           width: 450,
           height: 350,
-          showMenu: false,
-          contentClass: '',
-        },
-        {
-          id: 'pins',
-          title: 'Places - Explorer',
-          icon: require('../assets/win95/globe.svg'),
-          open: false,
-          minimized: false,
-          maximized: false,
-          x: 180,
-          y: 90,
-          width: 500,
-          height: 400,
           showMenu: false,
           contentClass: '',
         },
