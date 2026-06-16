@@ -332,9 +332,9 @@ export default {
       this.ship.maxY = this.height - this.ship.height / 2 - 20;
       this.stars = createStars(this.width, this.height);
 
-      // Start game loop
-      this.lastTime = performance.now();
-      this.gameLoop();
+      // Start game loop from the first real animation frame timestamp.
+      this.lastTime = 0;
+      this.animationId = requestAnimationFrame(this.gameLoop);
 
       // Start engine sound on first interaction
       const startAudio = () => {
@@ -437,6 +437,7 @@ export default {
         this.audio.stopEngine();
       } else if (this.gameState === 'paused') {
         this.gameState = 'playing';
+        this.lastTime = 0;
         if (this.audio.enabled) {
           this.audio.startEngine();
         }
@@ -449,6 +450,7 @@ export default {
     resumeGame() {
       this.contentView = null;
       this.gameState = 'playing';
+      this.lastTime = 0;
       if (this.audio.enabled) {
         this.audio.startEngine();
       }
@@ -471,6 +473,7 @@ export default {
       this.ship.minY = this.ship.height / 2 + 60;
       this.ship.maxY = this.height - this.ship.height / 2 - 20;
       this.gameState = 'playing';
+      this.lastTime = 0;
       this.audio.startEngine();
     },
 
@@ -493,12 +496,20 @@ export default {
     gameLoop(currentTime = 0) {
       this.animationId = requestAnimationFrame(this.gameLoop);
 
+      if (!this.lastTime) {
+        this.lastTime = currentTime;
+        this.render();
+        return;
+      }
+
       let deltaTime = (currentTime - this.lastTime) / 16.67;
       this.lastTime = currentTime;
 
       // Cap delta time to prevent huge jumps when returning from background/tab switch
       // This prevents stars from all aligning when coming back to the page
-      if (deltaTime > 3) {
+      if (!Number.isFinite(deltaTime) || deltaTime < 0) {
+        deltaTime = 0;
+      } else if (deltaTime > 3) {
         deltaTime = 1;
       }
 

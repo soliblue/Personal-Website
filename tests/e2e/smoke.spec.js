@@ -108,6 +108,33 @@ test.describe('site smoke', () => {
     expect(errors).toEqual([]);
   });
 
+  test('Space game starts with a nonnegative score after a long-lived page clock', async ({ page }) => {
+    test.skip(test.info().project.name !== 'chromium', 'Desktop shell flow is covered once.');
+    const errors = collectPageErrors(page);
+
+    await page.addInitScript(() => {
+      const realNow = performance.now.bind(performance);
+      Object.defineProperty(performance, 'now', {
+        configurable: true,
+        value: () => realNow() + 180000,
+      });
+    });
+
+    await page.goto('/windows95');
+    await expect(page.locator('.boot-screen')).toBeHidden({ timeout: 8000 });
+    await page.locator('.desktop-icon', { hasText: 'Space Game' }).dblclick();
+
+    await expect(page.locator('.titlebar-text', { hasText: 'Space Game' })).toBeVisible();
+    const score = page.locator('.space-game .stat').filter({ hasText: 'SCORE:' }).first();
+    await expect(score).toBeVisible();
+    await expect(score).not.toContainText('-');
+    await expect.poll(async () => {
+      const text = await score.textContent();
+      return Number(text.replace(/\D/g, ''));
+    }).toBeGreaterThanOrEqual(0);
+    expect(errors).toEqual([]);
+  });
+
   test('Projects mobile viewport does not horizontally overflow', async ({ page }) => {
     test.skip(test.info().project.name !== 'mobile-chrome', 'Mobile layout check only.');
     const errors = collectPageErrors(page);
