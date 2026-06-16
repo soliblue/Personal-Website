@@ -1,3 +1,4 @@
+/* eslint-disable import/prefer-default-export */
 // Input handling for keyboard and touch
 
 export class InputSystem {
@@ -12,27 +13,39 @@ export class InputSystem {
     this.touchY = null;
 
     // Bound handlers for cleanup
-    this._onKeyDown = this._onKeyDown.bind(this);
-    this._onKeyUp = this._onKeyUp.bind(this);
+    this.onKeyDown = this.onKeyDown.bind(this);
+    this.onKeyUp = this.onKeyUp.bind(this);
+    this.onTouchStart = this.onTouchStart.bind(this);
+    this.onTouchMove = this.onTouchMove.bind(this);
+    this.onTouchEnd = this.onTouchEnd.bind(this);
+    this.canvas = null;
   }
 
   init(canvas, callbacks = {}) {
+    if (this.canvas) this.cleanup();
+    this.canvas = canvas;
     this.callbacks = callbacks;
 
-    window.addEventListener('keydown', this._onKeyDown);
-    window.addEventListener('keyup', this._onKeyUp);
+    window.addEventListener('keydown', this.onKeyDown);
+    window.addEventListener('keyup', this.onKeyUp);
 
-    canvas.addEventListener('touchstart', (e) => this._onTouchStart(e), { passive: false });
-    canvas.addEventListener('touchmove', (e) => this._onTouchMove(e), { passive: false });
-    canvas.addEventListener('touchend', () => this._onTouchEnd());
+    canvas.addEventListener('touchstart', this.onTouchStart, { passive: false });
+    canvas.addEventListener('touchmove', this.onTouchMove, { passive: false });
+    canvas.addEventListener('touchend', this.onTouchEnd);
   }
 
   cleanup() {
-    window.removeEventListener('keydown', this._onKeyDown);
-    window.removeEventListener('keyup', this._onKeyUp);
+    window.removeEventListener('keydown', this.onKeyDown);
+    window.removeEventListener('keyup', this.onKeyUp);
+    if (this.canvas) {
+      this.canvas.removeEventListener('touchstart', this.onTouchStart);
+      this.canvas.removeEventListener('touchmove', this.onTouchMove);
+      this.canvas.removeEventListener('touchend', this.onTouchEnd);
+      this.canvas = null;
+    }
   }
 
-  _onKeyDown(e) {
+  onKeyDown(e) {
     switch (e.key) {
       case 'ArrowLeft':
       case 'a':
@@ -62,7 +75,7 @@ export class InputSystem {
     }
   }
 
-  _onKeyUp(e) {
+  onKeyUp(e) {
     switch (e.key) {
       case 'ArrowLeft':
       case 'a':
@@ -85,7 +98,7 @@ export class InputSystem {
     }
   }
 
-  _onTouchStart(e) {
+  onTouchStart(e) {
     e.preventDefault();
     if (this.callbacks.isPlaying && !this.callbacks.isPlaying()) return;
     const touch = e.touches[0];
@@ -93,7 +106,7 @@ export class InputSystem {
     this.touchY = touch.clientY;
   }
 
-  _onTouchMove(e) {
+  onTouchMove(e) {
     e.preventDefault();
     if (this.callbacks.isPlaying && !this.callbacks.isPlaying()) return;
     const touch = e.touches[0];
@@ -101,7 +114,7 @@ export class InputSystem {
     this.touchY = touch.clientY;
   }
 
-  _onTouchEnd() {
+  onTouchEnd() {
     this.touchX = null;
     this.touchY = null;
   }

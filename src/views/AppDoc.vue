@@ -15,6 +15,13 @@
 <script>
 import { marked } from 'marked';
 
+const escapeHtml = value => String(value)
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;')
+  .replace(/'/g, '&#39;');
+
 export default {
   name: 'AppDoc',
   data() {
@@ -41,7 +48,10 @@ export default {
         const response = await fetch(`/static/apps/${app}/${page}.md`);
         if (response.ok) {
           const markdown = await response.text();
-          this.content = marked(markdown);
+          this.content = marked(escapeHtml(markdown), {
+            headerIds: false,
+            mangle: false,
+          });
         }
       } catch (e) {
         // Page not found

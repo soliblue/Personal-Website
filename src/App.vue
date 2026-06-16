@@ -107,6 +107,25 @@ body {
   margin: 0;
 }
 
+.animated {
+  animation-duration: 1s;
+  animation-fill-mode: both;
+}
+
+.fadeIn {
+  animation-name: fadeIn;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -144,5 +163,14 @@ body {
 .fade-enter,
 .fade-leave-to {
   opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animated,
+  .fade-enter-active,
+  .fade-leave-active {
+    animation: none;
+    transition: none;
+  }
 }
 </style>
