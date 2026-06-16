@@ -114,6 +114,22 @@ const webpackConfig = merge(baseWebpackConfig, {
         from: path.resolve(__dirname, '../static'),
         to: config.build.assetsSubDirectory,
         ignore: ['.*']
+      },
+      {
+        from: path.resolve(__dirname, '../static/sitemap.xml'),
+        to: 'sitemap.xml'
+      },
+      {
+        from: path.resolve(__dirname, '../static/robots.txt'),
+        to: 'robots.txt'
+      },
+      {
+        from: path.resolve(__dirname, '../static/_headers'),
+        to: '[name]'
+      },
+      {
+        from: path.resolve(__dirname, '../static/_redirects'),
+        to: '[name]'
       }
     ])
   ]

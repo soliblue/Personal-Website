@@ -3,7 +3,6 @@ import Router from 'vue-router';
 import Home from '@/views/Home';
 import Pins from '@/views/Pins';
 import Resume from '@/views/Resume';
-import Plugins from '@/views/Plugins';
 import Projects from '@/views/Projects';
 import BuildHome from '@/views/BuildHome';
 import TerminalHome from '@/views/TerminalHome';
@@ -90,11 +89,6 @@ export default new Router({
       path: '/resume',
       name: 'Resume',
       component: Resume,
-    },
-    {
-      path: '/plugins',
-      name: 'Plugins',
-      component: Plugins,
     },
     {
       path: '/projects',

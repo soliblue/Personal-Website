@@ -37,5 +37,8 @@ rm(path.join(config.build.assetsRoot, config.build.assetsSubDirectory), err => {
       '  Tip: built files are meant to be served over an HTTP server.\n' +
       '  Opening index.html over file:// won\'t work.\n'
     ))
+    // Force a clean exit: webpack 3 + uglify can keep the event loop alive on
+    // Node 17+, leaving the process hanging after a successful build (breaks CI).
+    process.exit(0)
   })
 })

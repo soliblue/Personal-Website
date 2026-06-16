@@ -15,10 +15,10 @@ npm run lint     # ESLint for .js and .vue files
 
 ```
 src/
-├── views/          # Page components (Home, Pins, Resume, Plugins, Projects, BuildHome)
+├── views/          # Page components (Home, Pins, Resume, Projects, BuildHome)
 ├── components/     # Reusable components (BackButton, BaseHome)
 ├── router/         # Vue Router configuration
-├── assets/         # Static assets + JSON data (pins, plugins, projects, resume)
+├── assets/         # Static assets + JSON data (pins, projects, resume)
 ├── mixins/         # Vue mixins (StyleMixin)
 ├── App.vue         # Root component
 └── main.js         # Entry point
@@ -31,14 +31,13 @@ config/             # Environment configs (dev/prod)
 - `/` - Home
 - `/pins` - Pins
 - `/resume` - Resume
-- `/plugins` - Plugins
 - `/projects` - Projects
 - `/animation` - BuildHome animation
 
 ## Tech Stack
 
 - Vue 2.5 + Vue Router 3
-- Firebase (hosting)
+- Cloudflare Pages (hosting) + Pages Functions (`/api/chat`, `/api/md/*`)
 - Webpack 3
 - Babel + ESLint (airbnb-base)
 
@@ -46,7 +45,6 @@ config/             # Environment configs (dev/prod)
 
 Content is managed via JSON files in `src/assets/`:
 - `pins.json` - Map pins data
-- `plugins.json` - Plugins list
 - `projects.json` - Projects list
 - `resume.json` - Resume data
 

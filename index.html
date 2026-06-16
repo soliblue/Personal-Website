@@ -55,23 +55,10 @@
   </div>
   <script src="https://code.jquery.com/jquery-3.3.1.min.js"
     integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.11/firebase-app.js";
-    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.11/firebase-analytics.js";
+  <!-- Analytics: Cloudflare Web Analytics (cookieless). Enable on the Pages
+       project (Settings -> Web Analytics) to auto-inject the beacon — no snippet
+       needed here. Replaced Firebase/Google Analytics during the CF migration. -->
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDLHUurvF1ouQNJoBUUQ-gyKPf3q4Nlpxw",
-      authDomain: "personal-website-e63ac.firebaseapp.com",
-      projectId: "personal-website-e63ac",
-      storageBucket: "personal-website-e63ac.appspot.com",
-      messagingSenderId: "771751095859",
-      appId: "1:771751095859:web:563fd92900fa042d407d46",
-      measurementId: "G-GHDVWLS7V0"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const analytics = getAnalytics(app);
-  </script>
 
   <style id="style-tag">
     * {

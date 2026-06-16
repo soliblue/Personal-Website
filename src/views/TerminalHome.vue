@@ -196,7 +196,6 @@ export default {
       userInput: '',
       messages: [],
       isLoading: false,
-      sessionId: null,
       commands: ['/projects', '/resume', '/pins', '/help'],
       suggestions: [],
       showSuggestions: false,
@@ -214,7 +213,6 @@ export default {
     },
   },
   mounted() {
-    this.sessionId = Date.now().toString();
     this.$refs.input.focus();
   },
   methods: {
@@ -269,14 +267,15 @@ export default {
       this.scrollToBottom();
 
       try {
-        // Use emulator URL in dev, production URL otherwise
-        const apiUrl = window.location.hostname === 'localhost'
-          ? 'http://127.0.0.1:5001/personal-website-e63ac/us-central1/chat'
-          : '/api/chat';
-        const res = await fetch(apiUrl, {
+        // `wrangler pages dev` serves /api/* locally, same as production.
+        const res = await fetch('/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message: input, sessionId: this.sessionId }),
+          // Edge functions are stateless — send recent history for context.
+          body: JSON.stringify({
+            message: input,
+            history: this.messages.slice(0, -1).slice(-12),
+          }),
         });
         const data = await res.json();
 
@@ -286,7 +285,6 @@ export default {
 
         // Stream the response word by word
         await this.streamResponse(data.response);
-        this.sessionId = data.sessionId;
       } catch (error) {
         console.error('Error:', error);
         this.messages.push({
