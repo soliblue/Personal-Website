@@ -156,14 +156,14 @@
           </div>
           <div class="explorer-body">
             <div
-              v-for="(project, i) in projects"
+              v-for="(project, i) in sortedProjects"
               :key="'proj-'+i"
               class="folder-item clickable"
               @dblclick="openProjectDoc(project)"
               :title="project.description"
             >
-              <img :src="project.status === 'graveyard' ? icons.doc : icons.folder">
-              <span>{{ project.title }}{{ project.status === 'graveyard' ? '.old' : '' }}</span>
+              <img :src="icons.doc">
+              <span>{{ project.title }}.doc</span>
             </div>
           </div>
           <div class="explorer-status">{{ projects.length }} object(s)</div>
@@ -414,13 +414,6 @@
       </div>
     </div>
 
-    <!-- Screensaver -->
-    <div class="screensaver" v-if="screensaver">
-      <div class="saver-text" :style="{ left: saverPos.x + 'px', top: saverPos.y + 'px' }">
-        soli<strong>95</strong>
-      </div>
-    </div>
-
     <!-- Shutdown Screen -->
     <div class="shutdown-screen" v-if="shuttingDown">
       <div class="shutdown-content">
@@ -488,8 +481,6 @@ const SFX = {
   nudge: [[70, 0, 0.3, 'sawtooth', 0.11]],
 };
 
-const IDLE_MS = 60000;
-
 export default {
   name: 'Windows95Home',
   components: {
@@ -523,9 +514,6 @@ export default {
       contextMenu: { open: false, x: 0, y: 0 },
       refreshFlash: false,
       bsod: false,
-      screensaver: false,
-      saverPos: { x: 100, y: 100, dx: 2, dy: 2 },
-      lastActivity: Date.now(),
       mailSubject: '',
       mailBody: '',
       notepadDoc: { text: '', links: [] },
@@ -790,12 +778,19 @@ export default {
     openWindows() {
       return this.windows.filter(w => w.open);
     },
+    // Live projects first, then graveyard; each group newest-first by year.
+    sortedProjects() {
+      return this.projects.slice().sort((a, b) => {
+        const aLive = a.status !== 'graveyard';
+        const bLive = b.status !== 'graveyard';
+        if (aLive !== bLive) return aLive ? -1 : 1;
+        return Number(b.year) - Number(a.year);
+      });
+    },
   },
   created() {
     this.audioCtx = null;
     this.clockTimer = null;
-    this.idleTimer = null;
-    this.saverRaf = null;
   },
   mounted() {
     this.isTouch = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
@@ -806,9 +801,6 @@ export default {
     document.addEventListener('pointerup', this.onPointerUp);
     document.addEventListener('pointercancel', this.onPointerUp);
     document.addEventListener('keydown', this.onKeyDown);
-    document.addEventListener('pointerdown', this.onActivity);
-    document.addEventListener('mousemove', this.onActivity);
-    this.idleTimer = setInterval(this.checkIdle, 5000);
     // Hide the global theme toggle
     const themeToggle = document.querySelector('.theme-toggle');
     if (themeToggle) {
@@ -817,14 +809,10 @@ export default {
   },
   beforeDestroy() {
     clearInterval(this.clockTimer);
-    clearInterval(this.idleTimer);
-    if (this.saverRaf) cancelAnimationFrame(this.saverRaf);
     document.removeEventListener('pointermove', this.onPointerMove);
     document.removeEventListener('pointerup', this.onPointerUp);
     document.removeEventListener('pointercancel', this.onPointerUp);
     document.removeEventListener('keydown', this.onKeyDown);
-    document.removeEventListener('pointerdown', this.onActivity);
-    document.removeEventListener('mousemove', this.onActivity);
     // Restore theme toggle
     const themeToggle = document.querySelector('.theme-toggle');
     if (themeToggle) {
@@ -1083,54 +1071,13 @@ export default {
       this.dragging = null;
       this.resizing = null;
     },
-    // --- Idle / screensaver / BSOD ---
-    onActivity() {
-      this.lastActivity = Date.now();
-      if (this.screensaver) this.stopScreensaver();
-    },
+    // --- BSOD ---
     onKeyDown(e) {
-      this.lastActivity = Date.now();
       if (this.bsod) {
         this.dismissBsod();
         return;
       }
-      if (this.screensaver) {
-        this.stopScreensaver();
-        return;
-      }
       if (e.key === 'Escape') this.closeMenus();
-    },
-    checkIdle() {
-      if (this.screensaver || this.booting || this.shuttingDown || this.bsod) return;
-      if (Date.now() - this.lastActivity > IDLE_MS) this.startScreensaver();
-    },
-    startScreensaver() {
-      this.screensaver = true;
-      this.saverPos = { x: 100, y: 100, dx: 2.5, dy: 2 };
-      const step = () => {
-        if (!this.screensaver) return;
-        const maxX = this.$el.clientWidth - 160;
-        const maxY = this.$el.clientHeight - 60;
-        let { x, y } = this.saverPos;
-        const { dx, dy } = this.saverPos;
-        x += dx;
-        y += dy;
-        const ndx = (x <= 0 || x >= maxX) ? -dx : dx;
-        const ndy = (y <= 0 || y >= maxY) ? -dy : dy;
-        this.saverPos = {
-          x: Math.min(Math.max(x, 0), maxX),
-          y: Math.min(Math.max(y, 0), maxY),
-          dx: ndx,
-          dy: ndy,
-        };
-        this.saverRaf = requestAnimationFrame(step);
-      };
-      this.saverRaf = requestAnimationFrame(step);
-    },
-    stopScreensaver() {
-      this.screensaver = false;
-      if (this.saverRaf) cancelAnimationFrame(this.saverRaf);
-      this.saverRaf = null;
     },
     dismissBsod() {
       this.bsod = false;
@@ -1162,7 +1109,7 @@ export default {
         if (project.github) links.push({ label: 'GitHub', url: project.github });
         if (project.press) links.push({ label: 'Press', url: project.press });
       }
-      this.openNotepad(`${project.title}.txt`, text, links);
+      this.openNotepad(`${project.title}.doc`, text, links);
     },
     openRecycleFile(file) {
       if (file.bsod) {
@@ -1236,6 +1183,10 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+  /* Bottom-align content over a uniform height so every icon's image sits on
+     the same baseline and all labels line up across a row. */
+  justify-content: flex-end;
+  min-height: 66px;
   width: 70px;
   padding: 4px;
   cursor: pointer;
@@ -2110,30 +2061,6 @@ export default {
 .bsod-continue {
   text-align: center;
   margin-top: 24px;
-}
-
-/* Screensaver */
-.screensaver {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: calc(100vw / 0.9);
-  height: calc(100vh / 0.9);
-  background: #000;
-  z-index: 100000;
-  cursor: none;
-  overflow: hidden;
-}
-
-.saver-text {
-  position: absolute;
-  color: #fff;
-  font-size: 32px;
-  letter-spacing: 2px;
-}
-
-.saver-text strong {
-  color: #1084d0;
 }
 
 /* Shutdown Screen */

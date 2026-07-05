@@ -247,6 +247,14 @@ export default {
   outline: none;
 }
 
+/* iOS auto-zooms any focused input with font-size < 16px.
+   Bump to 16px on touch devices to keep the phone from zooming in. */
+@media (pointer: coarse) {
+  .messenger-input {
+    font-size: 16px;
+  }
+}
+
 .messenger-buttons {
   display: flex;
   flex-direction: column;
