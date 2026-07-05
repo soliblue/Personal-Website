@@ -73,7 +73,7 @@ export function generateMarkdown(path) {
   const pages = {
     '/': `# Soli — soli.blue
 
-Egyptian software engineer based in Germany. Passionate about AI, education, and building products.
+Egyptian AI engineer based in Germany. Passionate about AI, education, and building products.
 
 ## Currently
 - **Senior AI Product Engineer** at [Knowunity](https://knowunity.com) — Building AI-powered educational products for 30 million students (Sep 2025–Present)

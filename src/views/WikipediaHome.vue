@@ -54,7 +54,7 @@
           </div>
 
           <p>
-            <strong>Soli</strong> is a software engineer based in Berlin, Germany.
+            <strong>Soli</strong> is an AI engineer based in Berlin, Germany.
             He currently works as {{ currentJob.title }} at
             <a :href="currentJob.url" target="_blank">{{ currentJob.subtitle }}</a>.<sup>[1]</sup>
           </p>
@@ -147,7 +147,7 @@
 
         <div class="wiki-categories">
           <strong>Categories:</strong>
-          <a href="#">Software engineers</a> |
+          <a href="#">AI engineers</a> |
           <a href="#">People from Berlin</a> |
           <a href="#">Living people</a>
         </div>
@@ -189,7 +189,7 @@ export default {
   },
   computed: {
     currentJob() {
-      return this.resume.experience[0] || { title: 'Software Engineer', subtitle: '', url: '' };
+      return this.resume.experience[0] || { title: 'AI Engineer', subtitle: '', url: '' };
     },
     liveProjects() {
       return this.projects.filter(p => p.status === 'live');

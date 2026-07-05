@@ -76,7 +76,7 @@
             <img src="../assets/win95/computer.svg" class="about-icon">
             <div class="about-title">
               <h2>soli</h2>
-              <p>software engineer</p>
+              <p>ai engineer</p>
             </div>
           </div>
           <div class="about-info">
@@ -90,7 +90,7 @@
             </div>
             <div class="info-row">
               <span class="label">Status:</span>
-              <span>Building cool stuff</span>
+              <span>Building stuff</span>
             </div>
           </div>
           <div class="about-buttons">
@@ -121,7 +121,7 @@
           <div class="doc-body">
             <h1>CURRICULUM VITAE</h1>
             <h2>Soli</h2>
-            <p><strong>Current:</strong> Software Engineer @ Berlin</p>
+            <p><strong>Current:</strong> AI Engineer @ Berlin</p>
             <hr>
             <h3>EXPERIENCE</h3>
             <div v-for="(exp, i) in resume.experience" :key="'exp-'+i" class="resume-item">
