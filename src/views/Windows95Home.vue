@@ -1268,7 +1268,8 @@ export default {
   text-shadow: 1px 1px 1px black;
   margin-top: 4px;
   font-size: 11px;
-  word-break: break-word;
+  word-break: normal;
+  overflow-wrap: break-word;
 }
 
 .desktop-icon:hover span,
@@ -2164,12 +2165,26 @@ export default {
 
 /* Responsive */
 @media (max-width: 768px) {
+  /* Phones: flow icons in rows like a homescreen grid — the column layout
+     depends on viewport-height math that iOS Safari's toolbars break */
   .desktop-icons {
-    gap: 4px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(78px, 1fr));
+    justify-items: center;
+    align-content: start;
+    gap: 10px 2px;
+    height: auto;
+    padding: 8px 4px;
   }
 
   .desktop-icon {
-    width: 60px;
+    width: 78px;
+    padding: 2px;
+  }
+
+  /* Back into the grid flow instead of pinned bottom-left */
+  .desktop-icon.recycle {
+    position: static;
   }
 
   .win95-window {
