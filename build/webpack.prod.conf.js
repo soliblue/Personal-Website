@@ -124,6 +124,10 @@ const webpackConfig = merge(baseWebpackConfig, {
         to: 'robots.txt'
       },
       {
+        from: path.resolve(__dirname, '../static/llms.txt'),
+        to: 'llms.txt'
+      },
+      {
         from: path.resolve(__dirname, '../static/_headers'),
         to: '[name]'
       },

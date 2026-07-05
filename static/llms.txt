@@ -1,0 +1,30 @@
+# Soli (Ahmed Soliman)
+
+> AI Product Engineer building products people actually use. Egyptian, moved to Germany in 2014 to study computer science. Currently building AI-powered education at Knowunity for 30 million students. Shipping fast, learning faster.
+
+soli.blue is a playful, multi-themed personal site — the same content rendered as a Windows 95 desktop, a terminal, a newspaper, a Wikipedia article, and more — plus an AI chat that answers questions about Soli. Clean, machine-readable Markdown versions of each page are served under `/api/md/` so agents don't have to execute JavaScript.
+
+## Pages (Markdown for agents)
+
+- [Home](https://soli.blue/api/md/): Snapshot — who Soli is, what he's building now, background, and links.
+- [Resume](https://soli.blue/api/md/resume): Work experience (Knowunity, toy2life, goaudio, Uber, RWTH), education, and languages.
+- [Projects](https://soli.blue/api/md/projects): Apps and experiments — live and archived — with tech stacks and links.
+
+## About Soli
+
+- Senior AI Product Engineer at [Knowunity](https://knowunity.com), building AI education for 30M students.
+- B.Sc. & M.Sc. Computer Science, RWTH Aachen University (Germany).
+- Previously: Founder at [toy2life](https://toy2life.com), Founding CTO at [goaudio.ai](https://goaudio.ai), DACH Ops Manager at [Uber](https://uber.com).
+- Languages: Arabic (native), German (fluent), English (fluent), Spanish (B1).
+- Interests: AI, education, prediction markets (top creator on [Manifold](https://manifold.markets/Soli)), art & architecture (Hundertwasser, Gaudi), audiovisual art (Christopher Bauder), fonts, and travel.
+
+## Links
+
+- [Website](https://soli.blue)
+- [Twitter / X](https://twitter.com/_xSoli)
+- [GitHub](https://github.com/soliblue)
+- [Manifold](https://manifold.markets/Soli)
+
+## Optional
+
+- [Pins](https://soli.blue/api/md/pins): A collection of Soli's favorite quotes and books.
