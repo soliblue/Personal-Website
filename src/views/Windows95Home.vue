@@ -159,7 +159,7 @@
               v-for="(project, i) in projects"
               :key="'proj-'+i"
               class="folder-item clickable"
-              @dblclick="openProjectItem(project)"
+              @dblclick="openProjectDoc(project)"
               :title="project.description"
             >
               <img :src="project.status === 'graveyard' ? icons.doc : icons.folder">
@@ -1142,14 +1142,8 @@ export default {
       win.title = `${title} - Notepad`;
       this.openWindow('notepad');
     },
-    openProjectItem(project) {
-      if (project.status === 'graveyard') {
-        this.openProjectDoc(project);
-      } else if (project.link) {
-        this.openExternalLink(project.link);
-      }
-    },
     openProjectDoc(project) {
+      const dead = project.status === 'graveyard';
       const text = [
         project.title.toUpperCase(),
         '='.repeat(project.title.length + 8),
@@ -1160,12 +1154,14 @@ export default {
         '',
         project.description,
         '',
-        'status: discontinued. rest in peace. 🪦',
+        dead ? 'status: discontinued. rest in peace. 🪦' : 'status: live',
       ].join('\n');
       const links = [];
-      if (project.link) links.push({ label: 'Open Link', url: project.link });
-      if (project.github) links.push({ label: 'GitHub', url: project.github });
-      if (project.press) links.push({ label: 'Press', url: project.press });
+      if (!dead) {
+        if (project.link) links.push({ label: 'Visit', url: project.link });
+        if (project.github) links.push({ label: 'GitHub', url: project.github });
+        if (project.press) links.push({ label: 'Press', url: project.press });
+      }
       this.openNotepad(`${project.title}.txt`, text, links);
     },
     openRecycleFile(file) {
