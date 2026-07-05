@@ -1,5 +1,6 @@
 // Shared content for soli.blue Pages Functions (chat + markdown discovery).
 // Single source of truth for the resume, projects, and chat system prompt.
+import pins from '../src/assets/pins.json';
 
 export const resume = {
   experience: [
@@ -21,16 +22,18 @@ export const resume = {
   ],
 };
 
+// Ordered live-first, then archived — each group newest-first (matches the site).
 export const projects = [
-  { title: 'machtblick', subtitle: 'bundestag transparency', year: '2026', tags: ['React', 'TanStack', 'TypeScript', 'Drizzle', 'ETL'], description: 'A transparency platform for the German Bundestag. It makes votes, members, parties, speeches, questions, donations, and party histories easier to search and understand.', link: 'https://machtblick.de', status: 'live' },
-  { title: 'habibi', subtitle: 'couples & relationships', year: '2024', tags: ['Swift', 'SwiftUI', 'iCloud'], description: 'A couples app for sending handwritten notes and drawings to your partner.', link: 'https://testflight.apple.com/join/WU6nQu38', status: 'live' },
-  { title: 'habibis', subtitle: 'friends contact reminder', year: '2024', tags: ['Swift', 'SwiftUI', 'iCloud'], description: 'A friendship maintenance app that helps you stay in touch with the people you care about.', link: 'https://testflight.apple.com/join/x1SpM3A7', status: 'live' },
+  { title: 'remote claude', subtitle: 'claude code on your phone', year: '2026', tags: ['Swift', 'SwiftUI', 'Node', 'Cloudflare', 'Open Source'], description: 'An iOS app to access and control Claude Code running on your Mac or a Linux server — like Codex mobile, but for Claude. Open source.', link: 'https://testflight.apple.com/join/x27e26xs', github: 'https://github.com/soliblue/cloude', status: 'live' },
+  { title: 'machtblick', subtitle: 'bundestag transparency', year: '2026', tags: ['React', 'TanStack', 'TypeScript', 'Drizzle', 'ETL'], description: 'A transparency platform for the German Bundestag. It makes votes, members, parties, speeches, questions, donations, and party histories easier to search and understand, with AI-assisted summaries.', link: 'https://machtblick.de', status: 'live' },
   { title: 'goaudio', subtitle: 'ai audio production', year: '2024', tags: ['FastAPI', 'React Native', 'Cloud Run', 'Docker', 'AI'], description: 'An AI-powered audio production platform that transforms content into high-quality audiobooks, podcasts, and news formats.', link: 'https://goaudio.ai', status: 'live' },
   { title: 'songgpt', subtitle: 'ai music composer', year: '2023', tags: ['React Native', 'FastAPI'], description: 'A web-app to explore if text-based LLMs can create original music compositions.', link: 'https://songgpt.soli.blue/', status: 'live' },
-  { title: 'toy2life', subtitle: 'ai-powered talking toys', year: '2021', tags: ['C++', 'ESP32', 'Hardware', '3D Printing', 'AI'], description: 'A device that brought toys to life through AI conversation. First hardware project - learned C++, ESP32, 3D printing, soldering.', link: 'https://toy2life.com', status: 'graveyard' },
+  { title: 'habibi', subtitle: 'couples & relationships', year: '2024', tags: ['Swift', 'SwiftUI', 'iCloud'], description: 'A couples app for sending handwritten notes and drawings to your partner, synced over iCloud.', link: 'https://testflight.apple.com/join/WU6nQu38', status: 'graveyard' },
+  { title: 'habibis', subtitle: 'friends contact reminder', year: '2024', tags: ['Swift', 'SwiftUI', 'iCloud'], description: 'A friendship maintenance app that helps you stay in touch with the people you care about.', link: 'https://testflight.apple.com/join/x1SpM3A7', status: 'graveyard' },
   { title: 'memes ai', subtitle: 'ai meme generator', year: '2024', tags: ['Swift', 'SwiftUI', 'FastAPI'], description: 'An iOS app that let users create AI-generated memes.', link: 'https://memesai.app', status: 'graveyard' },
   { title: 'happy', subtitle: 'birthday reminder', year: '2023', tags: ['Swift', 'SwiftUI'], description: 'An app using phone contacts as database for birthday reminders - no backend needed.', link: 'https://apple.co/3FJD3eX', status: 'graveyard' },
   { title: 'piasso', subtitle: 'ai assistant in arabic', year: '2022', tags: ['React Native', 'FastAPI', 'Google Cloud', 'Docker'], description: 'AI image generation in any language, reached ~100k users.', link: 'https://apps.apple.com/de/app/piasso-ai-assistant/id6444704118', status: 'graveyard' },
+  { title: 'toy2life', subtitle: 'ai-powered talking toys', year: '2021', tags: ['C++', 'ESP32', 'Hardware', '3D Printing', 'AI'], description: 'A device that brought toys to life through AI conversation. First hardware project - learned C++, ESP32, 3D printing, soldering.', link: 'https://toy2life.com', status: 'graveyard' },
 ];
 
 export const systemPrompt = `You are an AI assistant on Soli's personal website (soli.blue). Your job is to answer questions about Soli in a friendly, concise, and helpful way.
@@ -113,9 +116,20 @@ ${resume.languages.map(l => `- **${l.name}**: ${l.level}`).join('\n')}
 
 ${projects.map(p => `## ${p.title} — ${p.subtitle} (${p.year})
 ${p.description}
-- Status: ${p.status}
+- Status: ${p.status === 'graveyard' ? 'archived' : 'live'}
 - Tags: ${p.tags.join(', ')}
-${p.link ? `- Link: [${p.title}](${p.link})` : ''}`).join('\n\n')}
+${p.link ? `- Link: [${p.title}](${p.link})` : ''}${p.github ? `\n- GitHub: [${p.title}](${p.github})` : ''}`).join('\n\n')}
+`,
+
+    '/pins': `# Soli — Pins
+
+A collection of Soli's favorite quotes and books.
+
+## Quotes
+${pins.filter(p => p.type === 'quote').map(p => `> ${p.message}\n> — ${p.author}`).join('\n\n')}
+
+## Books
+${pins.filter(p => p.type === 'book').map(p => `- **${p.title}**${p.subtitle ? ` — ${p.subtitle}` : ''} — ${p.author}`).join('\n')}
 `,
   };
 
