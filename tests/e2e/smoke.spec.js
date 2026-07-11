@@ -65,12 +65,18 @@ test.describe('site smoke', () => {
     expect(errors).toEqual([]);
   });
 
-  test('My Computer hides an interactive Claude desktop buddy', async ({ page }, testInfo) => {
-    test.skip(testInfo.project.name !== 'chromium', 'Desktop easter egg is covered once.');
+  test('Windows 95 includes an always-on interactive squirrel', async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== 'chromium', 'Desktop pet behavior is covered once.');
     const errors = collectPageErrors(page);
 
     await page.addInitScript(() => sessionStorage.setItem('soli95-booted', 'true'));
     await page.goto('/windows95');
+    const buddy = page.locator('.desktop-buddy');
+    const talkToBuddy = page.getByRole('button', { name: 'Talk to the desktop squirrel' });
+    await expect(buddy).toBeVisible();
+    await expect(talkToBuddy.locator('img')).toHaveAttribute('alt', 'Pixel squirrel');
+    await expect(buddy).toHaveAttribute('data-frame', /idle|curious/);
+
     await page.locator('.desktop-icon', { hasText: 'My Computer' }).dblclick();
 
     const computerWindow = page.locator('.win95-window').filter({
@@ -81,65 +87,72 @@ test.describe('site smoke', () => {
     await expect(computerWindow.locator('.address-bar')).toHaveText('C:\\');
     await computerWindow.locator('.folder-item', { hasText: 'DO_NOT_OPEN' }).dblclick();
     await expect(computerWindow.locator('.explorer-status')).toContainText('You were warned');
+    await expect(computerWindow.locator('.folder-item', { hasText: 'claude.exe' })).toHaveCount(0);
 
     await computerWindow.locator('.folder-item', { hasText: 'readme.txt' }).dblclick();
     const notepadWindow = page.locator('.win95-window').filter({
       has: page.locator('.titlebar-text', { hasText: 'readme.txt' }),
     });
-    await expect(notepadWindow.locator('.notepad-text')).toContainText('do not run the executable');
+    await expect(notepadWindow.locator('.notepad-text')).toContainText('DESKTOP PET NOTES');
     await notepadWindow.locator('.win-btn.close').click();
 
-    await computerWindow.locator('.folder-item', { hasText: 'claude.exe' }).dblclick();
-    await expect(page.locator('.claude-buddy')).toBeVisible();
-    await expect(page.locator('.buddy-bubble')).toContainText('You ran it. Bold choice.');
-    const talkToClaude = page.getByRole('button', { name: 'Talk to Claude' });
-    await talkToClaude.click();
+    await talkToBuddy.click();
     await expect(page.locator('.buddy-bubble')).toContainText('I was told this was production.');
-    await expect(page.locator('.claude-buddy')).toHaveAttribute('data-mood', 'surprised');
-    await talkToClaude.click();
+    await expect(buddy).toHaveAttribute('data-mood', 'surprised');
+    await expect(buddy).toHaveAttribute('data-frame', /hop|curious/);
+    await talkToBuddy.click();
     await expect(page.locator('.buddy-bubble')).toContainText('Yes, I noticed the first poke.');
-    await talkToClaude.click();
+    await talkToBuddy.click();
     await expect(page.locator('.buddy-bubble')).toContainText('repeatable test case');
-    await expect(page.locator('.claude-buddy')).toHaveAttribute('data-pokes', '3');
-    await expect(page.locator('.claude-buddy')).toHaveAttribute('data-mood', 'suspicious');
+    await expect(buddy).toHaveAttribute('data-pokes', '3');
+    await expect(buddy).toHaveAttribute('data-mood', 'suspicious');
 
     await page.waitForTimeout(1300);
-    const buddyBeforeDrag = await page.locator('.claude-buddy').boundingBox();
+    const buddyBeforeDrag = await buddy.boundingBox();
     await page.mouse.move(buddyBeforeDrag.x + 27, buddyBeforeDrag.y + 27);
     await page.mouse.down();
     await page.mouse.move(buddyBeforeDrag.x + 127, buddyBeforeDrag.y + 27);
     await page.mouse.up();
     await expect(page.locator('.buddy-bubble')).toContainText('pixel reserved');
+    await expect(buddy).toHaveAttribute('data-frame', 'annoyed');
     await page.waitForTimeout(1300);
-    const buddyAfterDrag = await page.locator('.claude-buddy').boundingBox();
+    const buddyAfterDrag = await buddy.boundingBox();
     expect(buddyAfterDrag.x).toBeGreaterThan(buddyBeforeDrag.x + 80);
 
-    await talkToClaude.click({ button: 'right' });
+    await talkToBuddy.click({ button: 'right' });
     await expect(page.locator('.buddy-context-menu')).toBeVisible();
+    await page.getByRole('menuitem', { name: 'Take a stroll' }).click();
+    await expect(page.locator('.buddy-bubble')).toContainText('quick lap');
+    await expect(buddy).toHaveAttribute('data-frame', /walk-a|walk-b/);
+
+    await talkToBuddy.click({ button: 'right' });
     await page.getByRole('menuitem', { name: 'Inspect desktop' }).click();
     await expect(page.locator('.buddy-bubble')).toContainText('visible windows');
-    await expect(page.locator('.claude-buddy')).toHaveAttribute('data-history', /[6-9]|[1-9][0-9]/);
+    await expect(buddy).toHaveAttribute('data-history', /[8-9]|[1-9][0-9]/);
 
-    await talkToClaude.click({ button: 'right' });
-    await page.getByRole('menuitem', { name: 'Open claude.log' }).click();
+    await talkToBuddy.click({ button: 'right' });
+    await page.getByRole('menuitem', { name: 'Open desktop.log' }).click();
     const logWindow = page.locator('.win95-window').filter({
-      has: page.locator('.titlebar-text', { hasText: 'claude.log' }),
+      has: page.locator('.titlebar-text', { hasText: 'desktop.log' }),
     });
-    await expect(logWindow.locator('.notepad-text')).toContainText('CLAUDE.EXE EVENT LOG');
+    await expect(logWindow.locator('.notepad-text')).toContainText('DESKTOP PET EVENT LOG');
     await expect(logWindow.locator('.notepad-text')).toContainText('poke #3');
     await expect(logWindow.locator('.notepad-text')).toContainText('drag:');
+    await expect(logWindow.locator('.notepad-text')).toContainText('stroll:');
     await logWindow.locator('.win-btn.close').click();
 
-    await talkToClaude.click({ button: 'right' });
+    await talkToBuddy.click({ button: 'right' });
     await page.getByRole('menuitem', { name: 'Take a nap' }).click();
-    await expect(page.locator('.claude-buddy')).toHaveAttribute('data-sleeping', 'true');
-    await expect(page.locator('.buddy-bubble')).toContainText('low-power mode');
+    await expect(buddy).toHaveAttribute('data-sleeping', 'true');
+    await expect(buddy).toHaveAttribute('data-frame', 'sleep');
+    await expect(page.locator('.buddy-bubble')).toContainText('tiny nap');
 
     await page.getByRole('button', { name: /start/i }).click();
     await page.locator('.menu-item-row', { hasText: 'Claude Hops' }).click();
-    await expect(page.locator('.buddy-bubble')).toContainText('Wait. Is that me?');
-    await expect(page.locator('.claude-buddy')).toHaveAttribute('data-mood', 'excited');
-    await expect(page.locator('.claude-buddy')).toHaveAttribute('data-sleeping', 'false');
+    await expect(page.locator('.buddy-bubble')).toContainText('Different department');
+    await expect(buddy).toHaveAttribute('data-mood', 'excited');
+    await expect(buddy).toHaveAttribute('data-frame', 'excited');
+    await expect(buddy).toHaveAttribute('data-sleeping', 'false');
 
     const codeHopWindow = page.locator('.win95-window').filter({
       has: page.locator('.titlebar-text', { hasText: 'Claude Hops' }),
@@ -151,8 +164,8 @@ test.describe('site smoke', () => {
     await codeHopWindow.locator('.win-btn.maximize').click();
     await expect(page.locator('.buddy-bubble')).toContainText('Maximum window');
 
-    await page.getByRole('button', { name: 'Close Claude buddy' }).click();
-    await expect(page.locator('.claude-buddy')).toBeHidden();
+    await expect(buddy).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Close Claude buddy' })).toHaveCount(0);
     expect(errors).toEqual([]);
   });
 
