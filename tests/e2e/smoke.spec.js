@@ -23,10 +23,14 @@ test.describe('site smoke', () => {
     await page.getByRole('button', { name: /start/i }).click();
     await expect(page.locator('.start-menu')).toBeVisible();
     await expect(page.locator('.start-menu')).not.toContainText('World Pins');
+    await expect(page.locator('.start-menu')).not.toContainText('Terminal Mode');
+    await expect(page.locator('.start-menu')).not.toContainText('Animation Mode');
+    await expect(page.locator('.start-menu')).not.toContainText('Newspaper Mode');
+    await expect(page.locator('.start-menu')).not.toContainText('Wikipedia Mode');
     await page.locator('.menu-item-row', { hasText: 'Projects' }).click();
 
     await expect(page.locator('.titlebar-text', { hasText: 'Projects' })).toBeVisible();
-    await expect(page.getByText('9 object(s)')).toBeVisible();
+    await expect(page.getByText('10 object(s)')).toBeVisible();
     expect(errors).toEqual([]);
   });
 

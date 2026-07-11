@@ -496,23 +496,6 @@ The squirrel got here first.</pre>
           <span>Claude Hops</span>
         </div>
         <div class="menu-divider"></div>
-        <div class="menu-item-row" @click="navigateTo('/terminal')">
-          <img src="../assets/win95/terminal.svg">
-          <span>Terminal Mode</span>
-        </div>
-        <div class="menu-item-row" @click="navigateTo('/animation')">
-          <img src="../assets/win95/doc.svg">
-          <span>Animation Mode</span>
-        </div>
-        <div class="menu-item-row" @click="navigateTo('/newspaper')">
-          <img src="../assets/win95/doc.svg">
-          <span>Newspaper Mode</span>
-        </div>
-        <div class="menu-item-row" @click="navigateTo('/wikipedia')">
-          <img src="../assets/win95/globe.svg">
-          <span>Wikipedia Mode</span>
-        </div>
-        <div class="menu-divider"></div>
         <div class="menu-item-row shutdown" @click="shutdown">
           <img src="../assets/win95/shutdown.svg">
           <span>Shut Down...</span>
@@ -1964,9 +1947,6 @@ export default {
         wikipedia: 'browserWikipedia',
       };
       this.narrateBuddy(reactions[url]);
-    },
-    navigateTo(path) {
-      this.$router.push(path);
     },
     openExternalLink(url) {
       this.narrateBuddy('external');
