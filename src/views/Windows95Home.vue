@@ -379,12 +379,20 @@ It has already reviewed the recycle bin.</pre>
       v-if="buddyActive"
       class="claude-buddy"
       :class="[
-        { leftward: !buddyFacingRight, poked: buddyPoked },
+        {
+          dragging: buddyDragging,
+          leftward: !buddyFacingRight,
+          poked: buddyPoked,
+          sleeping: buddySleeping,
+        },
         'mood-' + buddyMood,
       ]"
       :style="{ left: buddyX + 'px' }"
+      :data-history="buddyHistory.length"
       :data-mood="buddyMood"
       :data-pokes="buddyPokeCount"
+      :data-sleeping="String(buddySleeping)"
+      @contextmenu.stop.prevent="openBuddyContextMenu"
     >
       <div class="buddy-bubble" role="status" aria-live="polite">
         <button
@@ -401,10 +409,30 @@ It has already reviewed the recycle bin.</pre>
         class="buddy-character"
         title="Talk to Claude"
         aria-label="Talk to Claude"
-        @click.stop="pokeClaude"
+        @click.stop="onBuddyClick"
+        @pointerdown.stop="startBuddyDrag"
       >
-        <img :src="icons.claude" alt="Claude">
+        <img :src="icons.claude" alt="Claude" draggable="false">
       </button>
+    </div>
+
+    <div
+      v-if="buddyContext.open"
+      class="buddy-context-menu"
+      :style="{ left: buddyContext.x + 'px', top: buddyContext.y + 'px' }"
+      role="menu"
+      @click.stop
+      @contextmenu.stop.prevent
+    >
+      <button role="menuitem" @click="buddyContextAction('talk')">Say something</button>
+      <button role="menuitem" @click="buddyContextAction('inspect')">Inspect desktop</button>
+      <div class="menu-divider"></div>
+      <button role="menuitem" @click="buddyContextAction('log')">Open claude.log</button>
+      <button role="menuitem" @click="buddyContextAction('sleep')">
+        {{ buddySleeping ? 'Wake up' : 'Take a nap' }}
+      </button>
+      <div class="menu-divider"></div>
+      <button role="menuitem" @click="buddyContextAction('close')">Close claude.exe</button>
     </div>
 
     <!-- Taskbar -->
@@ -819,6 +847,9 @@ export default {
       bsod: false,
       computerPath: 'computer',
       buddyActive: false,
+      buddyContext: { open: false, x: 0, y: 0 },
+      buddyDragging: false,
+      buddyHistory: [],
       buddyMessage: '',
       buddyX: 720,
       buddyFacingRight: true,
@@ -826,6 +857,7 @@ export default {
       buddyMood: 'curious',
       buddyPoked: false,
       buddyPokeCount: 0,
+      buddySleeping: false,
       buddyWanderCount: 0,
       mailEmail: '',
       mailSubject: '',
@@ -1164,6 +1196,10 @@ export default {
   },
   created() {
     this.audioCtx = null;
+    this.buddyDragOffset = 0;
+    this.buddyDragScale = 1;
+    this.buddyDragStartX = 0;
+    this.buddyMoved = false;
     this.buddyPokeTimer = null;
     this.buddyReactionIndexes = Object.create(null);
     this.buddyTimer = null;
@@ -1279,12 +1315,14 @@ export default {
     // --- Menus ---
     toggleStartMenu() {
       this.startMenuOpen = !this.startMenuOpen;
+      this.buddyContext.open = false;
       this.playSound('click');
     },
     closeMenus() {
       this.startMenuOpen = false;
       this.openMenu = null;
       this.contextMenu.open = false;
+      this.buddyContext.open = false;
       this.selectedIcon = null;
     },
     toggleMenu(winId, name) {
@@ -1397,42 +1435,74 @@ export default {
     launchClaudeBuddy() {
       const width = this.$el ? this.$el.clientWidth : window.innerWidth;
       const maxX = Math.max(90, width - 110);
+      const wasActive = this.buddyActive;
 
       this.buddyX = Math.min(Math.max(Math.round(width * 0.66), 90), maxX);
       this.buddyFacingRight = false;
-      this.buddyMessage = this.buddyActive
+      this.buddyMessage = wasActive
         ? 'You ran it twice. That feels personal.'
         : 'You ran it. Bold choice.';
-      this.buddyMood = this.buddyActive ? 'annoyed' : 'excited';
+      this.buddyMood = wasActive ? 'annoyed' : 'excited';
       this.buddyActive = true;
+      this.buddySleeping = false;
+      this.recordBuddy(wasActive ? 'launch again' : 'launch', this.buddyMessage);
       this.playSound('win');
-
-      const reduceMotion = window.matchMedia
-        && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (!reduceMotion && !this.buddyTimer) {
-        this.buddyTimer = setInterval(() => this.wanderClaude(), 12000);
-      }
+      this.startBuddyWanderTimer();
     },
     closeClaudeBuddy() {
+      this.recordBuddy('close', 'claude.exe closed by user. Rude but valid.');
       this.buddyActive = false;
+      this.buddyContext.open = false;
+      this.buddyDragging = false;
       this.buddyMessage = '';
       this.buddyMood = 'curious';
       this.buddyPoked = false;
+      this.buddySleeping = false;
       clearTimeout(this.buddyPokeTimer);
       clearInterval(this.buddyTimer);
       this.buddyTimer = null;
       this.playSound('close');
     },
+    startBuddyWanderTimer() {
+      const reduceMotion = window.matchMedia
+        && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!reduceMotion && !this.buddySleeping && !this.buddyTimer) {
+        this.buddyTimer = setInterval(() => this.wanderClaude(), 12000);
+      }
+    },
+    recordBuddy(action, message) {
+      const time = new Date().toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true,
+      });
+      this.buddyHistory.push({ action, message, time });
+      if (this.buddyHistory.length > 40) this.buddyHistory.shift();
+    },
     narrateClaude(key, mood) {
       if (!this.buddyActive || !BUDDY_REACTIONS[key]) return;
+
+      if (this.buddySleeping) {
+        this.buddySleeping = false;
+        this.recordBuddy('wake', `Woken by desktop activity: ${key}.`);
+        this.startBuddyWanderTimer();
+      }
 
       const lines = BUDDY_REACTIONS[key];
       const index = this.buddyReactionIndexes[key] || 0;
       this.buddyMessage = lines[index % lines.length];
       this.buddyReactionIndexes[key] = index + 1;
       this.buddyMood = mood || BUDDY_MOODS[key] || 'curious';
+      this.recordBuddy(key, this.buddyMessage);
     },
     pokeClaude() {
+      if (this.buddySleeping) {
+        this.wakeClaude('That was a terrible alarm clock.');
+        this.playSound('nudge');
+        return;
+      }
+
       this.buddyPokeCount += 1;
       this.buddyMessage = BUDDY_LINES[this.buddyLineIndex % BUDDY_LINES.length];
       this.buddyLineIndex += 1;
@@ -1450,10 +1520,14 @@ export default {
         }, 420);
       });
       this.wanderClaude(true);
+      this.recordBuddy(`poke #${this.buddyPokeCount}`, this.buddyMessage);
       this.playSound('nudge');
     },
+    onBuddyClick(e) {
+      if (e.detail === 0) this.pokeClaude();
+    },
     wanderClaude(shortStep = false) {
-      if (!this.buddyActive) return;
+      if (!this.buddyActive || this.buddySleeping || this.buddyDragging) return;
 
       const width = this.$el ? this.$el.clientWidth : window.innerWidth;
       const minX = 90;
@@ -1473,6 +1547,96 @@ export default {
         this.buddyWanderCount += 1;
         if (this.buddyWanderCount % 2 === 0) this.narrateClaude('idle');
       }
+    },
+    startBuddyDrag(e) {
+      if (e.button !== 0 || this.buddySleeping) return;
+      const buddy = e.currentTarget.parentElement;
+      const buddyRect = buddy.getBoundingClientRect();
+      const scale = buddy.offsetWidth ? buddyRect.width / buddy.offsetWidth : 1;
+      const pointerX = e.clientX / scale;
+      if (e.currentTarget.setPointerCapture) e.currentTarget.setPointerCapture(e.pointerId);
+      this.buddyContext.open = false;
+      this.buddyX = buddyRect.left / scale;
+      this.buddyDragging = true;
+      this.buddyMoved = false;
+      this.buddyDragScale = scale;
+      this.buddyDragStartX = pointerX;
+      this.buddyDragOffset = pointerX - this.buddyX;
+    },
+    openBuddyContextMenu(e) {
+      const menuWidth = 174;
+      const menuHeight = 154;
+      const scale = this.$el && this.$el.offsetWidth
+        ? this.$el.getBoundingClientRect().width / this.$el.offsetWidth
+        : 1;
+      const pointerX = e.clientX / scale;
+      const pointerY = e.clientY / scale;
+      const menuX = pointerX + 34 + menuWidth <= this.$el.clientWidth
+        ? pointerX + 34
+        : pointerX - menuWidth - 12;
+      this.startMenuOpen = false;
+      this.contextMenu.open = false;
+      this.buddyContext = {
+        open: true,
+        x: Math.max(2, Math.min(menuX, this.$el.clientWidth - menuWidth - 2)),
+        y: Math.max(
+          2,
+          Math.min(pointerY - menuHeight - 76, this.$el.clientHeight - menuHeight - 2),
+        ),
+      };
+      this.playSound('click');
+    },
+    buddyContextAction(action) {
+      this.buddyContext.open = false;
+      this.playSound('click');
+
+      if (action === 'talk') {
+        if (this.buddySleeping) this.wakeClaude('I was having a perfectly optimized dream.');
+        else this.narrateClaude('idle');
+      }
+      if (action === 'inspect') this.inspectDesktopForClaude();
+      if (action === 'log') this.openBuddyLog();
+      if (action === 'sleep') {
+        if (this.buddySleeping) this.wakeClaude('Back online. What changed?');
+        else this.sleepClaude();
+      }
+      if (action === 'close') this.closeClaudeBuddy();
+    },
+    inspectDesktopForClaude() {
+      const visibleWindows = this.openWindows.filter(win => !win.minimized).length;
+      const suffix = visibleWindows === 1
+        ? 'It is carrying this desktop emotionally.'
+        : 'Multitasking has been observed.';
+      this.buddyMessage = `I count ${visibleWindows} visible window${visibleWindows === 1 ? '' : 's'}. ${suffix}`;
+      this.buddyMood = visibleWindows > 3 ? 'focused' : 'curious';
+      this.recordBuddy('inspect desktop', this.buddyMessage);
+    },
+    openBuddyLog() {
+      const entries = this.buddyHistory.map(entry => (
+        `[${entry.time}] ${entry.action}: ${entry.message}`
+      ));
+      const text = [
+        'CLAUDE.EXE EVENT LOG',
+        '====================',
+        '',
+        ...(entries.length ? entries : ['No observations recorded. Suspicious.']),
+      ].join('\n');
+      this.openNotepad('claude.log', text);
+    },
+    sleepClaude() {
+      this.buddySleeping = true;
+      this.buddyMood = 'sleeping';
+      this.buddyMessage = 'Entering low-power mode. Wake me if the desktop develops a strategy.';
+      clearInterval(this.buddyTimer);
+      this.buddyTimer = null;
+      this.recordBuddy('sleep', this.buddyMessage);
+    },
+    wakeClaude(message) {
+      this.buddySleeping = false;
+      this.buddyMood = 'surprised';
+      this.buddyMessage = message;
+      this.recordBuddy('wake', this.buddyMessage);
+      this.startBuddyWanderTimer();
     },
     // --- Windows ---
     openWindow(id) {
@@ -1586,6 +1750,14 @@ export default {
       };
     },
     onPointerMove(e) {
+      if (this.buddyDragging) {
+        const width = this.$el ? this.$el.clientWidth : window.innerWidth;
+        const pointerX = e.clientX / this.buddyDragScale;
+        const nextX = Math.min(Math.max(pointerX - this.buddyDragOffset, 4), width - 58);
+        if (Math.abs(pointerX - this.buddyDragStartX) > 12) this.buddyMoved = true;
+        if (nextX !== this.buddyX) this.buddyFacingRight = nextX > this.buddyX;
+        this.buddyX = nextX;
+      }
       if (this.dragging) {
         this.movedWindow = true;
         const bw = this.$el.clientWidth;
@@ -1604,9 +1776,18 @@ export default {
         this.resizing.height = Math.max(150, this.dragOffset.height + dy);
       }
     },
-    onPointerUp() {
+    onPointerUp(e) {
+      const clickedBuddy = this.buddyDragging && !this.buddyMoved && e.type === 'pointerup';
+      const movedBuddy = this.buddyDragging && this.buddyMoved;
       const movedWindow = Boolean(this.dragging && this.movedWindow);
       const resizedWindow = Boolean(this.resizing && this.resizedWindow);
+      this.buddyDragging = false;
+      if (movedBuddy) {
+        this.buddyMessage = 'You moved me. I had that pixel reserved.';
+        this.buddyMood = 'annoyed';
+        this.recordBuddy('drag', this.buddyMessage);
+      }
+      if (clickedBuddy) this.pokeClaude();
       this.dragging = null;
       this.resizing = null;
       if (movedWindow || resizedWindow) this.narrateClaude('drag');
@@ -2442,6 +2623,10 @@ export default {
   transition: left 1.2s steps(7) !important;
 }
 
+.win95-desktop .claude-buddy.dragging {
+  transition: none !important;
+}
+
 .buddy-character {
   width: 54px;
   height: 54px;
@@ -2449,6 +2634,12 @@ export default {
   border: 0;
   background: transparent;
   cursor: pointer;
+  touch-action: none;
+  user-select: none;
+}
+
+.claude-buddy.dragging .buddy-character {
+  cursor: grabbing;
 }
 
 .buddy-character:focus {
@@ -2476,6 +2667,14 @@ export default {
 
 .win95-desktop .claude-buddy.poked .buddy-character {
   animation: buddy-poke 420ms steps(5) !important;
+}
+
+.claude-buddy.sleeping .buddy-character {
+  transform: translateY(6px) rotate(5deg);
+}
+
+.claude-buddy.sleeping .buddy-character img {
+  filter: grayscale(0.35) drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.45));
 }
 
 .buddy-bubble {
@@ -2530,6 +2729,11 @@ export default {
   background: #fffbd6;
 }
 
+.claude-buddy.mood-sleeping .buddy-bubble,
+.claude-buddy.mood-sleeping .buddy-bubble::after {
+  background: #e6e6f2;
+}
+
 .buddy-close {
   position: absolute;
   top: 3px;
@@ -2548,6 +2752,47 @@ export default {
   font-size: 10px;
   font-weight: bold;
   cursor: pointer;
+}
+
+.buddy-context-menu {
+  position: fixed;
+  z-index: 10002;
+  width: 170px;
+  padding: 2px;
+  background: #c0c0c0;
+  border: 2px solid;
+  border-color: #ffffff #404040 #404040 #ffffff;
+  box-shadow: 1px 1px 0 #000000;
+  font-family: "MS Sans Serif", Tahoma, sans-serif;
+  font-size: 11px;
+}
+
+.buddy-context-menu button {
+  display: block;
+  width: 100%;
+  min-height: 22px;
+  padding: 3px 20px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #000000;
+  font: inherit;
+  text-align: left;
+  cursor: default;
+}
+
+.buddy-context-menu button:hover,
+.buddy-context-menu button:focus {
+  outline: 0;
+  background: #000080;
+  color: #ffffff;
+}
+
+.buddy-context-menu .menu-divider {
+  height: 2px;
+  margin: 2px 1px;
+  border-top: 1px solid #808080;
+  border-bottom: 1px solid #ffffff;
 }
 
 @media (prefers-reduced-motion: reduce) {
