@@ -65,6 +65,44 @@ test.describe('site smoke', () => {
     expect(errors).toEqual([]);
   });
 
+  test('My Computer hides an interactive Claude desktop buddy', async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== 'chromium', 'Desktop easter egg is covered once.');
+    const errors = collectPageErrors(page);
+
+    await page.addInitScript(() => sessionStorage.setItem('soli95-booted', 'true'));
+    await page.goto('/windows95');
+    await page.locator('.desktop-icon', { hasText: 'My Computer' }).dblclick();
+
+    const computerWindow = page.locator('.win95-window').filter({
+      has: page.locator('.titlebar-text', { hasText: 'My Computer' }),
+    });
+    await expect(computerWindow).toBeVisible();
+    await computerWindow.locator('.folder-item', { hasText: 'Local Disk (C:)' }).dblclick();
+    await expect(computerWindow.locator('.address-bar')).toHaveText('C:\\');
+    await computerWindow.locator('.folder-item', { hasText: 'DO_NOT_OPEN' }).dblclick();
+    await expect(computerWindow.locator('.explorer-status')).toContainText('You were warned');
+
+    await computerWindow.locator('.folder-item', { hasText: 'readme.txt' }).dblclick();
+    const notepadWindow = page.locator('.win95-window').filter({
+      has: page.locator('.titlebar-text', { hasText: 'readme.txt' }),
+    });
+    await expect(notepadWindow.locator('.notepad-text')).toContainText('do not run the executable');
+    await notepadWindow.locator('.win-btn.close').click();
+
+    await computerWindow.locator('.folder-item', { hasText: 'claude.exe' }).dblclick();
+    await expect(page.locator('.claude-buddy')).toBeVisible();
+    await expect(page.locator('.buddy-bubble')).toContainText('You ran it. Bold choice.');
+    await page.getByRole('button', { name: 'Talk to Claude' }).click();
+    await expect(page.locator('.buddy-bubble')).toContainText('I was told this was production.');
+
+    await page.getByRole('button', { name: /start/i }).click();
+    await page.locator('.menu-item-row', { hasText: 'Claude Hops' }).click();
+    await expect(page.locator('.buddy-bubble')).toContainText('Wait. Is that me?');
+    await page.getByRole('button', { name: 'Close Claude buddy' }).click();
+    await expect(page.locator('.claude-buddy')).toBeHidden();
+    expect(errors).toEqual([]);
+  });
+
   test('Pins route remains available as a standalone page', async ({ page }) => {
     const errors = collectPageErrors(page);
 

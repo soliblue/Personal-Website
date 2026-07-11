@@ -140,6 +140,41 @@
           </div>
         </div>
 
+        <!-- My Computer Window -->
+        <div v-if="win.id === 'mycomputer'" class="explorer-content">
+          <div class="explorer-toolbar">
+            <button class="toolbar-btn" disabled title="Back">
+              <img src="../assets/win95/back.svg" alt="Back">
+            </button>
+            <button class="toolbar-btn" disabled title="Forward">
+              <img src="../assets/win95/forward.svg" alt="Forward">
+            </button>
+            <button
+              class="toolbar-btn"
+              :disabled="computerPath === 'computer'"
+              title="Up"
+              @click="computerUp"
+            >
+              <img src="../assets/win95/up.svg" alt="Up">
+            </button>
+            <span class="address-bar">{{ computerAddress }}</span>
+          </div>
+          <div class="explorer-body">
+            <div
+              v-for="item in computerItems"
+              :key="item.id"
+              class="folder-item clickable"
+              tabindex="0"
+              @dblclick="openComputerItem(item)"
+              @keyup.enter="openComputerItem(item)"
+            >
+              <img :src="item.img">
+              <span>{{ item.label }}</span>
+            </div>
+          </div>
+          <div class="explorer-status">{{ computerStatus }}</div>
+        </div>
+
         <!-- Projects Window -->
         <div v-if="win.id === 'projects'" class="explorer-content">
           <div class="explorer-toolbar">
@@ -267,7 +302,7 @@
               class="folder-item clickable"
               @dblclick="openRecycleFile(file)"
             >
-              <img src="../assets/win95/doc.svg">
+              <img :src="file.buddy ? icons.claude : icons.doc">
               <span>{{ file.name }}</span>
             </div>
           </div>
@@ -288,10 +323,11 @@
               <img src="../assets/win95/home.svg" alt="Home">
             </button>
             <div class="browser-address">
-              <span>http://</span>
+              <span>{{ win.browserUrl === 'local' ? 'file:///' : 'http://' }}</span>
               <select v-model="win.browserUrl" class="url-select">
                 <option value="wikipedia">en.wikipedia.org/wiki/Soli</option>
                 <option value="newspaper">thedailysoli.com</option>
+                <option value="local">C:/DO_NOT_OPEN/readme.txt</option>
               </select>
             </div>
             <button class="toolbar-btn" title="Refresh" @click="playSound('click')">
@@ -301,6 +337,13 @@
           <div class="browser-content">
             <WikipediaHome v-if="win.browserUrl === 'wikipedia'" :embedded="true" />
             <NewspaperHome v-if="win.browserUrl === 'newspaper'" :embedded="true" />
+            <div v-if="win.browserUrl === 'local'" class="local-file-page">
+              <div class="local-file-title">C:\DO_NOT_OPEN\readme.txt</div>
+              <pre>Whatever you do, do not run claude.exe.
+
+It has already reviewed the recycle bin.</pre>
+              <button class="win95-btn" @click="openSecretFolder">Open containing folder</button>
+            </div>
           </div>
         </div>
 
@@ -325,6 +368,34 @@
         </div>
       </div>
       <div class="window-resize" @pointerdown="startResize($event, win)"></div>
+    </div>
+
+    <!-- Hidden desktop buddy, unlocked from C:\DO_NOT_OPEN\claude.exe -->
+    <div
+      v-if="buddyActive"
+      class="claude-buddy"
+      :class="{ leftward: !buddyFacingRight }"
+      :style="{ left: buddyX + 'px' }"
+    >
+      <div class="buddy-bubble">
+        <button
+          class="buddy-close"
+          title="Close Claude"
+          aria-label="Close Claude buddy"
+          @click.stop="closeClaudeBuddy"
+        >
+          ×
+        </button>
+        <span>{{ buddyMessage }}</span>
+      </div>
+      <button
+        class="buddy-character"
+        title="Talk to Claude"
+        aria-label="Talk to Claude"
+        @click.stop="pokeClaude"
+      >
+        <img :src="icons.claude" alt="Claude">
+      </button>
     </div>
 
     <!-- Taskbar -->
@@ -526,6 +597,24 @@ const SFX = {
   nudge: [[70, 0, 0.3, 'sawtooth', 0.11]],
 };
 
+const BUDDY_LINES = [
+  'I was told this was production.',
+  'That folder was clearly labeled.',
+  'Need help, or are we pretending this is intentional?',
+  'I can explain the code. The naming is between you and Soli.',
+  'I have reviewed the recycle bin. Bold choices.',
+];
+
+const BUDDY_REACTIONS = {
+  browser: 'The internet. Be careful out there.',
+  codehop: 'Wait. Is that me?',
+  contact: 'A real form. We are getting serious.',
+  minesweeper: 'I calculated the odds. I will keep them to myself.',
+  projects: 'Nine projects and at least eleven origin stories.',
+  recycle: 'I have reviewed this folder. Bold choices.',
+  spacegame: 'I call navigator. You can do the asteroid part.',
+};
+
 export default {
   name: 'Windows95Home',
   components: {
@@ -559,6 +648,12 @@ export default {
       contextMenu: { open: false, x: 0, y: 0 },
       refreshFlash: false,
       bsod: false,
+      computerPath: 'computer',
+      buddyActive: false,
+      buddyMessage: '',
+      buddyX: 720,
+      buddyFacingRight: true,
+      buddyLineIndex: 0,
       mailEmail: '',
       mailSubject: '',
       mailBody: '',
@@ -567,8 +662,14 @@ export default {
       mailStatus: '',
       mailStatusType: '',
       notepadDoc: { text: '', links: [] },
-      icons: { doc: docIcon, folder: folderIcon },
+      icons: {
+        claude: codeHopIcon,
+        computer: computerIcon,
+        doc: docIcon,
+        folder: folderIcon,
+      },
       desktopIcons: [
+        { id: 'mycomputer', label: 'My Computer', img: computerIcon },
         { id: 'resume', label: 'Resume.doc', img: docIcon },
         { id: 'projects', label: 'Projects', img: folderIcon },
         { id: 'about', label: 'About Me', img: computerIcon },
@@ -625,6 +726,7 @@ export default {
         },
       ],
       recycleFiles: [
+        { name: 'claude.exe.lnk', buddy: true },
         {
           name: 'failed_startup_1.plan',
           content: '1. build the app\n2. ???\n3. profit\n\n(we never figured out step 2)',
@@ -640,6 +742,21 @@ export default {
         { name: 'this_will_work.txt', bsod: true },
       ],
       windows: [
+        {
+          id: 'mycomputer',
+          title: 'My Computer',
+          icon: computerIcon,
+          open: false,
+          minimized: false,
+          maximized: false,
+          x: 130,
+          y: 85,
+          width: 500,
+          height: 360,
+          zIndex: 10,
+          showMenu: false,
+          contentClass: '',
+        },
         {
           id: 'about',
           title: 'About Me',
@@ -828,6 +945,40 @@ export default {
     openWindows() {
       return this.windows.filter(w => w.open);
     },
+    computerAddress() {
+      const addresses = {
+        computer: 'My Computer',
+        c: 'C:\\',
+        secret: 'C:\\DO_NOT_OPEN\\',
+      };
+      return addresses[this.computerPath];
+    },
+    computerItems() {
+      const items = {
+        computer: [
+          { id: 'drive-c', label: 'Local Disk (C:)', img: computerIcon, path: 'c' },
+          { id: 'floppy-a', label: '3½ Floppy (A:)', img: computerIcon, action: 'floppy' },
+          { id: 'control-panel', label: 'Control Panel', img: folderIcon, action: 'control' },
+        ],
+        c: [
+          { id: 'projects', label: 'Projects', img: folderIcon, action: 'projects' },
+          { id: 'documents', label: 'Documents', img: folderIcon, action: 'documents' },
+          { id: 'windows', label: 'WINDOWS', img: folderIcon, action: 'windows' },
+          { id: 'secret', label: 'DO_NOT_OPEN', img: folderIcon, path: 'secret' },
+        ],
+        secret: [
+          { id: 'readme', label: 'readme.txt', img: docIcon, action: 'readme' },
+          { id: 'claude', label: 'claude.exe', img: codeHopIcon, action: 'claude' },
+          { id: 'dll', label: 'totally_normal.dll', img: docIcon, action: 'dll' },
+        ],
+      };
+      return items[this.computerPath];
+    },
+    computerStatus() {
+      const count = this.computerItems.length;
+      if (this.computerPath === 'secret') return `${count} object(s) - You were warned`;
+      return `${count} object(s)`;
+    },
     // Live projects first, then graveyard; each group newest-first by year.
     sortedProjects() {
       return this.projects.slice().sort((a, b) => {
@@ -840,6 +991,7 @@ export default {
   },
   created() {
     this.audioCtx = null;
+    this.buddyTimer = null;
     this.clockTimer = null;
   },
   mounted() {
@@ -858,6 +1010,7 @@ export default {
     }
   },
   beforeDestroy() {
+    clearInterval(this.buddyTimer);
     clearInterval(this.clockTimer);
     document.removeEventListener('pointermove', this.onPointerMove);
     document.removeEventListener('pointerup', this.onPointerUp);
@@ -998,6 +1151,110 @@ export default {
         this.openWindow(icon.id);
       }
     },
+    // --- My Computer easter egg ---
+    computerUp() {
+      if (this.computerPath === 'secret') this.computerPath = 'c';
+      else if (this.computerPath === 'c') this.computerPath = 'computer';
+      this.playSound('click');
+    },
+    openComputerItem(item) {
+      if (item.path) {
+        this.computerPath = item.path;
+        this.playSound('open');
+        return;
+      }
+
+      if (item.action === 'projects') this.openWindow('projects');
+      if (item.action === 'documents') {
+        this.openNotepad(
+          'Documents',
+          'meeting_notes.txt\nideas_that_might_work.txt\nfinal_final_v7.txt\n\nNothing suspicious here.',
+        );
+      }
+      if (item.action === 'windows') {
+        this.playSound('error');
+        this.openNotepad(
+          'SYSTEM WARNING',
+          'Access denied.\n\nThis installation is held together by compatibility mode and optimism.',
+        );
+      }
+      if (item.action === 'floppy') {
+        this.playSound('error');
+        this.openNotepad('A:\\', 'A:\\ is not accessible.\n\nThe device is not ready. Obviously.');
+      }
+      if (item.action === 'control') {
+        this.openNotepad(
+          'Control Panel',
+          'Display: teal\nSound: optional\nMouse: probably connected\nPersonality: managed automatically',
+        );
+      }
+      if (item.action === 'readme') {
+        this.openNotepad(
+          'readme.txt',
+          'CLAUDE.EXE\n==========\n\nWhatever you do, do not run the executable.\n\nKnown side effects:\n- unsolicited code review\n- strong opinions about naming\n- inspecting the recycle bin\n- becoming emotionally invested in Minesweeper',
+        );
+      }
+      if (item.action === 'dll') {
+        this.openNotepad(
+          'totally_normal.dll',
+          'A DLL is not an application.\n\nThis one is mostly decorative.',
+        );
+      }
+      if (item.action === 'claude') this.launchClaudeBuddy();
+    },
+    openSecretFolder() {
+      this.computerPath = 'secret';
+      this.openWindow('mycomputer');
+    },
+    launchClaudeBuddy() {
+      const width = this.$el ? this.$el.clientWidth : window.innerWidth;
+      const maxX = Math.max(90, width - 110);
+
+      this.buddyX = Math.min(Math.max(Math.round(width * 0.66), 90), maxX);
+      this.buddyFacingRight = false;
+      this.buddyMessage = this.buddyActive
+        ? 'You ran it twice. That feels personal.'
+        : 'You ran it. Bold choice.';
+      this.buddyActive = true;
+      this.playSound('win');
+
+      const reduceMotion = window.matchMedia
+        && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!reduceMotion && !this.buddyTimer) {
+        this.buddyTimer = setInterval(() => this.wanderClaude(), 12000);
+      }
+    },
+    closeClaudeBuddy() {
+      this.buddyActive = false;
+      this.buddyMessage = '';
+      clearInterval(this.buddyTimer);
+      this.buddyTimer = null;
+      this.playSound('close');
+    },
+    pokeClaude() {
+      this.buddyMessage = BUDDY_LINES[this.buddyLineIndex % BUDDY_LINES.length];
+      this.buddyLineIndex += 1;
+      this.wanderClaude(true);
+      this.playSound('nudge');
+    },
+    wanderClaude(shortStep = false) {
+      if (!this.buddyActive) return;
+
+      const width = this.$el ? this.$el.clientWidth : window.innerWidth;
+      const minX = 90;
+      const maxX = Math.max(minX, width - 110);
+      const step = shortStep ? 55 : 110 + Math.round(Math.random() * 100);
+      let nextX = this.buddyX + (this.buddyFacingRight ? step : -step);
+
+      if (nextX >= maxX) {
+        nextX = maxX;
+        this.buddyFacingRight = false;
+      } else if (nextX <= minX) {
+        nextX = minX;
+        this.buddyFacingRight = true;
+      }
+      this.buddyX = nextX;
+    },
     // --- Windows ---
     openWindow(id) {
       const win = this.windows.find(w => w.id === id);
@@ -1008,6 +1265,9 @@ export default {
         win.zIndex = this.zIndexCounter;
         this.activeWindow = id;
         this.playSound('open');
+        if (this.buddyActive && BUDDY_REACTIONS[id]) {
+          this.buddyMessage = BUDDY_REACTIONS[id];
+        }
       }
       this.closeMenus();
     },
@@ -1162,6 +1422,10 @@ export default {
       this.openNotepad(`${project.title}.doc`, text, links);
     },
     openRecycleFile(file) {
+      if (file.buddy) {
+        this.launchClaudeBuddy();
+        return;
+      }
       if (file.bsod) {
         this.playSound('boom');
         this.bsod = true;
@@ -1795,6 +2059,26 @@ export default {
   background: white;
 }
 
+.local-file-page {
+  height: 100%;
+  padding: 20px;
+  background: #ffffff;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+}
+
+.local-file-title {
+  margin-bottom: 16px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #808080;
+  font-weight: bold;
+}
+
+.local-file-page pre {
+  min-height: 90px;
+  white-space: pre-wrap;
+}
+
 /* Mail Window */
 .mail-content {
   display: flex;
@@ -1903,6 +2187,97 @@ export default {
 .win95-btn:focus {
   outline: 1px dotted black;
   outline-offset: -4px;
+}
+
+/* Claude desktop buddy */
+.win95-desktop .claude-buddy {
+  position: fixed;
+  bottom: 28px;
+  width: 54px;
+  height: 54px;
+  z-index: 10001;
+  transition: left 1.2s steps(7) !important;
+}
+
+.buddy-character {
+  width: 54px;
+  height: 54px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.buddy-character:focus {
+  outline: 1px dotted #ffffff;
+}
+
+.buddy-character img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  image-rendering: auto;
+  filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.45));
+}
+
+.claude-buddy.leftward .buddy-character img {
+  transform: scaleX(-1);
+}
+
+.buddy-bubble {
+  position: absolute;
+  bottom: 58px;
+  left: 50%;
+  width: 190px;
+  min-height: 42px;
+  transform: translateX(-50%);
+  padding: 8px 24px 8px 9px;
+  background: #ffffe1;
+  border: 2px solid;
+  border-color: #ffffff #404040 #404040 #ffffff;
+  box-shadow: 1px 1px 0 #000000;
+  color: #000000;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.buddy-bubble::after {
+  content: '';
+  position: absolute;
+  left: calc(50% - 6px);
+  bottom: -8px;
+  width: 10px;
+  height: 10px;
+  background: #ffffe1;
+  border-right: 2px solid #404040;
+  border-bottom: 2px solid #404040;
+  transform: rotate(45deg);
+}
+
+.buddy-close {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 16px;
+  height: 14px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #c0c0c0;
+  border: 2px solid;
+  border-color: #ffffff #404040 #404040 #ffffff;
+  color: #000000;
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .win95-desktop .claude-buddy {
+    transition: none !important;
+  }
 }
 
 /* Taskbar */
@@ -2245,6 +2620,10 @@ export default {
 
   .taskbar-window span {
     display: none;
+  }
+
+  .buddy-bubble {
+    width: 160px;
   }
 }
 </style>
