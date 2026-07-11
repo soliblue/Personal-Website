@@ -92,12 +92,32 @@ test.describe('site smoke', () => {
     await computerWindow.locator('.folder-item', { hasText: 'claude.exe' }).dblclick();
     await expect(page.locator('.claude-buddy')).toBeVisible();
     await expect(page.locator('.buddy-bubble')).toContainText('You ran it. Bold choice.');
-    await page.getByRole('button', { name: 'Talk to Claude' }).click();
+    const talkToClaude = page.getByRole('button', { name: 'Talk to Claude' });
+    await talkToClaude.click();
     await expect(page.locator('.buddy-bubble')).toContainText('I was told this was production.');
+    await expect(page.locator('.claude-buddy')).toHaveAttribute('data-mood', 'surprised');
+    await talkToClaude.click();
+    await expect(page.locator('.buddy-bubble')).toContainText('Yes, I noticed the first poke.');
+    await talkToClaude.click();
+    await expect(page.locator('.buddy-bubble')).toContainText('repeatable test case');
+    await expect(page.locator('.claude-buddy')).toHaveAttribute('data-pokes', '3');
+    await expect(page.locator('.claude-buddy')).toHaveAttribute('data-mood', 'suspicious');
 
     await page.getByRole('button', { name: /start/i }).click();
     await page.locator('.menu-item-row', { hasText: 'Claude Hops' }).click();
     await expect(page.locator('.buddy-bubble')).toContainText('Wait. Is that me?');
+    await expect(page.locator('.claude-buddy')).toHaveAttribute('data-mood', 'excited');
+
+    const codeHopWindow = page.locator('.win95-window').filter({
+      has: page.locator('.titlebar-text', { hasText: 'Claude Hops' }),
+    });
+    await codeHopWindow.locator('.win-btn.minimize').click();
+    await expect(page.locator('.buddy-bubble')).toContainText('Out of sight, still using memory.');
+    await page.locator('.taskbar-window', { hasText: 'Claude Hops' }).click();
+    await expect(page.locator('.buddy-bubble')).toContainText('Welcome back');
+    await codeHopWindow.locator('.win-btn.maximize').click();
+    await expect(page.locator('.buddy-bubble')).toContainText('Maximum window');
+
     await page.getByRole('button', { name: 'Close Claude buddy' }).click();
     await expect(page.locator('.claude-buddy')).toBeHidden();
     expect(errors).toEqual([]);

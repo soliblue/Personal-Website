@@ -324,7 +324,11 @@
             </button>
             <div class="browser-address">
               <span>{{ win.browserUrl === 'local' ? 'file:///' : 'http://' }}</span>
-              <select v-model="win.browserUrl" class="url-select">
+              <select
+                v-model="win.browserUrl"
+                class="url-select"
+                @change="narrateBrowser(win.browserUrl)"
+              >
                 <option value="wikipedia">en.wikipedia.org/wiki/Soli</option>
                 <option value="newspaper">thedailysoli.com</option>
                 <option value="local">C:/DO_NOT_OPEN/readme.txt</option>
@@ -374,10 +378,15 @@ It has already reviewed the recycle bin.</pre>
     <div
       v-if="buddyActive"
       class="claude-buddy"
-      :class="{ leftward: !buddyFacingRight }"
+      :class="[
+        { leftward: !buddyFacingRight, poked: buddyPoked },
+        'mood-' + buddyMood,
+      ]"
       :style="{ left: buddyX + 'px' }"
+      :data-mood="buddyMood"
+      :data-pokes="buddyPokeCount"
     >
-      <div class="buddy-bubble">
+      <div class="buddy-bubble" role="status" aria-live="polite">
         <button
           class="buddy-close"
           title="Close Claude"
@@ -599,20 +608,180 @@ const SFX = {
 
 const BUDDY_LINES = [
   'I was told this was production.',
-  'That folder was clearly labeled.',
-  'Need help, or are we pretending this is intentional?',
-  'I can explain the code. The naming is between you and Soli.',
-  'I have reviewed the recycle bin. Bold choices.',
+  'Yes, I noticed the first poke.',
+  'This is now a repeatable test case.',
+  'Are we debugging me or avoiding something?',
+  'I have logged this under user research.',
+  'One more and I am opening a ticket.',
+  'Ticket title: Claude is apparently a button.',
+  'Fine. Achievement unlocked: boundary testing.',
+  'The latency is excellent. The purpose remains unclear.',
+  'I can do this all day. I would prefer not to.',
+  'You know there are actual apps here, right?',
+  'I am beginning to understand the recycle bin.',
 ];
 
 const BUDDY_REACTIONS = {
-  browser: 'The internet. Be careful out there.',
-  codehop: 'Wait. Is that me?',
-  contact: 'A real form. We are getting serious.',
-  minesweeper: 'I calculated the odds. I will keep them to myself.',
-  projects: 'Nine projects and at least eleven origin stories.',
-  recycle: 'I have reviewed this folder. Bold choices.',
-  spacegame: 'I call navigator. You can do the asteroid part.',
+  about: [
+    'Ah, the lore page.',
+    'Human 1.0. Surprisingly stable release.',
+  ],
+  browser: [
+    'The internet. Be careful out there.',
+    'Opening Internet Explorer is the bravest thing you have done today.',
+  ],
+  browserHome: [
+    'Back to the homepage. A classic retreat.',
+    'Wikipedia will know what to do with us.',
+  ],
+  browserLocal: [
+    'That is not the internet. That is evidence.',
+    'You found the browser breadcrumb. Nicely done.',
+  ],
+  browserNewspaper: [
+    'Fresh news from a deeply suspicious publication.',
+    'Print is not dead. It is embedded in Vue.',
+  ],
+  browserWikipedia: [
+    'Neutral point of view mode activated.',
+    'Citation needed, probably.',
+  ],
+  bsod: [
+    'We survived. The error report did not.',
+    'Blue is a calming color in every context except that one.',
+  ],
+  close: [
+    'Window closed. Closure is healthy.',
+    'I will pretend that freed memory.',
+    'Gone, but still present in the taskbar of my mind.',
+  ],
+  codehop: [
+    'Wait. Is that me?',
+    'My lawyers will call this transformative gameplay.',
+    'Please make the jump. I have a reputation now.',
+  ],
+  contact: [
+    'A real form. We are getting serious.',
+    'Type carefully. This one actually sends.',
+  ],
+  control: [
+    'Personality settings are managed automatically. Convenient.',
+    'Please do not adjust the teal.',
+  ],
+  dll: [
+    'A totally normal DLL would not need to say so.',
+    'Decorative infrastructure. My favorite kind.',
+  ],
+  documents: [
+    'final_final_v7.txt inspires confidence.',
+    'The documents folder contains several stages of acceptance.',
+  ],
+  drag: [
+    'Much better there. Probably.',
+    'Interior design, but for processes.',
+    'I support moving the problem somewhere else.',
+  ],
+  external: [
+    'Opening a new tab. I hope it is worth the context switch.',
+    'And now we leave the controlled environment.',
+  ],
+  floppy: [
+    'The floppy drive has been waiting decades for this moment.',
+    'No disk. Strong commitment to historical accuracy.',
+  ],
+  idle: [
+    'I can see the cursor thinking.',
+    'No rush. The CPU is mostly decorative right now.',
+    'This silence has excellent uptime.',
+    'I am standing by, which is different from being idle.',
+  ],
+  maximize: [
+    'Maximum window. Maximum confidence.',
+    'This app has claimed the entire available territory.',
+  ],
+  minesweeper: [
+    'I calculated the odds. I will keep them to myself.',
+    'Every square is safe until it is not.',
+    'Flag first, ask questions later.',
+  ],
+  minimize: [
+    'Out of sight, still using memory.',
+    'A strategic retreat to the taskbar.',
+  ],
+  projects: [
+    'Nine projects and at least eleven origin stories.',
+    'This folder has excellent sequel potential.',
+    'Live projects first. The graveyard knows what it did.',
+  ],
+  readme: [
+    'You read the warning. That removes plausible deniability.',
+    'Documentation was provided. This is legally significant.',
+  ],
+  recycle: [
+    'I have reviewed this folder. Bold choices.',
+    'Nothing is truly deleted. Some things become anecdotes.',
+    'The startup plans are resting now.',
+  ],
+  refresh: [
+    'Desktop refreshed. The teal remains.',
+    'Everything disappeared for 120 milliseconds. Productive.',
+  ],
+  restore: [
+    'Welcome back. The window missed you.',
+    'Restored from the taskbar with minimal paperwork.',
+  ],
+  secret: [
+    'That folder was clearly labeled.',
+    'You have entered the consequences directory.',
+  ],
+  sendError: [
+    'The message did not leave the building.',
+    'Email failed. At least the error state works.',
+  ],
+  sendSuccess: [
+    'Message dispatched. Actual networking occurred.',
+    'Sent. Somewhere, an inbox just became more interesting.',
+  ],
+  soundOff: [
+    'Muted. I will communicate exclusively through judgment.',
+    'Silence mode enabled. My opinions remain active.',
+  ],
+  soundOn: [
+    'Audio restored. The square waves are relieved.',
+    'Sound is back. Please use this power responsibly.',
+  ],
+  spacegame: [
+    'I call navigator. You can do the asteroid part.',
+    'Space is mostly empty, except for every obstacle in this game.',
+    'Try not to discover negative score technology again.',
+  ],
+  taskbarFocus: [
+    'Context switched successfully.',
+    'A different window has entered the foreground.',
+  ],
+  taskbarHide: [
+    'Minimized by taskbar. Efficient and slightly dismissive.',
+    'The window has been filed under later.',
+  ],
+  windows: [
+    'Access denied by compatibility mode and optimism.',
+    'System files. Look with your eyes, not your mouse.',
+  ],
+};
+
+const BUDDY_MOODS = {
+  browserLocal: 'surprised',
+  codehop: 'excited',
+  dll: 'suspicious',
+  floppy: 'annoyed',
+  minesweeper: 'focused',
+  readme: 'suspicious',
+  secret: 'suspicious',
+  sendError: 'annoyed',
+  sendSuccess: 'excited',
+  soundOff: 'annoyed',
+  spacegame: 'excited',
+  windows: 'annoyed',
 };
 
 export default {
@@ -654,6 +823,10 @@ export default {
       buddyX: 720,
       buddyFacingRight: true,
       buddyLineIndex: 0,
+      buddyMood: 'curious',
+      buddyPoked: false,
+      buddyPokeCount: 0,
+      buddyWanderCount: 0,
       mailEmail: '',
       mailSubject: '',
       mailBody: '',
@@ -991,8 +1164,12 @@ export default {
   },
   created() {
     this.audioCtx = null;
+    this.buddyPokeTimer = null;
+    this.buddyReactionIndexes = Object.create(null);
     this.buddyTimer = null;
     this.clockTimer = null;
+    this.movedWindow = false;
+    this.resizedWindow = false;
   },
   mounted() {
     this.isTouch = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
@@ -1010,6 +1187,7 @@ export default {
     }
   },
   beforeDestroy() {
+    clearTimeout(this.buddyPokeTimer);
     clearInterval(this.buddyTimer);
     clearInterval(this.clockTimer);
     document.removeEventListener('pointermove', this.onPointerMove);
@@ -1050,6 +1228,7 @@ export default {
       this.soundOn = !this.soundOn;
       localStorage.setItem('soli95-sound', this.soundOn ? 'on' : 'off');
       this.playSound('click');
+      this.narrateClaude(this.soundOn ? 'soundOn' : 'soundOff');
     },
     // --- Boot / shutdown ---
     startBoot() {
@@ -1133,6 +1312,7 @@ export default {
       if (action === 'refresh') {
         this.refreshFlash = true;
         setTimeout(() => { this.refreshFlash = false; }, 120);
+        this.narrateClaude('refresh');
       }
       if (action === 'properties') this.openWindow('about');
     },
@@ -1161,17 +1341,20 @@ export default {
       if (item.path) {
         this.computerPath = item.path;
         this.playSound('open');
+        if (item.path === 'secret') this.narrateClaude('secret');
         return;
       }
 
       if (item.action === 'projects') this.openWindow('projects');
       if (item.action === 'documents') {
+        this.narrateClaude('documents');
         this.openNotepad(
           'Documents',
           'meeting_notes.txt\nideas_that_might_work.txt\nfinal_final_v7.txt\n\nNothing suspicious here.',
         );
       }
       if (item.action === 'windows') {
+        this.narrateClaude('windows');
         this.playSound('error');
         this.openNotepad(
           'SYSTEM WARNING',
@@ -1179,22 +1362,26 @@ export default {
         );
       }
       if (item.action === 'floppy') {
+        this.narrateClaude('floppy');
         this.playSound('error');
         this.openNotepad('A:\\', 'A:\\ is not accessible.\n\nThe device is not ready. Obviously.');
       }
       if (item.action === 'control') {
+        this.narrateClaude('control');
         this.openNotepad(
           'Control Panel',
           'Display: teal\nSound: optional\nMouse: probably connected\nPersonality: managed automatically',
         );
       }
       if (item.action === 'readme') {
+        this.narrateClaude('readme');
         this.openNotepad(
           'readme.txt',
           'CLAUDE.EXE\n==========\n\nWhatever you do, do not run the executable.\n\nKnown side effects:\n- unsolicited code review\n- strong opinions about naming\n- inspecting the recycle bin\n- becoming emotionally invested in Minesweeper',
         );
       }
       if (item.action === 'dll') {
+        this.narrateClaude('dll');
         this.openNotepad(
           'totally_normal.dll',
           'A DLL is not an application.\n\nThis one is mostly decorative.',
@@ -1205,6 +1392,7 @@ export default {
     openSecretFolder() {
       this.computerPath = 'secret';
       this.openWindow('mycomputer');
+      this.narrateClaude('secret');
     },
     launchClaudeBuddy() {
       const width = this.$el ? this.$el.clientWidth : window.innerWidth;
@@ -1215,6 +1403,7 @@ export default {
       this.buddyMessage = this.buddyActive
         ? 'You ran it twice. That feels personal.'
         : 'You ran it. Bold choice.';
+      this.buddyMood = this.buddyActive ? 'annoyed' : 'excited';
       this.buddyActive = true;
       this.playSound('win');
 
@@ -1227,13 +1416,39 @@ export default {
     closeClaudeBuddy() {
       this.buddyActive = false;
       this.buddyMessage = '';
+      this.buddyMood = 'curious';
+      this.buddyPoked = false;
+      clearTimeout(this.buddyPokeTimer);
       clearInterval(this.buddyTimer);
       this.buddyTimer = null;
       this.playSound('close');
     },
+    narrateClaude(key, mood) {
+      if (!this.buddyActive || !BUDDY_REACTIONS[key]) return;
+
+      const lines = BUDDY_REACTIONS[key];
+      const index = this.buddyReactionIndexes[key] || 0;
+      this.buddyMessage = lines[index % lines.length];
+      this.buddyReactionIndexes[key] = index + 1;
+      this.buddyMood = mood || BUDDY_MOODS[key] || 'curious';
+    },
     pokeClaude() {
+      this.buddyPokeCount += 1;
       this.buddyMessage = BUDDY_LINES[this.buddyLineIndex % BUDDY_LINES.length];
       this.buddyLineIndex += 1;
+      if (this.buddyPokeCount === 1) this.buddyMood = 'surprised';
+      else if (this.buddyPokeCount < 4) this.buddyMood = 'suspicious';
+      else if (this.buddyPokeCount < 8) this.buddyMood = 'annoyed';
+      else this.buddyMood = 'focused';
+
+      clearTimeout(this.buddyPokeTimer);
+      this.buddyPoked = false;
+      this.$nextTick(() => {
+        this.buddyPoked = true;
+        this.buddyPokeTimer = setTimeout(() => {
+          this.buddyPoked = false;
+        }, 420);
+      });
       this.wanderClaude(true);
       this.playSound('nudge');
     },
@@ -1254,6 +1469,10 @@ export default {
         this.buddyFacingRight = true;
       }
       this.buddyX = nextX;
+      if (!shortStep) {
+        this.buddyWanderCount += 1;
+        if (this.buddyWanderCount % 2 === 0) this.narrateClaude('idle');
+      }
     },
     // --- Windows ---
     openWindow(id) {
@@ -1265,9 +1484,7 @@ export default {
         win.zIndex = this.zIndexCounter;
         this.activeWindow = id;
         this.playSound('open');
-        if (this.buddyActive && BUDDY_REACTIONS[id]) {
-          this.buddyMessage = BUDDY_REACTIONS[id];
-        }
+        this.narrateClaude(id);
       }
       this.closeMenus();
     },
@@ -1276,6 +1493,7 @@ export default {
       w.open = false;
       w.minimized = false;
       this.playSound('close');
+      this.narrateClaude('close');
       if (this.activeWindow === win.id) {
         const lastOpen = this.openWindows[this.openWindows.length - 1];
         this.activeWindow = lastOpen ? lastOpen.id : null;
@@ -1285,6 +1503,7 @@ export default {
       const w = win;
       w.minimized = true;
       this.playSound('minimize');
+      this.narrateClaude('minimize');
       if (this.activeWindow === win.id) {
         const visibleWindows = this.openWindows.filter(v => !v.minimized);
         const lastVisible = visibleWindows[visibleWindows.length - 1];
@@ -1294,6 +1513,7 @@ export default {
     toggleMaximize(win) {
       const w = win;
       w.maximized = !w.maximized;
+      this.narrateClaude(w.maximized ? 'maximize' : 'restore');
     },
     focusWindow(id) {
       const win = this.windows.find(w => w.id === id);
@@ -1311,15 +1531,18 @@ export default {
         this.zIndexCounter += 1;
         w.zIndex = this.zIndexCounter;
         this.activeWindow = w.id;
+        this.narrateClaude('restore');
       } else if (this.activeWindow === w.id) {
         w.minimized = true;
         const visibleWindows = this.openWindows.filter(v => !v.minimized);
         const lastVisible = visibleWindows[visibleWindows.length - 1];
         this.activeWindow = lastVisible ? lastVisible.id : null;
+        this.narrateClaude('taskbarHide');
       } else {
         this.zIndexCounter += 1;
         w.zIndex = this.zIndexCounter;
         this.activeWindow = w.id;
+        this.narrateClaude('taskbarFocus');
       }
     },
     getWindowStyle(win) {
@@ -1345,6 +1568,7 @@ export default {
       if (win.maximized) return;
       if (e.target.closest('.win-btn')) return;
       this.dragging = win;
+      this.movedWindow = false;
       this.dragOffset = {
         x: e.clientX - win.x,
         y: e.clientY - win.y,
@@ -1353,6 +1577,7 @@ export default {
     startResize(e, win) {
       if (win.maximized) return;
       this.resizing = win;
+      this.resizedWindow = false;
       this.dragOffset = {
         x: e.clientX,
         y: e.clientY,
@@ -1362,6 +1587,7 @@ export default {
     },
     onPointerMove(e) {
       if (this.dragging) {
+        this.movedWindow = true;
         const bw = this.$el.clientWidth;
         const bh = this.$el.clientHeight;
         // Clamp so the titlebar always stays reachable
@@ -1371,6 +1597,7 @@ export default {
         this.dragging.y = Math.min(Math.max(y, 0), bh - 60);
       }
       if (this.resizing) {
+        this.resizedWindow = true;
         const dx = e.clientX - this.dragOffset.x;
         const dy = e.clientY - this.dragOffset.y;
         this.resizing.width = Math.max(200, this.dragOffset.width + dx);
@@ -1378,8 +1605,11 @@ export default {
       }
     },
     onPointerUp() {
+      const movedWindow = Boolean(this.dragging && this.movedWindow);
+      const resizedWindow = Boolean(this.resizing && this.resizedWindow);
       this.dragging = null;
       this.resizing = null;
+      if (movedWindow || resizedWindow) this.narrateClaude('drag');
     },
     // --- BSOD ---
     onKeyDown(e) {
@@ -1391,6 +1621,7 @@ export default {
     },
     dismissBsod() {
       this.bsod = false;
+      this.narrateClaude('bsod');
     },
     // --- Documents ---
     openNotepad(title, text, links) {
@@ -1462,10 +1693,12 @@ export default {
         this.mailBody = '';
         this.mailStatus = 'Message sent. I will get back to you soon.';
         this.mailStatusType = 'success';
+        this.narrateClaude('sendSuccess');
         this.playSound('send');
       } catch (error) {
         this.mailStatus = error.message || 'Email could not be sent. Please try again.';
         this.mailStatusType = 'error';
+        this.narrateClaude('sendError');
         this.playSound('error');
       } finally {
         this.mailSending = false;
@@ -1475,12 +1708,22 @@ export default {
     goBrowserHome(win) {
       const w = win;
       w.browserUrl = 'wikipedia';
+      this.narrateClaude('browserHome');
       this.playSound('click');
+    },
+    narrateBrowser(url) {
+      const reactions = {
+        local: 'browserLocal',
+        newspaper: 'browserNewspaper',
+        wikipedia: 'browserWikipedia',
+      };
+      this.narrateClaude(reactions[url]);
     },
     navigateTo(path) {
       this.$router.push(path);
     },
     openExternalLink(url) {
+      this.narrateClaude('external');
       window.open(url, '_blank');
     },
   },
@@ -2224,6 +2467,17 @@ export default {
   transform: scaleX(-1);
 }
 
+@keyframes buddy-poke {
+  0% { transform: translateY(0) scale(1); }
+  30% { transform: translateY(-10px) scale(1.08, 0.92); }
+  60% { transform: translateY(1px) scale(0.92, 1.08); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+.win95-desktop .claude-buddy.poked .buddy-character {
+  animation: buddy-poke 420ms steps(5) !important;
+}
+
 .buddy-bubble {
   position: absolute;
   bottom: 58px;
@@ -2254,6 +2508,28 @@ export default {
   transform: rotate(45deg);
 }
 
+.claude-buddy.mood-surprised .buddy-bubble,
+.claude-buddy.mood-excited .buddy-bubble,
+.claude-buddy.mood-surprised .buddy-bubble::after,
+.claude-buddy.mood-excited .buddy-bubble::after {
+  background: #e8ffff;
+}
+
+.claude-buddy.mood-annoyed .buddy-bubble,
+.claude-buddy.mood-annoyed .buddy-bubble::after {
+  background: #fff0e6;
+}
+
+.claude-buddy.mood-focused .buddy-bubble,
+.claude-buddy.mood-focused .buddy-bubble::after {
+  background: #efffe8;
+}
+
+.claude-buddy.mood-suspicious .buddy-bubble,
+.claude-buddy.mood-suspicious .buddy-bubble::after {
+  background: #fffbd6;
+}
+
 .buddy-close {
   position: absolute;
   top: 3px;
@@ -2277,6 +2553,10 @@ export default {
 @media (prefers-reduced-motion: reduce) {
   .win95-desktop .claude-buddy {
     transition: none !important;
+  }
+
+  .win95-desktop .claude-buddy.poked .buddy-character {
+    animation: none !important;
   }
 }
 
