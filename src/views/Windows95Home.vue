@@ -73,7 +73,7 @@
         <!-- About Window -->
         <div v-if="win.id === 'about'" class="about-content">
           <div class="about-header">
-            <img src="../assets/win95/computer.svg" class="about-icon">
+            <img src="../assets/win95/about.svg" class="about-icon">
             <div class="about-title">
               <h2>soli</h2>
               <p>ai engineer</p>
@@ -382,6 +382,11 @@ The squirrel got here first.</pre>
           <Minesweeper v-if="win.open" @sound="playSound" />
         </div>
 
+        <!-- Paint Window - stays mounted while minimized to preserve the current drawing -->
+        <div v-if="win.id === 'paint'" class="app-window">
+          <PaintApp v-if="win.open" @sound="playSound" />
+        </div>
+
         <!-- Space Game Window - only mount when open and not minimized -->
         <div v-if="win.id === 'spacegame'" class="app-window">
           <SpaceGameHome v-if="win.open && !win.minimized" :embedded="true" />
@@ -504,6 +509,10 @@ The squirrel got here first.</pre>
           <img src="../assets/win95/msn.svg">
           <span>Messenger</span>
         </div>
+        <div class="menu-item-row" @click="openWindow('paint')">
+          <img src="../assets/win95/paint.svg">
+          <span>Paint</span>
+        </div>
         <div class="menu-item-row" @click="openWindow('minesweeper')">
           <img src="../assets/win95/mine.svg">
           <span>Minesweeper</span>
@@ -582,7 +591,9 @@ import SpaceGameHome from '@/views/SpaceGameHome';
 import CodeHopHome from '@/views/CodeHopHome';
 import MessengerApp from '@/components/win95/MessengerApp';
 import Minesweeper from '@/components/win95/Minesweeper';
+import PaintApp from '@/components/win95/PaintApp';
 import codeHopIcon from '@/assets/codehop/claude-hops-mascot.png';
+import aboutIcon from '@/assets/win95/about.svg';
 import docIcon from '@/assets/win95/doc.svg';
 import folderIcon from '@/assets/win95/folder.svg';
 import computerIcon from '@/assets/win95/computer.svg';
@@ -593,6 +604,7 @@ import globeIcon from '@/assets/win95/globe.svg';
 import recycleIcon from '@/assets/win95/recycle.svg';
 import msnIcon from '@/assets/win95/msn.svg';
 import mineIcon from '@/assets/win95/mine.svg';
+import paintIcon from '@/assets/win95/paint.svg';
 import spaceshipIcon from '@/assets/space/spaceship.png';
 import squirrelAnnoyed from '@/assets/win95/pet/squirrel-annoyed.png';
 import squirrelBlink from '@/assets/win95/pet/squirrel-blink.png';
@@ -767,6 +779,10 @@ const BUDDY_REACTIONS = {
     'This folder has excellent sequel potential.',
     'Live projects first. The graveyard knows what it did.',
   ],
+  paint: [
+    'A blank canvas. Finally, a bug-free starting state.',
+    'I will supervise the art direction from down here.',
+  ],
   readme: [
     'You read the warning. That removes plausible deniability.',
     'Documentation was provided. This is legally significant.',
@@ -829,6 +845,7 @@ const BUDDY_MOODS = {
   dll: 'suspicious',
   floppy: 'annoyed',
   minesweeper: 'focused',
+  paint: 'focused',
   readme: 'suspicious',
   secret: 'suspicious',
   sendError: 'annoyed',
@@ -860,6 +877,7 @@ const BUDDY_FRAMES = {
   idle: 'sit',
   maximize: 'excited',
   minesweeper: 'curious',
+  paint: 'curious',
   minimize: 'sit',
   projects: 'excited',
   readme: 'curious',
@@ -887,6 +905,7 @@ export default {
     CodeHopHome,
     MessengerApp,
     Minesweeper,
+    PaintApp,
   },
   data() {
     return {
@@ -942,8 +961,17 @@ export default {
         { id: 'mycomputer', label: 'My Computer', img: computerIcon },
         { id: 'resume', label: 'Resume.doc', img: docIcon },
         { id: 'projects', label: 'Projects', img: folderIcon },
-        { id: 'about', label: 'About Me', img: computerIcon },
+        { id: 'about', label: 'About Me', img: aboutIcon },
         { id: 'contact', label: 'Contact', img: mailIcon },
+        { id: 'paint', label: 'Paint', img: paintIcon },
+        { id: 'minesweeper', label: 'Minesweeper', img: mineIcon },
+        {
+          id: 'spacegame',
+          label: 'Space Game',
+          img: spaceshipIcon,
+          imgClass: 'space-icon',
+        },
+        { id: 'codehop', label: 'Claude Hops', img: codeHopIcon, imgClass: 'codehop-icon' },
         {
           id: 'github',
           label: 'GitHub',
@@ -953,14 +981,6 @@ export default {
         { id: 'terminal', label: 'Terminal', img: terminalIcon },
         { id: 'browser', label: 'Internet', img: globeIcon },
         { id: 'messenger', label: 'Messenger', img: msnIcon },
-        { id: 'minesweeper', label: 'Minesweeper', img: mineIcon },
-        {
-          id: 'spacegame',
-          label: 'Space Game',
-          img: spaceshipIcon,
-          imgClass: 'space-icon',
-        },
-        { id: 'codehop', label: 'Claude Hops', img: codeHopIcon, imgClass: 'codehop-icon' },
         { id: 'recycle', label: 'Recycle Bin', img: recycleIcon },
       ],
       menuBar: [
@@ -1029,11 +1049,11 @@ export default {
         {
           id: 'about',
           title: 'About Me',
-          icon: computerIcon,
+          icon: aboutIcon,
           open: false,
           minimized: false,
           maximized: false,
-          x: 100,
+          x: 270,
           y: 80,
           width: 400,
           height: 300,
@@ -1174,6 +1194,21 @@ export default {
           y: 70,
           width: 210,
           height: 245,
+          zIndex: 10,
+          showMenu: false,
+          contentClass: 'app-container',
+        },
+        {
+          id: 'paint',
+          title: 'untitled - Paint',
+          icon: paintIcon,
+          open: false,
+          minimized: false,
+          maximized: false,
+          x: 105,
+          y: 40,
+          width: 780,
+          height: 590,
           zIndex: 10,
           showMenu: false,
           contentClass: 'app-container',
@@ -2026,7 +2061,8 @@ export default {
   align-content: flex-start;
   gap: 8px;
   padding: 8px;
-  height: calc(100vh / 0.9 - 48px);
+  /* Reserve the lower-left slot for the absolutely positioned Recycle Bin. */
+  height: calc(100vh / 0.9 - 112px);
 }
 
 .desktop-icons.refreshing {

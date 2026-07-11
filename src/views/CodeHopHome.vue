@@ -5,7 +5,10 @@
     ref="gameContainer"
     :data-state="gameState"
     :data-airborne="player ? String(!player.grounded) : 'false'"
+    :data-combo="combo"
     :data-score="score"
+    :data-shielded="String(shielded)"
+    :data-world="worldIndex"
   >
     <canvas
       ref="canvas"
@@ -25,6 +28,8 @@
       <div class="hud-stats">
         <span>SCORE: {{ score }}</span>
         <span>SPEED: {{ speedLabel }}</span>
+        <span>COMBO: x{{ Math.max(1, combo) }}</span>
+        <span>SAFE: {{ shielded ? 'ON' : 'OFF' }}</span>
         <span>BEST: {{ bestScore }}</span>
       </div>
 
@@ -35,6 +40,15 @@
       <button class="hud-button" @click.stop="togglePause">
         {{ gameState === 'paused' ? 'RESUME' : 'MENU' }}
       </button>
+
+      <div class="world-progress" aria-hidden="true">
+        <span :style="{ width: `${worldProgress}%` }"></span>
+      </div>
+    </div>
+
+    <div v-if="milestone.life > 0" class="world-banner" role="status">
+      <strong>{{ milestone.title }}</strong>
+      <span>{{ milestone.subtitle }}</span>
     </div>
 
     <button
@@ -52,7 +66,8 @@
         <h1>CLAUDE HOPS</h1>
         <p v-if="gameState === 'ready'">
           WORLD 1-1 / BUG BLOCK ROAD<br>
-          {{ hopHint }}
+          {{ hopHint }}<br>
+          BUILD COMBOS / CATCH &lt;&gt; FOR SAFE MODE
           <span v-if="bestScore > 0"><br>BEST: {{ bestScore }}</span>
         </p>
         <p v-else-if="gameState === 'paused'">PAUSED / FLOPPY STILL SPINNING</p>
@@ -153,6 +168,22 @@ const DUST_COLORS = ['#d49b57', '#f1cf8d'];
 const SPARK_COLORS = ['#ffdf7e', '#fff6dc', '#f5c542'];
 const PUFF_COLORS = ['#dfe8ef', '#9fb8d8'];
 const CRASH_COLORS = ['#b95130', '#e8dcc0', '#3f2419'];
+const SHIELD_COLORS = ['#79f2da', '#e6fff9', '#2da88f'];
+
+const WORLD_PALETTES = [
+  {
+    sky: '#8db2bf', horizon: '#b6cba9', ground: '#d7b76f', ridge: '#6f7a68',
+  },
+  {
+    sky: '#bf8f83', horizon: '#dfb080', ground: '#ddc27c', ridge: '#765f65',
+  },
+  {
+    sky: '#33456b', horizon: '#596a7d', ground: '#98845f', ridge: '#3d4657',
+  },
+  {
+    sky: '#6f9db0', horizon: '#d49e8d', ground: '#ccb16f', ridge: '#526b67',
+  },
+];
 
 const CLOUDS = [
   { x: 70, y: 80, width: 88, speed: 0.14 },
@@ -203,7 +234,15 @@ export default {
       speed: 225,
       passed: 0,
       tokens: 0,
+      bonusScore: 0,
+      combo: 0,
+      comboTimer: 0,
+      shielded: false,
+      invulnerableTimer: 0,
+      worldIndex: 1,
+      milestone: { title: '', subtitle: '', life: 0 },
       spawnTimer: 1.25,
+      powerupTimer: 8.5,
       shakeTime: 0,
       soundOn: true,
       isTouch: false,
@@ -214,6 +253,7 @@ export default {
       clouds: [],
       particles: [],
       coins: [],
+      powerups: [],
       popups: [],
     };
   },
@@ -224,7 +264,12 @@ export default {
     },
 
     worldLabel() {
-      return `1-${clamp(Math.floor(this.elapsed / 28) + 1, 1, 4)}`;
+      return `1-${this.worldIndex}`;
+    },
+
+    worldProgress() {
+      if (this.worldIndex >= WORLD_PALETTES.length) return 100;
+      return Math.round(((this.elapsed % 22) / 22) * 100);
     },
 
     hopHint() {
@@ -350,6 +395,11 @@ export default {
         coin.y = this.groundY - coin.altitude * this.scale;
       });
 
+      this.powerups.forEach((powerup) => {
+        powerup.size = 30 * this.scale;
+        powerup.y = this.groundY - powerup.altitude * this.scale;
+      });
+
       this.createClouds();
     },
 
@@ -361,12 +411,21 @@ export default {
       this.speed = 225;
       this.passed = 0;
       this.tokens = 0;
+      this.bonusScore = 0;
+      this.combo = 0;
+      this.comboTimer = 0;
+      this.shielded = false;
+      this.invulnerableTimer = 0;
+      this.worldIndex = 1;
+      this.milestone = { title: '', subtitle: '', life: 0 };
       this.spawnTimer = 1.35;
+      this.powerupTimer = 8.5;
       this.shakeTime = 0;
       this.lastTime = 0;
       this.obstacles = [];
       this.particles = [];
       this.coins = [];
+      this.powerups = [];
       this.popups = [];
       this.player = {
         x: clamp(this.width * 0.18, 78, 172),
@@ -413,6 +472,7 @@ export default {
       this.updateClouds(delta, 12);
       this.updateParticles(delta);
       this.updatePopups(delta);
+      this.updateMilestone(delta);
     },
 
     updateGame(delta) {
@@ -423,18 +483,46 @@ export default {
       ) % (this.tile * 2);
 
       this.updateClouds(delta, 48);
+      this.updateWorld();
       this.updatePlayer(delta);
       this.updateObstacles(delta);
       this.updateCoins(delta);
+      this.updatePowerups(delta);
       this.updateParticles(delta);
       this.updatePopups(delta);
+      this.updateMilestone(delta);
+
+      this.comboTimer = Math.max(0, this.comboTimer - delta);
+      if (this.comboTimer === 0) this.combo = 0;
+      this.invulnerableTimer = Math.max(0, this.invulnerableTimer - delta);
 
       this.score = Math.max(
         0,
-        Math.floor(this.elapsed * 9) + this.passed * 35 + this.tokens * 40,
+        Math.floor(this.elapsed * 9) + this.passed * 35 + this.tokens * 40 + this.bonusScore,
       );
       this.collectCoins();
+      this.collectPowerups();
       this.checkCollisions();
+    },
+
+    updateWorld() {
+      const nextWorld = clamp(Math.floor(this.elapsed / 22) + 1, 1, WORLD_PALETTES.length);
+      if (nextWorld === this.worldIndex) return;
+      this.worldIndex = nextWorld;
+      this.bonusScore += 100;
+      this.milestone = {
+        title: `WORLD 1-${nextWorld}`,
+        subtitle: nextWorld === WORLD_PALETTES.length ? 'FINAL BUILD' : 'CHECKPOINT +100',
+        life: 2.4,
+      };
+      this.emitDust(this.width * 0.5, this.height * 0.35, 18, SPARK_COLORS);
+      this.playCheckpoint();
+    },
+
+    updateMilestone(delta) {
+      if (this.milestone.life > 0) {
+        this.milestone.life = Math.max(0, this.milestone.life - delta);
+      }
     },
 
     updateClouds(delta, pace) {
@@ -494,11 +582,23 @@ export default {
         if (!obstacle.passed && obstacle.x + obstacle.width < this.player.x) {
           obstacle.passed = true;
           this.passed += 1;
+          this.combo = Math.min(this.combo + 1, 9);
+          this.comboTimer = 2.5;
+          const comboBonus = this.combo * 8;
+          this.bonusScore += comboBonus;
+          this.popups.push({
+            x: obstacle.x + obstacle.width,
+            y: obstacle.y - 8 * this.scale,
+            text: this.combo > 1 ? `x${this.combo} +${comboBonus}` : `+${comboBonus}`,
+            life: 0.8,
+          });
           this.emitDust(obstacle.x + obstacle.width, obstacle.y + obstacle.height, 5);
         }
       });
 
-      this.obstacles = this.obstacles.filter(obstacle => obstacle.x + obstacle.width > -40);
+      this.obstacles = this.obstacles.filter(obstacle => (
+        !obstacle.destroyed && obstacle.x + obstacle.width > -40
+      ));
     },
 
     updateCoins(delta) {
@@ -507,6 +607,20 @@ export default {
         coin.phase += delta * 6;
       });
       this.coins = this.coins.filter(coin => !coin.taken && coin.x > -40);
+    },
+
+    updatePowerups(delta) {
+      this.powerupTimer -= delta;
+      if (this.powerupTimer <= 0) {
+        if (!this.shielded) this.spawnPowerup();
+        this.powerupTimer = 10 + Math.random() * 6;
+      }
+
+      this.powerups.forEach((powerup) => {
+        powerup.x -= this.speed * delta;
+        powerup.phase += delta * 5;
+      });
+      this.powerups = this.powerups.filter(powerup => !powerup.taken && powerup.x > -50);
     },
 
     updatePopups(delta) {
@@ -556,6 +670,27 @@ export default {
       });
 
       if (!flying && Math.random() < 0.5) this.spawnCoins(startX, width, type.height);
+
+      const pairChance = this.worldIndex > 1 ? 0.12 + this.worldIndex * 0.05 : 0;
+      if (!flying && Math.random() < pairChance) {
+        const pairType = OBSTACLE_TYPES[Math.floor(Math.random() * OBSTACLE_TYPES.length)];
+        const pairWidth = pairType.width * this.scale;
+        const pairHeight = pairType.height * this.scale;
+        const pairGap = clamp(92 + this.speed * 0.08, 105, 145) * this.scale;
+        const pairX = startX + width + pairGap;
+        this.obstacles.push({
+          type: pairType,
+          x: pairX,
+          y: this.groundY - pairHeight,
+          width: pairWidth,
+          height: pairHeight,
+          passed: false,
+          flying: false,
+          altitude: 0,
+          phase: 0,
+        });
+        if (Math.random() < 0.7) this.spawnCoins(pairX, pairWidth, pairType.height);
+      }
     },
 
     spawnCoins(obstacleX, obstacleWidth, obstacleHeight) {
@@ -575,6 +710,24 @@ export default {
           taken: false,
         });
       }
+    },
+
+    spawnPowerup() {
+      const last = this.obstacles[this.obstacles.length - 1];
+      const size = 30 * this.scale;
+      const altitude = 108;
+      const x = Math.max(
+        this.width + 70,
+        last ? last.x + last.width + 90 * this.scale : this.width + 70,
+      );
+      this.powerups.push({
+        x,
+        y: this.groundY - altitude * this.scale,
+        altitude,
+        size,
+        phase: 0,
+        taken: false,
+      });
     },
 
     collectCoins() {
@@ -598,9 +751,36 @@ export default {
       });
     },
 
+    collectPowerups() {
+      const bounds = this.getPlayerBounds();
+      this.powerups.forEach((powerup) => {
+        if (powerup.taken) return;
+        const half = powerup.size / 2;
+        const powerupBounds = {
+          x: powerup.x - half,
+          y: powerup.y - half,
+          width: powerup.size,
+          height: powerup.size,
+        };
+        if (!overlaps(bounds, powerupBounds)) return;
+        powerup.taken = true;
+        this.shielded = true;
+        this.bonusScore += 75;
+        this.emitDust(powerup.x, powerup.y, 14, SHIELD_COLORS);
+        this.popups.push({
+          x: powerup.x,
+          y: powerup.y - powerup.size,
+          text: 'SAFE MODE +75',
+          life: 1.15,
+        });
+        this.playShield();
+      });
+    },
+
     checkCollisions() {
+      if (this.invulnerableTimer > 0) return;
       const playerBounds = this.getPlayerBounds();
-      const hit = this.obstacles.some((obstacle) => {
+      const hit = this.obstacles.find((obstacle) => {
         const inset = Math.max(3, 5 * this.scale);
         const obstacleBounds = {
           x: obstacle.x + inset,
@@ -611,7 +791,29 @@ export default {
         return overlaps(playerBounds, obstacleBounds);
       });
 
-      if (hit) this.endGame();
+      if (!hit) return;
+      if (this.shielded) {
+        this.shielded = false;
+        this.invulnerableTimer = 1.1;
+        this.bonusScore += 125;
+        this.shakeTime = 0.18;
+        hit.destroyed = true;
+        this.emitDust(
+          hit.x + hit.width / 2,
+          hit.y + hit.height / 2,
+          18,
+          SHIELD_COLORS,
+        );
+        this.popups.push({
+          x: hit.x + hit.width / 2,
+          y: hit.y,
+          text: 'RECOVERED +125',
+          life: 1.05,
+        });
+        this.playShieldBreak();
+        return;
+      }
+      this.endGame();
     },
 
     getPlayerBounds() {
@@ -780,6 +982,22 @@ export default {
       this.playTone(1470, 1470, 0.12, 'square', 0.09, 0.06);
     },
 
+    playShield() {
+      this.playTone(420, 840, 0.18, 'square', 0.08);
+      this.playTone(840, 1260, 0.2, 'square', 0.08, 0.12);
+    },
+
+    playShieldBreak() {
+      this.playTone(920, 180, 0.28, 'sawtooth', 0.11);
+      this.playTone(520, 740, 0.12, 'square', 0.08, 0.25);
+    },
+
+    playCheckpoint() {
+      [392, 523.25, 659.25].forEach((freq, index) => {
+        this.playTone(freq, freq, 0.13, 'square', 0.08, index * 0.1);
+      });
+    },
+
     playCrash() {
       this.playTone(320, 48, 0.5, 'sawtooth', 0.16);
     },
@@ -835,6 +1053,7 @@ export default {
       this.drawGround();
       this.obstacles.forEach(this.drawObstacle);
       this.coins.forEach(this.drawCoin);
+      this.powerups.forEach(this.drawPowerup);
       this.drawClaude();
       this.drawParticles();
       this.drawPopups();
@@ -842,9 +1061,16 @@ export default {
     },
 
     drawSky() {
-      this.block(0, 0, this.width, this.height, '#8db2bf');
-      this.block(0, this.height * 0.34, this.width, this.height * 0.16, '#b6cba9');
-      this.block(0, this.height * 0.5, this.width, this.groundY - this.height * 0.5, '#d7b76f');
+      const palette = WORLD_PALETTES[this.worldIndex - 1];
+      this.block(0, 0, this.width, this.height, palette.sky);
+      this.block(0, this.height * 0.34, this.width, this.height * 0.16, palette.horizon);
+      this.block(
+        0,
+        this.height * 0.5,
+        this.width,
+        this.groundY - this.height * 0.5,
+        palette.ground,
+      );
 
       this.block(0, this.groundY - 2 * this.scale, this.width, 2 * this.scale, '#b18f55');
     },
@@ -862,8 +1088,9 @@ export default {
     drawDistantBlocks() {
       const baseY = this.groundY - 78 * this.scale;
       const gap = this.tile * 5.2;
+      const palette = WORLD_PALETTES[this.worldIndex - 1];
       for (let x = -this.tile; x < this.width + gap; x += gap) {
-        this.block(x, baseY + this.tile, this.tile * 3, this.tile, '#6f7a68');
+        this.block(x, baseY + this.tile, this.tile * 3, this.tile, palette.ridge);
         this.block(x + this.tile, baseY, this.tile * 2, this.tile, '#778872');
         this.block(x + this.tile * 2, baseY - this.tile * 0.65, this.tile, this.tile * 0.65, '#59675a');
       }
@@ -955,6 +1182,29 @@ export default {
       );
     },
 
+    drawPowerup(powerup) {
+      const pulse = 1 + Math.sin(powerup.phase) * 0.08;
+      const size = powerup.size * pulse;
+      const x = powerup.x - size / 2;
+      const y = powerup.y - size / 2;
+      const unit = Math.max(2, 3 * this.scale);
+
+      this.block(x + unit, y, size - unit * 2, unit, '#e6fff9');
+      this.block(x, y + unit, unit, size - unit * 2, '#e6fff9');
+      this.block(x + size - unit, y + unit, unit, size - unit * 2, '#176e63');
+      this.block(x + unit, y + size - unit, size - unit * 2, unit, '#176e63');
+      this.block(x + unit, y + unit, size - unit * 2, size - unit * 2, '#2da88f');
+
+      const ctx = this.ctx;
+      ctx.save();
+      ctx.fillStyle = '#e6fff9';
+      ctx.font = `bold ${Math.max(12, Math.round(14 * this.scale))}px "Courier New", monospace`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('<>', powerup.x, powerup.y + unit * 0.3);
+      ctx.restore();
+    },
+
     drawPipe(obstacle) {
       const unit = Math.max(3, 4 * this.scale);
       this.block(
@@ -1033,6 +1283,20 @@ export default {
       const bob = player.grounded ? Math.sin(player.runFrame) * unit * 0.18 : -unit * 0.35;
       const x = player.x;
       const y = player.y + bob;
+
+      if (this.shielded) {
+        const pulse = Math.floor(this.elapsed * 8) % 2;
+        ctx.save();
+        ctx.strokeStyle = pulse ? '#e6fff9' : '#2da88f';
+        ctx.lineWidth = Math.max(2, 3 * this.scale);
+        ctx.strokeRect(
+          x - unit * 1.2,
+          y - unit * 1.2,
+          player.width + unit * 2.4,
+          player.height + unit * 2.4,
+        );
+        ctx.restore();
+      }
 
       if (player.grounded) {
         this.block(
@@ -1321,6 +1585,50 @@ canvas {
   background: #395c9d;
 }
 
+.world-progress {
+  flex-basis: 100%;
+  height: 8px;
+  overflow: hidden;
+  border: 2px solid #1d1712;
+  background: #f2d59d;
+  box-shadow: 3px 3px 0 rgba(35, 21, 14, 0.32);
+}
+
+.world-progress span {
+  display: block;
+  height: 100%;
+  background: #2f6f58;
+}
+
+.world-banner {
+  position: absolute;
+  top: 104px;
+  left: 50%;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  min-width: 220px;
+  padding: 10px 16px;
+  border: 3px solid #1d1712;
+  background: #f4d69a;
+  box-shadow: 5px 5px 0 rgba(35, 21, 14, 0.45);
+  text-align: center;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.world-banner strong {
+  color: #b95130;
+  font-size: 22px;
+}
+
+.world-banner span {
+  margin-top: 3px;
+  color: #3f2419;
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .overlay {
   position: absolute;
   inset: 0;
@@ -1456,6 +1764,10 @@ h1 {
 
   .panel {
     padding: 20px 16px;
+  }
+
+  .world-banner {
+    top: 154px;
   }
 }
 

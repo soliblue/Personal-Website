@@ -99,6 +99,56 @@ test.describe('site smoke', () => {
     expect(errors).toEqual([]);
   });
 
+  test('Windows 95 Paint draws, undoes, redoes, and restores the picture', async ({ page }) => {
+    test.skip(test.info().project.name !== 'chromium', 'Desktop Paint flow is covered once.');
+    const errors = collectPageErrors(page);
+
+    await page.addInitScript(() => {
+      sessionStorage.setItem('soli95-booted', 'true');
+      localStorage.removeItem('soli95-paint-document');
+    });
+    await page.goto('/windows95');
+
+    const aboutIcon = page.locator('.desktop-icon', { hasText: 'About Me' }).locator('img');
+    const computerIcon = page.locator('.desktop-icon', { hasText: 'My Computer' }).locator('img');
+    await expect(aboutIcon).not.toHaveAttribute('src', await computerIcon.getAttribute('src'));
+
+    await page.locator('.desktop-icon', { hasText: 'Paint' }).dblclick();
+    const paintWindow = page.locator('.win95-window').filter({
+      has: page.locator('.titlebar-text', { hasText: 'untitled - Paint' }),
+    });
+    const canvas = paintWindow.locator('.paint-stage canvas');
+    await expect(canvas).toBeVisible();
+    await expect(canvas).toHaveAttribute('data-tool', 'pencil');
+
+    await paintWindow.getByRole('button', { name: 'Brush', exact: true }).click();
+    await paintWindow.getByRole('button', { name: 'Brush size 10' }).click();
+    await paintWindow.getByRole('button', { name: 'Use #ff0000' }).click();
+    const box = await canvas.boundingBox();
+    const start = { x: box.x + box.width * 0.25, y: box.y + box.height * 0.45 };
+    const finish = { x: box.x + box.width * 0.55, y: box.y + box.height * 0.45 };
+    await page.mouse.move(start.x, start.y);
+    await page.mouse.down();
+    await page.mouse.move(finish.x, finish.y, { steps: 10 });
+    await page.mouse.up();
+
+    const samplePixel = async () => canvas.evaluate((element) => {
+      const context = element.getContext('2d');
+      return Array.from(context.getImageData(360, 198, 1, 1).data);
+    });
+    await expect.poll(samplePixel).toEqual([255, 0, 0, 255]);
+
+    await paintWindow.getByRole('button', { name: 'Undo' }).click();
+    await expect.poll(samplePixel).toEqual([255, 255, 255, 255]);
+    await paintWindow.getByRole('button', { name: 'Redo' }).click();
+    await expect.poll(samplePixel).toEqual([255, 0, 0, 255]);
+
+    await paintWindow.locator('.win-btn.close').click();
+    await page.locator('.desktop-icon', { hasText: 'Paint' }).dblclick();
+    await expect.poll(samplePixel).toEqual([255, 0, 0, 255]);
+    expect(errors).toEqual([]);
+  });
+
   test('Windows 95 includes an always-on interactive squirrel', async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== 'chromium', 'Desktop pet behavior is covered once.');
     const errors = collectPageErrors(page);
@@ -358,6 +408,67 @@ test.describe('site smoke', () => {
     await expect(page.locator('.code-hop')).toHaveAttribute('data-state', 'playing');
     await expect(page.locator('.hud-stats')).toContainText('SCORE:');
     await expect(page.locator('.hud-stats')).toContainText('SPEED:');
+    await expect(page.locator('.hud-stats')).toContainText('COMBO:');
+    await expect(page.locator('.hud-stats')).toContainText('SAFE:');
+
+    const upgradedState = await page.evaluate(() => {
+      const game = document.querySelector('.code-hop').__vue__;
+      game.obstacles = [];
+      game.powerups = [{
+        x: game.player.x + game.player.width / 2,
+        y: game.player.y + game.player.height / 2,
+        size: 34,
+        altitude: 100,
+        phase: 0,
+        taken: false,
+      }];
+      game.collectPowerups();
+      const shieldCollected = game.shielded;
+
+      game.obstacles = [{
+        x: game.player.x,
+        y: game.player.y,
+        width: game.player.width,
+        height: game.player.height,
+        passed: false,
+        flying: false,
+        destroyed: false,
+      }];
+      game.checkCollisions();
+      const recovered = game.gameState === 'playing'
+        && !game.shielded
+        && game.obstacles[0].destroyed;
+
+      game.obstacles = [];
+      game.worldIndex = 2;
+      game.elapsed = 0;
+      const realRandom = Math.random;
+      Math.random = () => 0;
+      game.spawnObstacle();
+      Math.random = realRandom;
+      const pairedObstacles = game.obstacles.length;
+
+      game.worldIndex = 1;
+      game.elapsed = 22.1;
+      game.updateWorld();
+      return {
+        shieldCollected,
+        recovered,
+        pairedObstacles,
+        world: game.worldIndex,
+        milestone: game.milestone.title,
+      };
+    });
+
+    expect(upgradedState).toEqual({
+      shieldCollected: true,
+      recovered: true,
+      pairedObstacles: 2,
+      world: 2,
+      milestone: 'WORLD 1-2',
+    });
+    await expect(page.locator('.code-hop')).toHaveAttribute('data-world', '2');
+    await expect(page.locator('.world-banner')).toContainText('CHECKPOINT +100');
     expect(errors).toEqual([]);
   });
 
