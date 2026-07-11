@@ -10,6 +10,7 @@ name = "soli-blue"
 compatibility_date = "2026-06-01"
 pages_build_output_dir = "dist"
 
-# Secret (set out-of-band, never commit):
+# Secrets (set out-of-band, never commit):
 #   npx wrangler pages secret put GOOGLE_AI_API_KEY
-# Used by functions/api/chat.js as env.GOOGLE_AI_API_KEY.
+#   npx wrangler pages secret put RESEND_API_KEY
+# Used by functions/api/chat.js and functions/api/contact.js.

@@ -30,6 +30,41 @@ test.describe('site smoke', () => {
     expect(errors).toEqual([]);
   });
 
+  test('Windows 95 contact form sends through the API', async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== 'chromium', 'Desktop shell flow is covered once.');
+    const errors = collectPageErrors(page);
+    let requestBody;
+
+    await page.route('**/api/contact', async (route) => {
+      requestBody = route.request().postDataJSON();
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ ok: true }),
+      });
+    });
+
+    await page.goto('/windows95');
+    await expect(page.locator('.boot-screen')).toBeHidden({ timeout: 8000 });
+    await page.locator('.desktop-icon', { hasText: 'Contact' }).dblclick();
+
+    await expect(page.locator('.titlebar-text', { hasText: 'New Message' })).toBeVisible();
+    await page.getByLabel('Your email').fill('visitor@example.com');
+    await page.getByLabel('Subject').fill('Website hello');
+    await page.getByLabel('Message').fill('This came through the contact form.');
+    await page.getByRole('button', { name: /Send/ }).click();
+
+    await expect(page.locator('.mail-status.success')).toContainText('Message sent');
+    await expect(page.getByLabel('Message')).toHaveValue('');
+    expect(requestBody).toEqual({
+      email: 'visitor@example.com',
+      subject: 'Website hello',
+      message: 'This came through the contact form.',
+      company: '',
+    });
+    expect(errors).toEqual([]);
+  });
+
   test('Pins route remains available as a standalone page', async ({ page }) => {
     const errors = collectPageErrors(page);
 

@@ -189,18 +189,63 @@
           <div class="mail-header">
             <div class="mail-field">
               <span>To:</span>
-              <input type="text" value="soli@soli.blue" readonly>
+              <input type="text" value="asoliman96@gmail.com" readonly aria-label="To">
+            </div>
+            <div class="mail-field">
+              <span>From:</span>
+              <input
+                type="email"
+                placeholder="you@example.com"
+                v-model="mailEmail"
+                autocomplete="email"
+                aria-label="Your email"
+              >
             </div>
             <div class="mail-field">
               <span>Subject:</span>
-              <input type="text" placeholder="Hello!" v-model="mailSubject">
+              <input
+                type="text"
+                placeholder="Hello!"
+                v-model="mailSubject"
+                maxlength="160"
+                aria-label="Subject"
+              >
             </div>
+            <input
+              class="mail-honeypot"
+              type="text"
+              v-model="mailCompany"
+              name="company"
+              autocomplete="off"
+              tabindex="-1"
+              aria-hidden="true"
+            >
           </div>
           <div class="mail-body">
-            <textarea placeholder="Type your message here..." v-model="mailBody"></textarea>
+            <textarea
+              placeholder="Type your message here..."
+              v-model="mailBody"
+              maxlength="5000"
+              aria-label="Message"
+            ></textarea>
+          </div>
+          <div
+            v-if="mailStatus"
+            class="mail-status"
+            :class="mailStatusType"
+            role="status"
+            aria-live="polite"
+          >
+            {{ mailStatus }}
           </div>
           <div class="mail-actions">
-            <button class="win95-btn" @click="sendMail">📧 Send</button>
+            <button
+              class="win95-btn"
+              :disabled="mailSending || !mailEmail.trim() || !mailBody.trim()"
+              @click="sendMail"
+            >
+              {{ mailSending ? 'Sending...' : '📧 Send' }}
+            </button>
             <button class="win95-btn" @click="openExternalLink('https://cal.com/solimeet/15min')">
               📅 Book a Call
             </button>
@@ -514,8 +559,13 @@ export default {
       contextMenu: { open: false, x: 0, y: 0 },
       refreshFlash: false,
       bsod: false,
+      mailEmail: '',
       mailSubject: '',
       mailBody: '',
+      mailCompany: '',
+      mailSending: false,
+      mailStatus: '',
+      mailStatusType: '',
       notepadDoc: { text: '', links: [] },
       icons: { doc: docIcon, folder: folderIcon },
       desktopIcons: [
@@ -1120,10 +1170,42 @@ export default {
       this.openNotepad(file.name, file.content);
     },
     // --- Contact ---
-    sendMail() {
-      const subject = encodeURIComponent(this.mailSubject || 'Hello!');
-      const body = encodeURIComponent(this.mailBody);
-      window.location.href = `mailto:soli@soli.blue?subject=${subject}&body=${body}`;
+    async sendMail() {
+      if (this.mailSending) return;
+
+      this.mailSending = true;
+      this.mailStatus = '';
+      this.mailStatusType = '';
+
+      try {
+        const response = await fetch('/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: this.mailEmail.trim(),
+            subject: this.mailSubject.trim(),
+            message: this.mailBody.trim(),
+            company: this.mailCompany,
+          }),
+        });
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Email could not be sent. Please try again.');
+        }
+
+        this.mailSubject = '';
+        this.mailBody = '';
+        this.mailStatus = 'Message sent. I will get back to you soon.';
+        this.mailStatusType = 'success';
+        this.playSound('send');
+      } catch (error) {
+        this.mailStatus = error.message || 'Email could not be sent. Please try again.';
+        this.mailStatusType = 'error';
+        this.playSound('error');
+      } finally {
+        this.mailSending = false;
+      }
     },
     // --- Misc ---
     goBrowserHome(win) {
@@ -1746,6 +1828,14 @@ export default {
   font-size: 11px;
 }
 
+.mail-honeypot {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
 .mail-body {
   flex: 1;
   padding: 8px;
@@ -1771,6 +1861,23 @@ export default {
   flex-wrap: wrap;
 }
 
+.mail-status {
+  margin: 0 8px;
+  padding: 4px 6px;
+  background: #ffffff;
+  border: 2px solid;
+  border-color: #808080 #ffffff #ffffff #808080;
+  line-height: 1.3;
+}
+
+.mail-status.success {
+  color: #006000;
+}
+
+.mail-status.error {
+  color: #800000;
+}
+
 /* Windows 95 Button */
 .win95-btn {
   background: #c0c0c0;
@@ -1785,6 +1892,12 @@ export default {
 
 .win95-btn:active {
   border-color: #404040 #ffffff #ffffff #404040;
+}
+
+.win95-btn:disabled {
+  color: #808080;
+  cursor: default;
+  text-shadow: 1px 1px #ffffff;
 }
 
 .win95-btn:focus {
