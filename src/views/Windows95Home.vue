@@ -323,7 +323,7 @@
               <img src="../assets/win95/home.svg" alt="Home">
             </button>
             <div class="browser-address">
-              <span>{{ win.browserUrl === 'local' ? 'file:///' : 'http://' }}</span>
+              <span>{{ win.browserUrl === 'local' ? 'file:///' : 'https://' }}</span>
               <select
                 v-model="win.browserUrl"
                 class="url-select"
@@ -331,16 +331,37 @@
               >
                 <option value="wikipedia">en.wikipedia.org/wiki/Soli</option>
                 <option value="newspaper">thedailysoli.com</option>
+                <option value="machtblick">machtblick.de/votes/</option>
+                <option value="songgpt">songgpt.soli.blue</option>
                 <option value="local">C:/DO_NOT_OPEN/readme.txt</option>
               </select>
             </div>
-            <button class="toolbar-btn" title="Refresh" @click="playSound('click')">
+            <button class="toolbar-btn" title="Refresh" @click="refreshBrowser(win)">
               <img src="../assets/win95/refresh.svg" alt="Refresh">
             </button>
           </div>
           <div class="browser-content">
             <WikipediaHome v-if="win.browserUrl === 'wikipedia'" :embedded="true" />
             <NewspaperHome v-if="win.browserUrl === 'newspaper'" :embedded="true" />
+            <iframe
+              v-if="win.browserUrl === 'songgpt'"
+              :key="`songgpt-${win.browserRefreshKey}`"
+              class="browser-frame"
+              src="https://songgpt.soli.blue/"
+              title="SongGPT"
+              allow="autoplay"
+            ></iframe>
+            <div v-if="win.browserUrl === 'machtblick'" class="browser-launch-page">
+              <img src="../assets/win95/globe.svg" alt="">
+              <h2>Machtblick</h2>
+              <p>
+                Bundestag votes, members, speeches, donations, and party histories in one place.
+              </p>
+              <button class="win95-btn" @click="openExternalLink('https://machtblick.de/votes/')">
+                Open machtblick.de
+              </button>
+              <small>This website opens in its own window.</small>
+            </div>
             <div v-if="win.browserUrl === 'local'" class="local-file-page">
               <div class="local-file-title">C:\DO_NOT_OPEN\readme.txt</div>
               <pre>There is no executable here anymore.
@@ -667,6 +688,14 @@ const BUDDY_REACTIONS = {
     'Fresh news from a deeply suspicious publication.',
     'Print is not dead. It is embedded in Vue.',
   ],
+  browserMachtblick: [
+    'Parliamentary transparency. Suddenly the browser looks responsible.',
+    'Votes, speeches, donations. Quite a lot for one little window.',
+  ],
+  browserSonggpt: [
+    'The browser is composing now. This should be interesting.',
+    'An LLM making music inside Internet Explorer. Historically inevitable.',
+  ],
   browserWikipedia: [
     'Neutral point of view mode activated.',
     'Citation needed, probably.',
@@ -814,7 +843,9 @@ const BUDDY_FRAMES = {
   browser: 'curious',
   browserHome: 'sit',
   browserLocal: 'curious',
+  browserMachtblick: 'curious',
   browserNewspaper: 'curious',
+  browserSonggpt: 'excited',
   browserWikipedia: 'curious',
   bsod: 'annoyed',
   close: 'blink',
@@ -1115,6 +1146,7 @@ export default {
           showMenu: false,
           contentClass: 'app-container',
           browserUrl: 'wikipedia',
+          browserRefreshKey: 0,
         },
         {
           id: 'messenger',
@@ -1943,10 +1975,17 @@ export default {
     narrateBrowser(url) {
       const reactions = {
         local: 'browserLocal',
+        machtblick: 'browserMachtblick',
         newspaper: 'browserNewspaper',
+        songgpt: 'browserSonggpt',
         wikipedia: 'browserWikipedia',
       };
       this.narrateBuddy(reactions[url]);
+    },
+    refreshBrowser(win) {
+      this.$set(win, 'browserRefreshKey', win.browserRefreshKey + 1);
+      this.narrateBuddy('refresh');
+      this.playSound('click');
     },
     openExternalLink(url) {
       this.narrateBuddy('external');
@@ -2526,6 +2565,46 @@ export default {
   flex: 1;
   overflow: hidden;
   background: white;
+}
+
+.browser-frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: white;
+}
+
+.browser-launch-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 24px;
+  color: #000000;
+  text-align: center;
+}
+
+.browser-launch-page img {
+  width: 48px;
+  height: 48px;
+}
+
+.browser-launch-page h2 {
+  margin: 10px 0 6px;
+  font-size: 20px;
+}
+
+.browser-launch-page p {
+  max-width: 420px;
+  margin: 0 0 16px;
+  line-height: 1.45;
+}
+
+.browser-launch-page small {
+  margin-top: 10px;
+  color: #555555;
 }
 
 .local-file-page {

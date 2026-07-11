@@ -69,6 +69,36 @@ test.describe('site smoke', () => {
     expect(errors).toEqual([]);
   });
 
+  test('Internet Explorer includes Machtblick and embedded SongGPT', async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== 'chromium', 'Desktop browser flow is covered once.');
+    const errors = collectPageErrors(page);
+
+    await page.route('https://songgpt.soli.blue/', route => route.fulfill({
+      contentType: 'text/html',
+      body: '<title>SongGPT test</title><main>SongGPT is framed</main>',
+    }));
+    await page.addInitScript(() => sessionStorage.setItem('soli95-booted', 'true'));
+    await page.goto('/windows95');
+    await page.locator('.desktop-icon', { hasText: 'Internet' }).dblclick();
+
+    const browserWindow = page.locator('.win95-window').filter({
+      has: page.locator('.titlebar-text', { hasText: 'Internet Explorer' }),
+    });
+    const address = browserWindow.locator('.url-select');
+    await address.selectOption('songgpt');
+    await expect(browserWindow.locator('.browser-frame')).toHaveAttribute(
+      'src',
+      'https://songgpt.soli.blue/',
+    );
+    await expect(browserWindow.locator('.browser-frame')).toHaveAttribute('title', 'SongGPT');
+
+    await address.selectOption('machtblick');
+    await expect(browserWindow.locator('.browser-launch-page')).toContainText('Machtblick');
+    await expect(browserWindow.getByRole('button', { name: 'Open machtblick.de' })).toBeVisible();
+    await expect(browserWindow.locator('.browser-frame')).toHaveCount(0);
+    expect(errors).toEqual([]);
+  });
+
   test('Windows 95 includes an always-on interactive squirrel', async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== 'chromium', 'Desktop pet behavior is covered once.');
     const errors = collectPageErrors(page);
