@@ -18,6 +18,7 @@ test.describe('site smoke', () => {
     await expect(page).toHaveURL(/\/windows95$/);
     await expect(page.locator('.boot-screen')).toBeHidden({ timeout: 8000 });
     await expect(page.locator('.titlebar-text', { hasText: 'About Me' })).toBeVisible();
+    await expect(page.locator('.about-content')).not.toContainText('ai engineer');
     await expect(page.locator('.desktop-icon', { hasText: 'World Pins' })).toHaveCount(0);
 
     await page.getByRole('button', { name: /start/i }).click();

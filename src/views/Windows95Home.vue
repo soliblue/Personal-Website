@@ -76,7 +76,6 @@
             <img src="../assets/win95/about.svg" class="about-icon">
             <div class="about-title">
               <h2>soli</h2>
-              <p>ai engineer</p>
             </div>
           </div>
           <div class="about-info">
@@ -2313,11 +2312,6 @@ export default {
   margin: 0;
   font-size: 16px;
   font-weight: bold;
-}
-
-.about-title p {
-  margin: 4px 0 0;
-  color: #404040;
 }
 
 .about-info {
