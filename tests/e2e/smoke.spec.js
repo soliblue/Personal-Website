@@ -21,6 +21,11 @@ test.describe('site smoke', () => {
     await expect(page.locator('.about-content')).not.toContainText('ai engineer');
     await expect(page.locator('.desktop-icon', { hasText: 'World Pins' })).toHaveCount(0);
 
+    await page.locator('.desktop-icon', { hasText: 'Resume' }).dblclick();
+    const knowunityRole = page.locator('.resume-item', { hasText: 'Knowunity' });
+    await expect(knowunityRole).toContainText('Staff AI Engineer');
+    await expect(knowunityRole.locator('.resume-date')).toHaveText('Sep 2025 - Present');
+
     await page.getByRole('button', { name: /start/i }).click();
     await expect(page.locator('.start-menu')).toBeVisible();
     await expect(page.locator('.start-menu')).not.toContainText('World Pins');

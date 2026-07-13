@@ -4,7 +4,7 @@ import pins from '../src/assets/pins.json';
 
 export const resume = {
   experience: [
-    { title: 'Senior AI Product Engineer', subtitle: 'Knowunity', url: 'https://knowunity.com', description: 'Building AI-powered educational products for 30 million students', start: 'Sep 2025', end: 'Present' },
+    { title: 'Staff AI Engineer', subtitle: 'Knowunity', url: 'https://knowunity.com', description: 'Building AI-powered educational products for 30 million students', start: 'Sep 2025', end: 'Present' },
     { title: 'Founder', subtitle: 'toy2life', url: 'https://toy2life.com', start: 'Sep 2024', end: 'Aug 2025' },
     { title: 'Founding CTO', subtitle: 'goaudio.ai', url: 'https://goaudio.ai', location: 'Berlin, Germany', start: 'Sep 2021', end: 'Aug 2024' },
     { title: 'DACH Marketplace Operations Manager', subtitle: 'Uber', url: 'https://uber.com', location: 'Berlin, Germany', start: 'Sep 2019', end: 'Aug 2021' },
@@ -76,7 +76,7 @@ export function generateMarkdown(path) {
 Egyptian AI engineer based in Germany. Passionate about AI, education, and building products.
 
 ## Currently
-- **Senior AI Product Engineer** at [Knowunity](https://knowunity.com) — Building AI-powered educational products for 30 million students (Sep 2025–Present)
+- **Staff AI Engineer** at [Knowunity](https://knowunity.com) — Building AI-powered educational products for 30 million students (Sep 2025–Present)
 
 ## Background
 - B.Sc. & M.Sc. Computer Science, RWTH Aachen University

@@ -120,7 +120,7 @@
           <div class="doc-body">
             <h1>CURRICULUM VITAE</h1>
             <h2>Soli</h2>
-            <p><strong>Current:</strong> AI Engineer @ Berlin</p>
+            <p><strong>Current:</strong> Staff AI Engineer @ Knowunity</p>
             <hr>
             <h3>EXPERIENCE</h3>
             <div v-for="(exp, i) in resume.experience" :key="'exp-'+i" class="resume-item">
