@@ -188,17 +188,40 @@
             </button>
             <span class="address-bar">C:\Projects\</span>
           </div>
-          <div class="explorer-body">
-            <div
-              v-for="(project, i) in sortedProjects"
-              :key="'proj-'+i"
-              class="folder-item clickable"
-              @dblclick="openProjectDoc(project)"
-              :title="project.description"
+          <div class="projects-browser-body">
+            <section
+              v-for="group in projectGroups"
+              :key="group.id"
+              class="project-group"
+              :class="'project-group-' + group.id"
             >
-              <img :src="icons.doc">
-              <span>{{ project.title }}.doc</span>
-            </div>
+              <div class="project-group-header">
+                <span class="project-status-dot" :class="group.id" aria-hidden="true"></span>
+                <span>{{ group.label }}</span>
+                <span class="project-group-count">{{ group.items.length }}</span>
+              </div>
+              <div class="project-grid">
+                <div
+                  v-for="project in group.items"
+                  :key="project.title"
+                  class="folder-item project-item clickable"
+                  tabindex="0"
+                  @dblclick="openProjectDoc(project)"
+                  @keyup.enter="openProjectDoc(project)"
+                  :title="project.description"
+                >
+                  <img :src="group.icon" :alt="group.iconAlt">
+                  <div class="project-file-label">
+                    <span
+                      class="project-status-dot project-file-dot"
+                      :class="group.id"
+                      aria-hidden="true"
+                    ></span>
+                    <span class="project-file-title">{{ project.title }}.doc</span>
+                  </div>
+                </div>
+              </div>
+            </section>
           </div>
           <div class="explorer-status">{{ projects.length }} object(s)</div>
         </div>
@@ -595,6 +618,8 @@ import codeHopIcon from '@/assets/codehop/claude-hops-mascot.png';
 import aboutIcon from '@/assets/win95/about.svg';
 import docIcon from '@/assets/win95/doc.svg';
 import folderIcon from '@/assets/win95/folder.svg';
+import projectLiveIcon from '@/assets/win95/project-live.svg';
+import projectArchiveIcon from '@/assets/win95/project-archive.svg';
 import computerIcon from '@/assets/win95/computer.svg';
 import mailIcon from '@/assets/win95/mail.svg';
 import networkIcon from '@/assets/win95/network.svg';
@@ -774,7 +799,7 @@ const BUDDY_REACTIONS = {
     'A strategic retreat to the taskbar.',
   ],
   projects: [
-    'Nine projects and at least eleven origin stories.',
+    'Ten projects and at least eleven origin stories.',
     'This folder has excellent sequel potential.',
     'Live projects first. The graveyard knows what it did.',
   ],
@@ -1084,8 +1109,8 @@ export default {
           maximized: false,
           x: 200,
           y: 120,
-          width: 450,
-          height: 350,
+          width: 560,
+          height: 430,
           zIndex: 10,
           showMenu: false,
           contentClass: '',
@@ -1282,14 +1307,24 @@ export default {
       if (this.computerPath === 'secret') return `${count} object(s) - You were warned`;
       return `${count} object(s)`;
     },
-    // Live projects first, then graveyard; each group newest-first by year.
-    sortedProjects() {
-      return this.projects.slice().sort((a, b) => {
-        const aLive = a.status !== 'graveyard';
-        const bLive = b.status !== 'graveyard';
-        if (aLive !== bLive) return aLive ? -1 : 1;
-        return Number(b.year) - Number(a.year);
-      });
+    projectGroups() {
+      const newestFirst = (a, b) => Number(b.year) - Number(a.year);
+      return [
+        {
+          id: 'live',
+          label: 'Live Projects',
+          icon: projectLiveIcon,
+          iconAlt: 'Live project',
+          items: this.projects.filter(project => project.status !== 'graveyard').sort(newestFirst),
+        },
+        {
+          id: 'archive',
+          label: 'Archive',
+          icon: projectArchiveIcon,
+          iconAlt: 'Archived project',
+          items: this.projects.filter(project => project.status === 'graveyard').sort(newestFirst),
+        },
+      ];
     },
   },
   created() {
@@ -1945,7 +1980,7 @@ export default {
       ].join('\n');
       const links = [];
       if (!dead) {
-        if (project.link) links.push({ label: 'Visit', url: project.link });
+        if (project.link) links.push({ label: project.linkLabel || 'Visit', url: project.link });
         if (project.github) links.push({ label: 'GitHub', url: project.github });
         if (project.press) links.push({ label: 'Press', url: project.press });
       }
@@ -2490,6 +2525,101 @@ export default {
   gap: 16px;
 }
 
+.projects-browser-body {
+  flex: 1;
+  padding: 8px;
+  background: #ffffff;
+  overflow: auto;
+}
+
+.project-group + .project-group {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #808080;
+}
+
+.project-group-header {
+  min-height: 22px;
+  padding: 2px 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #efefef;
+  border: 1px solid;
+  border-color: #ffffff #c0c0c0 #c0c0c0 #ffffff;
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.project-group-count {
+  margin-left: auto;
+  color: #606060;
+  font-weight: normal;
+}
+
+.project-status-dot {
+  width: 9px;
+  height: 9px;
+  flex: 0 0 9px;
+  border: 1px solid rgba(0, 0, 0, 0.28);
+  border-radius: 50%;
+  box-sizing: border-box;
+}
+
+.project-status-dot.live {
+  background: #9ed8a6;
+}
+
+.project-status-dot.archive {
+  background: #d9a2aa;
+}
+
+.project-grid {
+  padding: 8px 0 2px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 8px;
+  align-items: start;
+}
+
+.folder-item.project-item {
+  width: auto;
+  min-width: 0;
+  padding: 4px 2px;
+}
+
+.project-file-label {
+  width: 100%;
+  margin-top: 4px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 4px;
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+.project-file-dot {
+  width: 7px;
+  height: 7px;
+  flex-basis: 7px;
+  margin-top: 3px;
+}
+
+.project-file-title {
+  min-width: 0;
+  margin: 0;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+.project-item:hover .project-file-label,
+.project-item:focus .project-file-label {
+  background: #000080;
+  color: #ffffff;
+}
+
 .folder-item {
   display: flex;
   flex-direction: column;
@@ -2509,14 +2639,14 @@ export default {
   image-rendering: pixelated;
 }
 
-.folder-item span {
+.folder-item > span {
   text-align: center;
   margin-top: 4px;
   font-size: 11px;
   word-break: break-all;
 }
 
-.folder-item.clickable:hover span {
+.folder-item.clickable:hover > span {
   background: #000080;
   color: white;
 }

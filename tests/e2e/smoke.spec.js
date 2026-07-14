@@ -37,6 +37,27 @@ test.describe('site smoke', () => {
 
     await expect(page.locator('.titlebar-text', { hasText: 'Projects' })).toBeVisible();
     await expect(page.getByText('10 object(s)')).toBeVisible();
+    const projectsWindow = page.locator('.win95-window').filter({
+      has: page.locator('.titlebar-text', { hasText: 'Projects' }),
+    });
+    const projectGroups = projectsWindow.locator('.project-group');
+    await expect(
+      projectGroups.nth(0).locator('.project-group-header'),
+    ).toContainText('Live Projects');
+    await expect(projectGroups.nth(0).locator('.project-group-count')).toHaveText('4');
+    await expect(
+      projectGroups.nth(1).locator('.project-group-header'),
+    ).toContainText('Archive');
+    await expect(projectGroups.nth(1).locator('.project-group-count')).toHaveText('6');
+    await expect(projectsWindow.locator('.project-status-dot.live').first()).toBeVisible();
+    await expect(projectsWindow.locator('.project-status-dot.archive').first()).toBeVisible();
+    const machtblickFile = projectsWindow.locator(
+      '.project-item',
+      { hasText: 'machtblick.doc' },
+    );
+    await expect(machtblickFile.locator('img')).toHaveAttribute('alt', 'Live project');
+    await machtblickFile.dblclick();
+    await expect(page.getByRole('button', { name: 'App Store' })).toBeVisible();
     expect(errors).toEqual([]);
   });
 
@@ -297,7 +318,12 @@ test.describe('site smoke', () => {
 
     await page.goto('/projects');
     await expect(page.locator('.tabs button.active')).toHaveText('Live');
-    await expect(page.locator('.project', { hasText: 'machtblick' })).toBeVisible();
+    const machtblick = page.locator('.project', { hasText: 'machtblick' });
+    await expect(machtblick).toBeVisible();
+    await expect(machtblick.locator('a[title="App Store"]')).toHaveAttribute(
+      'href',
+      'https://apps.apple.com/de/app/machtblick/id6787755187',
+    );
 
     await page.getByRole('button', { name: 'Graveyard' }).click();
     await expect(page.locator('.tabs button.active')).toHaveText('Graveyard');
