@@ -7,7 +7,7 @@
     "description": "An iOS app to access and control Claude Code running on your MacBook or a Linux server - like Codex mobile, but for Claude. A daemon on your machine spawns the CLI and the app talks to it over HTTP: multiple sessions across multiple machines, each with chat, files, and git tabs. Live streaming output, image attachments, voice input, offline access to everything already on the phone, and streams resume exactly where they left off after a disconnect. Open source.",
     "link": "https://testflight.apple.com/join/x27e26xs",
     "github": "https://github.com/soliblue/cloude",
-    "status": "live"
+    "status": "graveyard"
   },
   {
     "title": "machtblick",

@@ -44,18 +44,31 @@ test.describe('site smoke', () => {
     await expect(
       projectGroups.nth(0).locator('.project-group-header'),
     ).toContainText('Live Projects');
-    await expect(projectGroups.nth(0).locator('.project-group-count')).toHaveText('4');
+    await expect(projectGroups.nth(0).locator('.project-group-count')).toHaveText('3');
     await expect(
       projectGroups.nth(1).locator('.project-group-header'),
     ).toContainText('Archive');
-    await expect(projectGroups.nth(1).locator('.project-group-count')).toHaveText('6');
+    await expect(projectGroups.nth(1).locator('.project-group-count')).toHaveText('7');
     await expect(projectsWindow.locator('.project-status-dot.live').first()).toBeVisible();
     await expect(projectsWindow.locator('.project-status-dot.archive').first()).toBeVisible();
+    await expect(projectsWindow).not.toContainText('.doc');
+    const remoteClaudeFile = projectGroups.nth(1).locator(
+      '.project-item',
+      { hasText: 'remote claude' },
+    );
+    await expect(remoteClaudeFile).toBeVisible();
+    await expect(remoteClaudeFile.locator('img')).toHaveAttribute(
+      'alt',
+      'remote claude icon',
+    );
     const machtblickFile = projectsWindow.locator(
       '.project-item',
-      { hasText: 'machtblick.doc' },
+      { hasText: 'machtblick' },
     );
-    await expect(machtblickFile.locator('img')).toHaveAttribute('alt', 'Live project');
+    await expect(machtblickFile.locator('img')).toHaveAttribute(
+      'alt',
+      'machtblick icon',
+    );
     await machtblickFile.dblclick();
     await expect(page.getByRole('button', { name: 'App Store' })).toBeVisible();
     expect(errors).toEqual([]);

@@ -210,14 +210,17 @@
                   @keyup.enter="openProjectDoc(project)"
                   :title="project.description"
                 >
-                  <img :src="group.icon" :alt="group.iconAlt">
+                  <img
+                    :src="projectIcons[project.title] || icons.folder"
+                    :alt="`${project.title} icon`"
+                  >
                   <div class="project-file-label">
                     <span
                       class="project-status-dot project-file-dot"
                       :class="group.id"
                       aria-hidden="true"
                     ></span>
-                    <span class="project-file-title">{{ project.title }}.doc</span>
+                    <span class="project-file-title">{{ project.title }}</span>
                   </div>
                 </div>
               </div>
@@ -618,8 +621,6 @@ import codeHopIcon from '@/assets/codehop/claude-hops-mascot.png';
 import aboutIcon from '@/assets/win95/about.svg';
 import docIcon from '@/assets/win95/doc.svg';
 import folderIcon from '@/assets/win95/folder.svg';
-import projectLiveIcon from '@/assets/win95/project-live.svg';
-import projectArchiveIcon from '@/assets/win95/project-archive.svg';
 import computerIcon from '@/assets/win95/computer.svg';
 import mailIcon from '@/assets/win95/mail.svg';
 import networkIcon from '@/assets/win95/network.svg';
@@ -640,6 +641,16 @@ import squirrelSit from '@/assets/win95/pet/squirrel-sit.png';
 import squirrelSleep from '@/assets/win95/pet/squirrel-sleep.png';
 import squirrelWalkA from '@/assets/win95/pet/squirrel-walk-a.png';
 import squirrelWalkB from '@/assets/win95/pet/squirrel-walk-b.png';
+import goaudioIcon from '@/assets/win95/projects/goaudio.svg';
+import habibiIcon from '@/assets/win95/projects/habibi.svg';
+import habibisIcon from '@/assets/win95/projects/habibis.svg';
+import happyIcon from '@/assets/win95/projects/happy.svg';
+import machtblickIcon from '@/assets/win95/projects/machtblick.svg';
+import memesAiIcon from '@/assets/win95/projects/memes-ai.svg';
+import piassoIcon from '@/assets/win95/projects/piasso.svg';
+import remoteClaudeIcon from '@/assets/win95/projects/remote-claude.svg';
+import songgptIcon from '@/assets/win95/projects/songgpt.svg';
+import toy2lifeIcon from '@/assets/win95/projects/toy2life.svg';
 
 const PET_SPRITES = {
   annoyed: squirrelAnnoyed,
@@ -652,6 +663,19 @@ const PET_SPRITES = {
   sleep: squirrelSleep,
   'walk-a': squirrelWalkA,
   'walk-b': squirrelWalkB,
+};
+
+const PROJECT_ICONS = {
+  'remote claude': remoteClaudeIcon,
+  machtblick: machtblickIcon,
+  goaudio: goaudioIcon,
+  songgpt: songgptIcon,
+  habibi: habibiIcon,
+  habibis: habibisIcon,
+  toy2life: toy2lifeIcon,
+  'memes ai': memesAiIcon,
+  happy: happyIcon,
+  piasso: piassoIcon,
 };
 
 // Tiny Web Audio synth: each sound is a list of [freq, startOffset, duration, waveType, volume]
@@ -976,6 +1000,7 @@ export default {
       mailStatusType: '',
       notepadDoc: { text: '', links: [] },
       petSprites: PET_SPRITES,
+      projectIcons: PROJECT_ICONS,
       icons: {
         computer: computerIcon,
         doc: docIcon,
@@ -1313,15 +1338,11 @@ export default {
         {
           id: 'live',
           label: 'Live Projects',
-          icon: projectLiveIcon,
-          iconAlt: 'Live project',
           items: this.projects.filter(project => project.status !== 'graveyard').sort(newestFirst),
         },
         {
           id: 'archive',
           label: 'Archive',
-          icon: projectArchiveIcon,
-          iconAlt: 'Archived project',
           items: this.projects.filter(project => project.status === 'graveyard').sort(newestFirst),
         },
       ];
