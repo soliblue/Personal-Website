@@ -641,6 +641,7 @@ import squirrelSit from '@/assets/win95/pet/squirrel-sit.png';
 import squirrelSleep from '@/assets/win95/pet/squirrel-sleep.png';
 import squirrelWalkA from '@/assets/win95/pet/squirrel-walk-a.png';
 import squirrelWalkB from '@/assets/win95/pet/squirrel-walk-b.png';
+import biddzIcon from '@/assets/win95/projects/biddz.svg';
 import goaudioIcon from '@/assets/win95/projects/goaudio.svg';
 import habibiIcon from '@/assets/win95/projects/habibi.svg';
 import habibisIcon from '@/assets/win95/projects/habibis.svg';
@@ -676,6 +677,7 @@ const PROJECT_ICONS = {
   'memes ai': memesAiIcon,
   happy: happyIcon,
   piasso: piassoIcon,
+  biddz: biddzIcon,
 };
 
 // Tiny Web Audio synth: each sound is a list of [freq, startOffset, duration, waveType, volume]
@@ -823,7 +825,7 @@ const BUDDY_REACTIONS = {
     'A strategic retreat to the taskbar.',
   ],
   projects: [
-    'Ten projects and at least eleven origin stories.',
+    '{projectCount} projects and at least as many origin stories.',
     'This folder has excellent sequel potential.',
     'Live projects first. The graveyard knows what it did.',
   ],
@@ -1649,7 +1651,8 @@ export default {
 
       const lines = BUDDY_REACTIONS[key];
       const index = this.buddyReactionIndexes[key] || 0;
-      this.buddyMessage = lines[index % lines.length];
+      this.buddyMessage = lines[index % lines.length]
+        .replace('{projectCount}', this.projects.length);
       this.buddyReactionIndexes[key] = index + 1;
       this.buddyMood = mood || BUDDY_MOODS[key] || 'curious';
       this.setBuddyFrame(BUDDY_FRAMES[key] || 'curious');

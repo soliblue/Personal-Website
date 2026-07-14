@@ -36,7 +36,8 @@ test.describe('site smoke', () => {
     await page.locator('.menu-item-row', { hasText: 'Projects' }).click();
 
     await expect(page.locator('.titlebar-text', { hasText: 'Projects' })).toBeVisible();
-    await expect(page.getByText('10 object(s)')).toBeVisible();
+    await expect(page.locator('.buddy-bubble')).toContainText('11 projects');
+    await expect(page.getByText('11 object(s)')).toBeVisible();
     const projectsWindow = page.locator('.win95-window').filter({
       has: page.locator('.titlebar-text', { hasText: 'Projects' }),
     });
@@ -48,7 +49,7 @@ test.describe('site smoke', () => {
     await expect(
       projectGroups.nth(1).locator('.project-group-header'),
     ).toContainText('Archive');
-    await expect(projectGroups.nth(1).locator('.project-group-count')).toHaveText('7');
+    await expect(projectGroups.nth(1).locator('.project-group-count')).toHaveText('8');
     await expect(projectsWindow.locator('.project-status-dot.live').first()).toBeVisible();
     await expect(projectsWindow.locator('.project-status-dot.archive').first()).toBeVisible();
     await expect(projectsWindow).not.toContainText('.doc');
@@ -61,6 +62,30 @@ test.describe('site smoke', () => {
       'alt',
       'remote claude icon',
     );
+    const biddzFile = projectGroups.nth(1).locator(
+      '.project-item',
+      { hasText: 'biddz' },
+    );
+    await expect(biddzFile).toBeVisible();
+    await expect(biddzFile.locator('img')).toHaveAttribute('alt', 'biddz icon');
+    const folderIconSrc = await page.locator(
+      '.desktop-icon',
+      { hasText: 'Projects' },
+    ).locator('img').getAttribute('src');
+    await expect(biddzFile.locator('img')).not.toHaveAttribute('src', folderIconSrc);
+    await biddzFile.dblclick();
+    const projectDocument = page.locator('.notepad-text');
+    await expect(projectDocument).toContainText('fans could support artists');
+    await expect(projectDocument).not.toContainText('fan-powered music funding');
+    await expect(projectDocument).not.toContainText('status:');
+    await expect(
+      page.locator('.titlebar-text', { hasText: 'biddz - Notepad' }),
+    ).toBeVisible();
+    await expect(page.locator('.notepad-links')).toHaveCount(0);
+    await page.locator('.win95-window').filter({
+      has: page.locator('.titlebar-text', { hasText: 'biddz - Notepad' }),
+    }).locator('.win-btn.close').click();
+
     const machtblickFile = projectsWindow.locator(
       '.project-item',
       { hasText: 'machtblick' },
@@ -70,7 +95,6 @@ test.describe('site smoke', () => {
       'machtblick icon',
     );
     await machtblickFile.dblclick();
-    const projectDocument = page.locator('.notepad-text');
     await expect(projectDocument).toContainText('A transparency platform');
     await expect(projectDocument).not.toContainText('MACHTBLICK');
     await expect(projectDocument).not.toContainText('bundestag transparency');

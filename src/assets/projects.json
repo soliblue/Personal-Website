@@ -92,5 +92,15 @@
     "link": "https://apps.apple.com/de/app/piasso-ai-assistant/id6444704118?l=en-GB",
     "press": "https://cairoscene.com/Buzz/Piasso-is-the-AI-Powered-Art-App-That-Can-Understand-Arabic",
     "status": "graveyard"
+  },
+  {
+    "title": "biddz",
+    "subtitle": "fan-powered music funding",
+    "year": "2022",
+    "tags": ["Music", "Fintech", "Mobile", "Web3"],
+    "description": "At biddz, I helped build a platform where fans could support artists by buying a share of a song's future streaming revenue. The app brought music discovery, checkout, digital biddzCards, portfolios, payouts, and artist communities into one place. It was an ambitious attempt to make music funding more direct and transparent; the original App Store app is no longer available.",
+    "website": "https://www.biddz.io/",
+    "appStoreId": "1608522898",
+    "status": "graveyard"
   }
 ]
