@@ -1988,24 +1988,19 @@ export default {
     openProjectDoc(project) {
       const dead = project.status === 'graveyard';
       const text = [
-        project.title.toUpperCase(),
-        '='.repeat(project.title.length + 8),
-        '',
-        project.subtitle,
-        `year: ${project.year}`,
-        `tags: ${project.tags.join(', ')}`,
-        '',
         project.description,
         '',
-        dead ? 'status: discontinued. rest in peace. 🪦' : 'status: live',
+        `year: ${project.year}`,
+        `tags: ${project.tags.join(', ')}`,
       ].join('\n');
       const links = [];
       if (!dead) {
+        if (project.website) links.push({ label: 'Website', url: project.website });
         if (project.link) links.push({ label: project.linkLabel || 'Visit', url: project.link });
         if (project.github) links.push({ label: 'GitHub', url: project.github });
         if (project.press) links.push({ label: 'Press', url: project.press });
       }
-      this.openNotepad(`${project.title}.doc`, text, links);
+      this.openNotepad(project.title, text, links);
     },
     openRecycleFile(file) {
       if (file.bsod) {

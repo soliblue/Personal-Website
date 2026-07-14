@@ -17,6 +17,7 @@
     "description": "A transparency platform for the German Bundestag. It makes votes, members, parties, speeches, questions, donations, and party histories easier to search and understand, with ETL pipelines that pull together public political data and AI-assisted summaries/translations where they help.",
     "link": "https://apps.apple.com/de/app/machtblick/id6787755187",
     "linkLabel": "App Store",
+    "website": "https://machtblick.de/",
     "status": "live"
   },
   {

@@ -2,12 +2,20 @@
   <div class="animated fadeIn">
     <BackButton />
     <div class="tabs">
-      <button :class="{ active: activeTab === 'live' }" @click="activeTab = 'live'">Live</button>
-      <button :class="{ active: activeTab === 'graveyard' }" @click="activeTab = 'graveyard'">Graveyard</button>
+      <button
+        :class="{ active: activeTab === 'live' }"
+        @click="activeTab = 'live'"
+      >Live</button>
+      <button
+        :class="{ active: activeTab === 'graveyard' }"
+        @click="activeTab = 'graveyard'"
+      >Graveyard</button>
     </div>
     <div class="disclaimer">
       <p>
-        I enjoy coding on my nights & weekends. I build stuff for fun or to learn how to use a library or language. Most, if not all, of the projects here should be seen as fun prototypes that sometimes made it a bit further than that.
+        I enjoy coding on my nights & weekends. I build stuff for fun or to learn
+        how to use a library or language. Most, if not all, of the projects here
+        should be seen as fun prototypes that sometimes made it a bit further than that.
       </p>
     </div>
     <div v-for="project in filteredProjects" class="project" :key="project.title">
@@ -21,10 +29,47 @@
           class="external-link"
           :title="project.linkLabel || 'Open project'"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
             <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
             <polyline points="15 3 21 3 21 9"></polyline>
             <line x1="10" y1="14" x2="21" y2="3"></line>
+          </svg>
+        </a>
+        <a
+          v-if="project.website"
+          :href="project.website"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="external-link"
+          title="Website"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="2" y1="12" x2="22" y2="12"></line>
+            <path
+              d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10
+                15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10Z"
+            ></path>
           </svg>
         </a>
         <a
@@ -55,9 +100,29 @@
             <path d="M9 18c-4.51 2-5-2-7-2"></path>
           </svg>
         </a>
-        <a v-if="project.press" :href="project.press" target="_blank" rel="noopener noreferrer" class="external-link" title="Press coverage">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"></path>
+        <a
+          v-if="project.press"
+          :href="project.press"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="external-link"
+          title="Press coverage"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16
+                a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"
+            ></path>
             <path d="M18 14h-8"></path>
             <path d="M15 18h-5"></path>
             <path d="M10 6h8v4h-8V6Z"></path>
@@ -66,7 +131,13 @@
       </h2>
       <p v-if="project.subtitle" class="subtitle">{{ project.subtitle }}</p>
       <p>
-        <span class="tag" v-for="tag in project.tags" :class="{ selected: selectedTags.includes(tag) }" :key="tag" @click="toggleTag(tag)">
+        <span
+          v-for="tag in project.tags"
+          :key="tag"
+          class="tag"
+          :class="{ selected: selectedTags.includes(tag) }"
+          @click="toggleTag(tag)"
+        >
           {{ tag }}
         </span>
       </p>

@@ -70,6 +70,15 @@ test.describe('site smoke', () => {
       'machtblick icon',
     );
     await machtblickFile.dblclick();
+    const projectDocument = page.locator('.notepad-text');
+    await expect(projectDocument).toContainText('A transparency platform');
+    await expect(projectDocument).not.toContainText('MACHTBLICK');
+    await expect(projectDocument).not.toContainText('bundestag transparency');
+    await expect(projectDocument).not.toContainText('status:');
+    await expect(
+      page.locator('.titlebar-text', { hasText: 'machtblick - Notepad' }),
+    ).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Website' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'App Store' })).toBeVisible();
     expect(errors).toEqual([]);
   });
@@ -336,6 +345,10 @@ test.describe('site smoke', () => {
     await expect(machtblick.locator('a[title="App Store"]')).toHaveAttribute(
       'href',
       'https://apps.apple.com/de/app/machtblick/id6787755187',
+    );
+    await expect(machtblick.locator('a[title="Website"]')).toHaveAttribute(
+      'href',
+      'https://machtblick.de/',
     );
 
     await page.getByRole('button', { name: 'Graveyard' }).click();
