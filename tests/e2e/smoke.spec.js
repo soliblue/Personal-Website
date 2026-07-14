@@ -58,7 +58,7 @@ test.describe('site smoke', () => {
       { hasText: 'remote claude' },
     );
     await expect(remoteClaudeFile).toBeVisible();
-    await expect(remoteClaudeFile.locator('img')).toHaveAttribute(
+    await expect(remoteClaudeFile.locator('.project-icon')).toHaveAttribute(
       'alt',
       'remote claude icon',
     );
@@ -67,43 +67,84 @@ test.describe('site smoke', () => {
       { hasText: 'biddz' },
     );
     await expect(biddzFile).toBeVisible();
-    await expect(biddzFile.locator('img')).toHaveAttribute('alt', 'biddz icon');
+    await expect(biddzFile).toHaveClass(/has-media/);
+    await expect(biddzFile.locator('.project-icon')).toHaveAttribute('alt', 'biddz icon');
+    await expect(biddzFile.locator('.project-media-marker')).toBeVisible();
     const folderIconSrc = await page.locator(
       '.desktop-icon',
       { hasText: 'Projects' },
     ).locator('img').getAttribute('src');
-    await expect(biddzFile.locator('img')).not.toHaveAttribute('src', folderIconSrc);
+    await expect(biddzFile.locator('.project-icon')).not.toHaveAttribute('src', folderIconSrc);
     await biddzFile.dblclick();
+    await expect(projectsWindow.locator('.project-explorer-address')).toHaveText(
+      'C:\\Projects\\biddz\\',
+    );
+    const biddzSummary = projectsWindow.locator('.project-folder-summary');
+    await expect(biddzSummary).toContainText('fans could support artists');
+    await expect(biddzSummary).not.toContainText('fan-powered music funding');
+    await expect(biddzSummary).not.toContainText('status:');
+    await expect(projectsWindow.locator('.project-summary-links')).toHaveCount(0);
+    const biddzImages = projectsWindow.locator('.project-media-file');
+    await expect(biddzImages).toHaveCount(4);
+    await expect(biddzImages.first()).toContainText('deal-dashboard.jpg');
+
+    await biddzImages.first().dblclick();
+    const imageViewer = page.locator('.win95-window').filter({
+      has: page.locator('.titlebar-text', { hasText: 'Image Preview' }),
+    });
+    await expect(imageViewer).toBeVisible();
+    await expect(imageViewer.locator('.image-viewer-count')).toHaveText('1 of 4');
+    await expect(imageViewer.locator('.image-viewer-stage img')).toHaveJSProperty(
+      'complete',
+      true,
+    );
+    await expect.poll(async () => imageViewer.locator(
+      '.image-viewer-stage img',
+    ).evaluate(image => image.naturalWidth)).toBeGreaterThan(0);
+    await imageViewer.getByRole('button', { name: 'Next image' }).click();
+    await expect(imageViewer.locator('.titlebar-text')).toContainText('live-deals.jpg');
+    await expect(imageViewer.locator('.image-viewer-count')).toHaveText('2 of 4');
+    await imageViewer.getByRole('button', { name: '100%' }).click();
+    await expect(imageViewer.locator('.image-viewer-stage')).toHaveClass(/actual/);
+    await page.keyboard.press('ArrowRight');
+    await expect(imageViewer.locator('.titlebar-text')).toContainText('purchase-flow.jpg');
+    await imageViewer.locator('.win-btn.close').click();
+
+    await projectsWindow.getByRole('button', { name: 'Up one level' }).click();
+    await expect(projectsWindow.locator('.project-explorer-address')).toHaveText(
+      'C:\\Projects\\',
+    );
+
+    await remoteClaudeFile.dblclick();
     const projectDocument = page.locator('.notepad-text');
-    await expect(projectDocument).toContainText('fans could support artists');
-    await expect(projectDocument).not.toContainText('fan-powered music funding');
+    await expect(projectDocument).toContainText('access and control Claude Code');
+    await expect(projectDocument).not.toContainText('claude code on your phone');
     await expect(projectDocument).not.toContainText('status:');
     await expect(
-      page.locator('.titlebar-text', { hasText: 'biddz - Notepad' }),
+      page.locator('.titlebar-text', { hasText: 'remote claude - Notepad' }),
     ).toBeVisible();
-    await expect(page.locator('.notepad-links')).toHaveCount(0);
     await page.locator('.win95-window').filter({
-      has: page.locator('.titlebar-text', { hasText: 'biddz - Notepad' }),
+      has: page.locator('.titlebar-text', { hasText: 'remote claude - Notepad' }),
     }).locator('.win-btn.close').click();
 
     const machtblickFile = projectsWindow.locator(
       '.project-item',
       { hasText: 'machtblick' },
     );
-    await expect(machtblickFile.locator('img')).toHaveAttribute(
+    await expect(machtblickFile.locator('.project-icon')).toHaveAttribute(
       'alt',
       'machtblick icon',
     );
     await machtblickFile.dblclick();
-    await expect(projectDocument).toContainText('A transparency platform');
-    await expect(projectDocument).not.toContainText('MACHTBLICK');
-    await expect(projectDocument).not.toContainText('bundestag transparency');
-    await expect(projectDocument).not.toContainText('status:');
-    await expect(
-      page.locator('.titlebar-text', { hasText: 'machtblick - Notepad' }),
-    ).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Website' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'App Store' })).toBeVisible();
+    await expect(projectsWindow.locator('.project-explorer-address')).toHaveText(
+      'C:\\Projects\\machtblick\\',
+    );
+    await expect(projectsWindow.locator('.project-folder-summary')).toContainText(
+      'A transparency platform',
+    );
+    await expect(projectsWindow.locator('.project-media-file')).toHaveCount(4);
+    await expect(projectsWindow.getByRole('button', { name: 'Website' })).toBeVisible();
+    await expect(projectsWindow.getByRole('button', { name: 'App Store' })).toBeVisible();
     expect(errors).toEqual([]);
   });
 
@@ -567,6 +608,43 @@ test.describe('site smoke', () => {
     await page.locator('.code-hop.embedded .panel button.primary').click();
     await expect(page.locator('.code-hop.embedded .overlay')).toBeHidden();
     await expect(page.locator('.code-hop.embedded .hud-brand')).toContainText('CLAUDE HOPS');
+    expect(errors).toEqual([]);
+  });
+
+  test('Windows 95 project folders reset their scroll position on mobile', async ({ page }) => {
+    test.skip(test.info().project.name !== 'mobile-chrome', 'Touch flow is covered once.');
+    const errors = collectPageErrors(page);
+
+    await page.goto('/windows95');
+    await expect(page.locator('.boot-screen')).toBeHidden({ timeout: 8000 });
+    await page.getByRole('button', { name: /start/i }).click();
+    await page.locator('.menu-item-row', { hasText: 'Projects' }).click();
+
+    const projectsWindow = page.locator('.win95-window').filter({
+      has: page.locator('.titlebar-text', { hasText: 'Projects' }),
+    });
+    const biddzFile = projectsWindow.locator('.project-item', { hasText: 'biddz' });
+    await biddzFile.scrollIntoViewIfNeeded();
+    await biddzFile.click();
+
+    await expect(projectsWindow.locator('.project-explorer-address')).toHaveText(
+      'C:\\Projects\\biddz\\',
+    );
+    const scrollState = await projectsWindow.evaluate((windowElement) => {
+      const content = windowElement.querySelector('.window-content');
+      const body = windowElement.querySelector('.project-folder-body');
+      const summary = windowElement.querySelector('.project-folder-summary');
+      return {
+        parentScrollTop: content.scrollTop,
+        paneScrollTop: body.scrollTop,
+        bodyTop: Math.round(body.getBoundingClientRect().top),
+        summaryTop: Math.round(summary.getBoundingClientRect().top),
+      };
+    });
+    expect(scrollState.parentScrollTop).toBe(0);
+    expect(scrollState.paneScrollTop).toBe(0);
+    expect(scrollState.summaryTop).toBeGreaterThanOrEqual(scrollState.bodyTop);
+    await expect(projectsWindow.locator('.project-media-file')).toHaveCount(4);
     expect(errors).toEqual([]);
   });
 

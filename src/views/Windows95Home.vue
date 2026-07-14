@@ -175,59 +175,18 @@
         </div>
 
         <!-- Projects Window -->
-        <div v-if="win.id === 'projects'" class="explorer-content">
-          <div class="explorer-toolbar">
-            <button class="toolbar-btn" disabled title="Back">
-              <img src="../assets/win95/back.svg" alt="Back">
-            </button>
-            <button class="toolbar-btn" disabled title="Forward">
-              <img src="../assets/win95/forward.svg" alt="Forward">
-            </button>
-            <button class="toolbar-btn" disabled title="Up">
-              <img src="../assets/win95/up.svg" alt="Up">
-            </button>
-            <span class="address-bar">C:\Projects\</span>
-          </div>
-          <div class="projects-browser-body">
-            <section
-              v-for="group in projectGroups"
-              :key="group.id"
-              class="project-group"
-              :class="'project-group-' + group.id"
-            >
-              <div class="project-group-header">
-                <span class="project-status-dot" :class="group.id" aria-hidden="true"></span>
-                <span>{{ group.label }}</span>
-                <span class="project-group-count">{{ group.items.length }}</span>
-              </div>
-              <div class="project-grid">
-                <div
-                  v-for="project in group.items"
-                  :key="project.title"
-                  class="folder-item project-item clickable"
-                  tabindex="0"
-                  @dblclick="openProjectDoc(project)"
-                  @keyup.enter="openProjectDoc(project)"
-                  :title="project.description"
-                >
-                  <img
-                    :src="projectIcons[project.title] || icons.folder"
-                    :alt="`${project.title} icon`"
-                  >
-                  <div class="project-file-label">
-                    <span
-                      class="project-status-dot project-file-dot"
-                      :class="group.id"
-                      aria-hidden="true"
-                    ></span>
-                    <span class="project-file-title">{{ project.title }}</span>
-                  </div>
-                </div>
-              </div>
-            </section>
-          </div>
-          <div class="explorer-status">{{ projects.length }} object(s)</div>
-        </div>
+        <ProjectExplorer
+          v-if="win.id === 'projects'"
+          :projects="projects"
+          :project-icons="projectIcons"
+          :project-media="projectMedia"
+          :folder-icon="icons.folder"
+          :is-touch="isTouch"
+          @open-document="openProjectDoc"
+          @open-image="openProjectImage"
+          @open-link="openExternalLink"
+          @folder-open="narrateProjectFolder"
+        />
 
         <!-- Notepad Window -->
         <div v-if="win.id === 'notepad'" class="notepad-content">
@@ -242,6 +201,67 @@
               {{ l.label }}
             </button>
           </div>
+        </div>
+
+        <!-- Image Preview Window -->
+        <div v-if="win.id === 'imageviewer'" class="image-viewer">
+          <template v-if="imageViewerImage">
+            <div class="image-viewer-toolbar">
+              <button
+                class="toolbar-btn"
+                :disabled="imageViewer.index === 0"
+                title="Previous image"
+                aria-label="Previous image"
+                @click="moveProjectImage(-1)"
+              >
+                <img src="../assets/win95/back.svg" alt="">
+              </button>
+              <button
+                class="toolbar-btn"
+                :disabled="imageViewer.index === imageViewerItems.length - 1"
+                title="Next image"
+                aria-label="Next image"
+                @click="moveProjectImage(1)"
+              >
+                <img src="../assets/win95/forward.svg" alt="">
+              </button>
+              <span class="image-viewer-divider"></span>
+              <div class="image-viewer-modes" aria-label="Image size">
+                <button
+                  :class="{ active: imageViewer.fit }"
+                  :aria-pressed="String(imageViewer.fit)"
+                  @click="setProjectImageFit(true)"
+                >
+                  Fit
+                </button>
+                <button
+                  :class="{ active: !imageViewer.fit }"
+                  :aria-pressed="String(!imageViewer.fit)"
+                  @click="setProjectImageFit(false)"
+                >
+                  100%
+                </button>
+              </div>
+              <span class="image-viewer-count">
+                {{ imageViewer.index + 1 }} of {{ imageViewerItems.length }}
+              </span>
+            </div>
+            <div
+              class="image-viewer-stage"
+              :class="{ actual: !imageViewer.fit }"
+              @dblclick="setProjectImageFit(!imageViewer.fit)"
+            >
+              <img
+                :src="imageViewerImage.src"
+                :alt="imageViewerImage.caption"
+                :class="{ fitted: imageViewer.fit }"
+              >
+            </div>
+            <div class="image-viewer-status">
+              <span>{{ imageViewerImage.name }}</span>
+              <span>{{ imageViewerImage.caption }}</span>
+            </div>
+          </template>
         </div>
 
         <!-- Contact Window -->
@@ -617,10 +637,13 @@ import CodeHopHome from '@/views/CodeHopHome';
 import MessengerApp from '@/components/win95/MessengerApp';
 import Minesweeper from '@/components/win95/Minesweeper';
 import PaintApp from '@/components/win95/PaintApp';
+import ProjectExplorer from '@/components/win95/ProjectExplorer';
+import projectMedia from '@/assets/project-media';
 import codeHopIcon from '@/assets/codehop/claude-hops-mascot.png';
 import aboutIcon from '@/assets/win95/about.svg';
 import docIcon from '@/assets/win95/doc.svg';
 import folderIcon from '@/assets/win95/folder.svg';
+import imageFileIcon from '@/assets/win95/image-file.svg';
 import computerIcon from '@/assets/win95/computer.svg';
 import mailIcon from '@/assets/win95/mail.svg';
 import networkIcon from '@/assets/win95/network.svg';
@@ -829,6 +852,14 @@ const BUDDY_REACTIONS = {
     'This folder has excellent sequel potential.',
     'Live projects first. The graveyard knows what it did.',
   ],
+  projectFolder: [
+    'A folder with evidence. Very professional.',
+    'Screenshots survived. The product archaeology is going well.',
+  ],
+  imageviewer: [
+    'Receipts! I love documentation.',
+    'A real screenshot. No mockup hand-waving required.',
+  ],
   paint: [
     'A blank canvas. Finally, a bug-free starting state.',
     'I will supervise the art direction from down here.',
@@ -896,6 +927,7 @@ const BUDDY_MOODS = {
   floppy: 'annoyed',
   minesweeper: 'focused',
   paint: 'focused',
+  imageviewer: 'excited',
   readme: 'suspicious',
   secret: 'suspicious',
   sendError: 'annoyed',
@@ -925,11 +957,13 @@ const BUDDY_FRAMES = {
   external: 'excited',
   floppy: 'annoyed',
   idle: 'sit',
+  imageviewer: 'excited',
   maximize: 'excited',
   minesweeper: 'curious',
   paint: 'curious',
   minimize: 'sit',
   projects: 'excited',
+  projectFolder: 'curious',
   readme: 'curious',
   recycle: 'excited',
   refresh: 'hop',
@@ -956,11 +990,13 @@ export default {
     MessengerApp,
     Minesweeper,
     PaintApp,
+    ProjectExplorer,
   },
   data() {
     return {
       resume,
       projects,
+      projectMedia,
       booting: true,
       bootProgress: 0,
       shuttingDown: false,
@@ -1001,6 +1037,11 @@ export default {
       mailStatus: '',
       mailStatusType: '',
       notepadDoc: { text: '', links: [] },
+      imageViewer: {
+        fit: true,
+        index: 0,
+        project: null,
+      },
       petSprites: PET_SPRITES,
       projectIcons: PROJECT_ICONS,
       icons: {
@@ -1156,6 +1197,21 @@ export default {
           zIndex: 10,
           showMenu: true,
           contentClass: '',
+        },
+        {
+          id: 'imageviewer',
+          title: 'Image Preview',
+          icon: imageFileIcon,
+          open: false,
+          minimized: false,
+          maximized: false,
+          x: 275,
+          y: 70,
+          width: 580,
+          height: 540,
+          zIndex: 10,
+          showMenu: false,
+          contentClass: 'image-viewer-host',
         },
         {
           id: 'contact',
@@ -1334,20 +1390,12 @@ export default {
       if (this.computerPath === 'secret') return `${count} object(s) - You were warned`;
       return `${count} object(s)`;
     },
-    projectGroups() {
-      const newestFirst = (a, b) => Number(b.year) - Number(a.year);
-      return [
-        {
-          id: 'live',
-          label: 'Live Projects',
-          items: this.projects.filter(project => project.status !== 'graveyard').sort(newestFirst),
-        },
-        {
-          id: 'archive',
-          label: 'Archive',
-          items: this.projects.filter(project => project.status === 'graveyard').sort(newestFirst),
-        },
-      ];
+    imageViewerItems() {
+      if (!this.imageViewer.project) return [];
+      return this.projectMedia[this.imageViewer.project.title] || [];
+    },
+    imageViewerImage() {
+      return this.imageViewerItems[this.imageViewer.index] || null;
     },
   },
   created() {
@@ -1975,6 +2023,16 @@ export default {
         this.dismissBsod();
         return;
       }
+      if (this.activeWindow === 'imageviewer' && e.key === 'ArrowLeft') {
+        e.preventDefault();
+        this.moveProjectImage(-1);
+        return;
+      }
+      if (this.activeWindow === 'imageviewer' && e.key === 'ArrowRight') {
+        e.preventDefault();
+        this.moveProjectImage(1);
+        return;
+      }
       if (e.key === 'Escape') this.closeMenus();
     },
     dismissBsod() {
@@ -2004,6 +2062,30 @@ export default {
         if (project.press) links.push({ label: 'Press', url: project.press });
       }
       this.openNotepad(project.title, text, links);
+    },
+    narrateProjectFolder() {
+      this.narrateBuddy('projectFolder');
+    },
+    openProjectImage({ project, index }) {
+      this.imageViewer.project = project;
+      this.imageViewer.fit = true;
+      this.setProjectImage(index);
+      this.openWindow('imageviewer');
+    },
+    setProjectImage(index) {
+      if (!this.imageViewerItems.length) return;
+      const boundedIndex = Math.max(0, Math.min(index, this.imageViewerItems.length - 1));
+      this.imageViewer.index = boundedIndex;
+      const win = this.windows.find(item => item.id === 'imageviewer');
+      win.title = `${this.imageViewerItems[boundedIndex].name} - Image Preview`;
+    },
+    moveProjectImage(offset) {
+      this.setProjectImage(this.imageViewer.index + offset);
+      this.playSound('click');
+    },
+    setProjectImageFit(fit) {
+      this.imageViewer.fit = fit;
+      this.playSound('click');
     },
     openRecycleFile(file) {
       if (file.bsod) {
@@ -2508,6 +2590,128 @@ export default {
   flex-wrap: wrap;
   background: #c0c0c0;
   border-top: 1px solid #808080;
+}
+
+/* Image Preview Window */
+.window-content.image-viewer-host {
+  overflow: hidden;
+  background: #c0c0c0;
+}
+
+.image-viewer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background: #c0c0c0;
+}
+
+.image-viewer-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 0 0 auto;
+  min-height: 30px;
+  padding: 3px 4px;
+  border-bottom: 1px solid #808080;
+}
+
+.image-viewer-divider {
+  width: 1px;
+  height: 20px;
+  margin: 0 3px;
+  background: #808080;
+  box-shadow: 1px 0 #ffffff;
+}
+
+.image-viewer-modes {
+  display: flex;
+}
+
+.image-viewer-modes button {
+  min-width: 42px;
+  height: 22px;
+  padding: 0 7px;
+  background: #c0c0c0;
+  border: 1px solid;
+  border-color: #ffffff #808080 #808080 #ffffff;
+  color: #000000;
+  font: inherit;
+  font-size: 10px;
+}
+
+.image-viewer-modes button + button {
+  margin-left: 2px;
+}
+
+.image-viewer-modes button.active,
+.image-viewer-modes button:active {
+  background: #d4d4d4;
+  border-color: #808080 #ffffff #ffffff #808080;
+  box-shadow: inset 1px 1px #808080;
+}
+
+.image-viewer-count {
+  margin-left: auto;
+  padding-right: 4px;
+  color: #404040;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.image-viewer-stage {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+  margin: 3px;
+  padding: 8px;
+  background: #666666;
+  border: 2px solid;
+  border-color: #404040 #ffffff #ffffff #404040;
+}
+
+.image-viewer-stage.actual {
+  display: block;
+}
+
+.image-viewer-stage img {
+  display: block;
+  width: auto;
+  height: auto;
+  margin: auto;
+  background: #ffffff;
+  box-shadow: 2px 2px 0 #303030;
+}
+
+.image-viewer-stage img.fitted {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.image-viewer-status {
+  display: grid;
+  grid-template-columns: minmax(90px, auto) minmax(0, 1fr);
+  gap: 8px;
+  flex: 0 0 auto;
+  min-height: 22px;
+  padding: 3px 6px;
+  border-top: 2px solid;
+  border-color: #808080 #ffffff #ffffff #808080;
+  font-size: 10px;
+}
+
+.image-viewer-status span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.image-viewer-status span:first-child {
+  font-weight: bold;
 }
 
 /* Explorer Window */
