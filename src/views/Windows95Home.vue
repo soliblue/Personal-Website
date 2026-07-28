@@ -22,26 +22,38 @@
       v-for="win in windows"
       :key="win.id"
       v-show="win.open && !win.minimized"
-      class="win95-window"
+      class="win95-window window"
       :class="{ active: win.id === activeWindow, maximized: win.maximized }"
       :style="getWindowStyle(win)"
       @pointerdown="focusWindow(win.id)"
     >
       <div
-        class="window-titlebar"
+        class="window-titlebar title-bar"
+        :class="{ inactive: win.id !== activeWindow }"
         @pointerdown="startDrag($event, win)"
         @dblclick="toggleMaximize(win)"
       >
         <div class="titlebar-left">
           <img :src="win.icon" class="titlebar-icon">
-          <span class="titlebar-text">{{ win.title }}</span>
+          <span class="titlebar-text title-bar-text">{{ win.title }}</span>
         </div>
-        <div class="titlebar-buttons">
-          <button class="win-btn minimize" @click.stop="minimizeWindow(win)">_</button>
-          <button class="win-btn maximize" @click.stop="toggleMaximize(win)">
-            {{ win.maximized ? '❐' : '□' }}
-          </button>
-          <button class="win-btn close" @click.stop="closeWindow(win)">×</button>
+        <div class="titlebar-buttons title-bar-controls">
+          <button
+            class="win-btn minimize"
+            aria-label="Minimize"
+            @click.stop="minimizeWindow(win)"
+          ></button>
+          <button
+            class="win-btn"
+            :class="win.maximized ? 'restore' : 'maximize'"
+            :aria-label="win.maximized ? 'Restore' : 'Maximize'"
+            @click.stop="toggleMaximize(win)"
+          ></button>
+          <button
+            class="win-btn close"
+            aria-label="Close"
+            @click.stop="closeWindow(win)"
+          ></button>
         </div>
       </div>
       <div class="window-menubar" v-if="win.showMenu">
@@ -499,7 +511,11 @@ The squirrel got here first.</pre>
 
     <!-- Taskbar -->
     <div class="taskbar">
-      <button class="start-button" @click.stop="toggleStartMenu">
+      <button
+        class="start-button"
+        :class="{ active: startMenuOpen }"
+        @click.stop="toggleStartMenu"
+      >
         <img src="../assets/win95/start.svg" alt="">
         <span>Start</span>
       </button>
@@ -2166,6 +2182,24 @@ export default {
 </script>
 
 <style scoped>
+@font-face {
+  font-family: 'Pixelated MS Sans Serif';
+  src:
+    url('~98.css/dist/ms_sans_serif.woff2') format('woff2'),
+    url('~98.css/dist/ms_sans_serif.woff') format('woff');
+  font-style: normal;
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: 'Pixelated MS Sans Serif';
+  src:
+    url('~98.css/dist/ms_sans_serif_bold.woff2') format('woff2'),
+    url('~98.css/dist/ms_sans_serif_bold.woff') format('woff');
+  font-style: normal;
+  font-weight: 700;
+}
+
 /* Block all external animations */
 .win95-desktop,
 .win95-desktop * {
@@ -2181,7 +2215,8 @@ export default {
   width: calc(100vw / 0.9);
   height: calc(100vh / 0.9);
   background: #008080;
-  font-family: 'MS Sans Serif', 'Segoe UI', Tahoma, sans-serif;
+  font-family: 'Pixelated MS Sans Serif', Arial, sans-serif;
+  -webkit-font-smoothing: none;
   font-size: 11px;
   overflow: hidden;
   cursor: default;
@@ -2270,13 +2305,18 @@ export default {
 .win95-window {
   position: absolute;
   background: #c0c0c0;
-  border: 2px solid;
-  border-color: #ffffff #404040 #404040 #ffffff;
-  box-shadow: inset 1px 1px 0 #dfdfdf, inset -1px -1px 0 #808080;
+  border: 0;
+  box-shadow:
+    inset -1px -1px #0a0a0a,
+    inset 1px 1px #dfdfdf,
+    inset -2px -2px #808080,
+    inset 2px 2px #ffffff;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   min-width: 200px;
   min-height: 150px;
+  padding: 3px;
 }
 
 .win95-window.active .window-titlebar {
@@ -2284,14 +2324,14 @@ export default {
 }
 
 .win95-window:not(.active) .window-titlebar {
-  background: #808080;
+  background: linear-gradient(90deg, #808080, #b5b5b5);
 }
 
 .window-titlebar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 2px 3px;
+  padding: 3px 2px 3px 3px;
   color: white;
   font-weight: bold;
   cursor: move;
@@ -2312,6 +2352,7 @@ export default {
 }
 
 .titlebar-text {
+  margin-right: 24px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -2319,15 +2360,19 @@ export default {
 
 .titlebar-buttons {
   display: flex;
-  gap: 2px;
+  gap: 0;
 }
 
 .win-btn {
   width: 16px;
   height: 14px;
   background: #c0c0c0;
-  border: 2px solid;
-  border-color: #ffffff #404040 #404040 #ffffff;
+  border: 0;
+  box-shadow:
+    inset -1px -1px #0a0a0a,
+    inset 1px 1px #ffffff,
+    inset -2px -2px #808080,
+    inset 2px 2px #dfdfdf;
   font-size: 9px;
   font-weight: bold;
   cursor: pointer;
@@ -2339,11 +2384,40 @@ export default {
 }
 
 .win-btn:active {
-  border-color: #404040 #ffffff #ffffff #404040;
+  box-shadow:
+    inset -1px -1px #ffffff,
+    inset 1px 1px #0a0a0a,
+    inset -2px -2px #dfdfdf,
+    inset 2px 2px #808080;
+}
+
+.win-btn:focus {
+  outline: none;
+}
+
+.win-btn.minimize {
+  background-image: url('~98.css/icon/minimize.svg');
+  background-position: bottom 3px left 4px;
+  background-repeat: no-repeat;
+}
+
+.win-btn.maximize {
+  background-image: url('~98.css/icon/maximize.svg');
+  background-position: top 2px left 3px;
+  background-repeat: no-repeat;
+}
+
+.win-btn.restore {
+  background-image: url('~98.css/icon/restore.svg');
+  background-position: top 2px left 3px;
+  background-repeat: no-repeat;
 }
 
 .win-btn.close {
-  color: black;
+  margin-left: 2px;
+  background-image: url('~98.css/icon/close.svg');
+  background-position: top 3px left 4px;
+  background-repeat: no-repeat;
 }
 
 .window-menubar {
@@ -2487,8 +2561,12 @@ export default {
   width: 24px;
   height: 22px;
   background: #c0c0c0;
-  border: 1px solid;
-  border-color: #ffffff #808080 #808080 #ffffff;
+  border: 0;
+  box-shadow:
+    inset -1px -1px #0a0a0a,
+    inset 1px 1px #ffffff,
+    inset -2px -2px #808080,
+    inset 2px 2px #dfdfdf;
   cursor: pointer;
   padding: 0;
   display: flex;
@@ -2505,7 +2583,11 @@ export default {
 }
 
 .toolbar-btn:not(:disabled):active {
-  border-color: #808080 #ffffff #ffffff #808080;
+  box-shadow:
+    inset -1px -1px #ffffff,
+    inset 1px 1px #0a0a0a,
+    inset -2px -2px #dfdfdf,
+    inset 2px 2px #808080;
 }
 
 .toolbar-btn:disabled {
@@ -3096,9 +3178,14 @@ export default {
 /* Windows 95 Button */
 .win95-btn {
   background: #c0c0c0;
-  border: 2px solid;
-  border-color: #ffffff #404040 #404040 #ffffff;
-  padding: 4px 16px;
+  border: 0;
+  box-shadow:
+    inset -1px -1px #0a0a0a,
+    inset 1px 1px #ffffff,
+    inset -2px -2px #808080,
+    inset 2px 2px #dfdfdf;
+  min-height: 23px;
+  padding: 0 12px;
   font-family: inherit;
   font-size: 11px;
   cursor: pointer;
@@ -3106,7 +3193,12 @@ export default {
 }
 
 .win95-btn:active {
-  border-color: #404040 #ffffff #ffffff #404040;
+  box-shadow:
+    inset -1px -1px #ffffff,
+    inset 1px 1px #0a0a0a,
+    inset -2px -2px #dfdfdf,
+    inset 2px 2px #808080;
+  text-shadow: 1px 1px #222222;
 }
 
 .win95-btn:disabled {
@@ -3314,8 +3406,12 @@ export default {
   gap: 4px;
   padding: 2px 6px;
   background: #c0c0c0;
-  border: 2px solid;
-  border-color: #ffffff #404040 #404040 #ffffff;
+  border: 0;
+  box-shadow:
+    inset -1px -1px #0a0a0a,
+    inset 1px 1px #ffffff,
+    inset -2px -2px #808080,
+    inset 2px 2px #dfdfdf;
   font-family: inherit;
   font-size: 11px;
   font-weight: bold;
@@ -3323,8 +3419,14 @@ export default {
   height: 22px;
 }
 
-.start-button:active {
-  border-color: #404040 #ffffff #ffffff #404040;
+.start-button:active,
+.start-button.active {
+  box-shadow:
+    inset -1px -1px #ffffff,
+    inset 1px 1px #0a0a0a,
+    inset -2px -2px #dfdfdf,
+    inset 2px 2px #808080;
+  text-shadow: 1px 1px #222222;
 }
 
 .start-button img {
@@ -3356,8 +3458,12 @@ export default {
   min-width: 120px;
   max-width: 160px;
   background: #c0c0c0;
-  border: 2px solid;
-  border-color: #ffffff #404040 #404040 #ffffff;
+  border: 0;
+  box-shadow:
+    inset -1px -1px #0a0a0a,
+    inset 1px 1px #ffffff,
+    inset -2px -2px #808080,
+    inset 2px 2px #dfdfdf;
   font-family: inherit;
   font-size: 11px;
   cursor: pointer;
@@ -3366,8 +3472,12 @@ export default {
 }
 
 .taskbar-window.active {
-  border-color: #404040 #ffffff #ffffff #404040;
   background: #a0a0a0;
+  box-shadow:
+    inset -1px -1px #ffffff,
+    inset 1px 1px #0a0a0a,
+    inset -2px -2px #dfdfdf,
+    inset 2px 2px #808080;
 }
 
 .taskbar-window img {

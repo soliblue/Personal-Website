@@ -12,6 +12,7 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "98.css": "^0.1.21",
     "marked": "^4.3.0",
     "vue": "^2.5.2",
     "vue-router": "^3.0.1"
