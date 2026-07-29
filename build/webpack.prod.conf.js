@@ -136,8 +136,8 @@ const webpackConfig = merge(baseWebpackConfig, {
         to: '[name]'
       },
       {
-        from: path.resolve(__dirname, '../static/asset-not-found.txt'),
-        to: 'asset-not-found.txt'
+        from: path.resolve(__dirname, '../static/404.html'),
+        to: '404.html'
       }
     ])
   ]

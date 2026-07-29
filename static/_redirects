@@ -1,2 +1,13 @@
-/static/* /asset-not-found.txt 404
-/* /index.html 200
+/ /index.html 200
+/animation /index.html 200
+/terminal /index.html 200
+/newspaper /index.html 200
+/windows95 /index.html 200
+/wikipedia /index.html 200
+/space /index.html 200
+/code-hop /index.html 200
+/home /index.html 200
+/pins /index.html 200
+/resume /index.html 200
+/projects /index.html 200
+/apps/* /index.html 200
