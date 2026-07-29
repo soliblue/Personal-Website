@@ -14,7 +14,12 @@
         <div class="msg-sender" :class="msg.role === 'assistant' ? 'sender-soli' : 'sender-you'">
           {{ msg.role === 'assistant' ? 'soli says:' : 'you say:' }}
         </div>
-        <div class="msg-body">{{ msg.content }}</div>
+        <div
+          v-if="msg.role === 'assistant'"
+          class="msg-body markdown-body"
+          v-html="renderMarkdown(msg.content)"
+        ></div>
+        <div v-else class="msg-body">{{ msg.content }}</div>
       </div>
       <div v-if="isSending" class="msg typing-indicator">soli is typing...</div>
     </div>
@@ -45,8 +50,29 @@
 </template>
 
 <script>
+import { marked } from 'marked/lib/marked.cjs';
+
 const MAX_MESSAGE_LENGTH = 1200; // mirrors functions/api/chat.js
 const MAX_HISTORY = 12;
+
+const escapeHtml = value => String(value)
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;')
+  .replace(/'/g, '&#39;');
+
+const markdownRenderer = new marked.Renderer();
+
+markdownRenderer.html = html => escapeHtml(html);
+markdownRenderer.image = (href, title, text) => escapeHtml(text || '');
+markdownRenderer.link = (href, title, text) => {
+  const safeHref = /^(https?:\/\/|mailto:|\/(?!\/)|#)/i.test(href || '');
+  if (!safeHref) return text;
+
+  const titleAttribute = title ? ` title="${escapeHtml(title)}"` : '';
+  return `<a href="${escapeHtml(href)}"${titleAttribute} target="_blank" rel="noopener noreferrer">${text}</a>`;
+};
 
 export default {
   name: 'MessengerApp',
@@ -67,6 +93,14 @@ export default {
     this.scrollToBottom();
   },
   methods: {
+    renderMarkdown(content) {
+      return marked(content || '', {
+        renderer: markdownRenderer,
+        headerIds: false,
+        mangle: false,
+        breaks: true,
+      });
+    },
     async sendMessage() {
       const input = this.draft.trim();
       if (!input || this.isSending) return;
@@ -137,10 +171,11 @@ export default {
   display: flex;
   flex-direction: column;
   height: 100%;
+  box-sizing: border-box;
   background: #c0c0c0;
   font-family: 'MS Sans Serif', 'Segoe UI', Tahoma, sans-serif;
   font-size: 11px;
-  padding: 4px;
+  padding: 4px 4px 8px;
 }
 
 .messenger-status {
@@ -222,6 +257,65 @@ export default {
   color: #000000;
   white-space: pre-wrap;
   word-break: break-word;
+}
+
+.markdown-body {
+  white-space: normal;
+}
+
+.markdown-body >>> p {
+  margin: 0 0 6px;
+}
+
+.markdown-body >>> p:last-child {
+  margin-bottom: 0;
+}
+
+.markdown-body >>> a {
+  color: #0000ee;
+  text-decoration: underline;
+}
+
+.markdown-body >>> ul,
+.markdown-body >>> ol {
+  margin: 4px 0 6px;
+  padding-left: 22px;
+}
+
+.markdown-body >>> li {
+  margin-bottom: 2px;
+}
+
+.markdown-body >>> h1,
+.markdown-body >>> h2,
+.markdown-body >>> h3 {
+  margin: 6px 0 4px;
+  font-size: 11px;
+}
+
+.markdown-body >>> code {
+  padding: 1px 2px;
+  background: #e8e8e8;
+  font-family: 'Courier New', monospace;
+}
+
+.markdown-body >>> pre {
+  margin: 4px 0 6px;
+  padding: 5px;
+  overflow-x: auto;
+  background: #e8e8e8;
+  border: 1px solid #808080;
+  white-space: pre-wrap;
+}
+
+.markdown-body >>> pre code {
+  padding: 0;
+}
+
+.markdown-body >>> blockquote {
+  margin: 4px 0 6px 8px;
+  padding-left: 7px;
+  border-left: 2px solid #808080;
 }
 
 .typing-indicator {

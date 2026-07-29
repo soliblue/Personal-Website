@@ -183,6 +183,56 @@ test.describe('site smoke', () => {
     expect(errors).toEqual([]);
   });
 
+  test('Messenger renders safe Markdown with comfortable composer spacing', async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== 'chromium', 'Desktop messenger flow is covered once.');
+    const errors = collectPageErrors(page);
+
+    await page.route('**/api/chat', route => route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({
+        response: [
+          '**Useful link:** [Machtblick](https://machtblick.de/)',
+          '',
+          '- One thing',
+          '- Another thing',
+          '',
+          '<script>window.messengerXss = true</script>',
+          '![Tracker](https://example.com/pixel.gif)',
+          '[Unsafe link](javascript:window.messengerXss=true)',
+        ].join('\n'),
+      }),
+    }));
+
+    await page.addInitScript(() => sessionStorage.setItem('soli95-booted', 'true'));
+    await page.goto('/windows95');
+    await page.locator('.desktop-icon', { hasText: 'Messenger' }).dblclick();
+    await page.getByPlaceholder('Type a message...').fill('Show me a project');
+    await page.getByRole('button', { name: 'Send' }).click();
+
+    const reply = page.locator('.msg', { hasText: 'Useful link:' });
+    await expect(reply.locator('strong')).toHaveText('Useful link:');
+    await expect(reply.locator('li')).toHaveCount(2);
+    await expect(reply.getByRole('link', { name: 'Machtblick' })).toHaveAttribute(
+      'href',
+      'https://machtblick.de/',
+    );
+    await expect(reply.getByRole('link', { name: 'Machtblick' })).toHaveAttribute(
+      'rel',
+      'noopener noreferrer',
+    );
+    await expect(reply.locator('script')).toHaveCount(0);
+    await expect(reply.locator('img')).toHaveCount(0);
+    await expect(reply.getByRole('link', { name: 'Unsafe link' })).toHaveCount(0);
+    await expect.poll(() => page.evaluate(() => window.messengerXss)).not.toBe(true);
+
+    const bottomGap = await page.locator('.messenger-app').evaluate((app) => {
+      const composer = app.querySelector('.messenger-input-area');
+      return app.getBoundingClientRect().bottom - composer.getBoundingClientRect().bottom;
+    });
+    expect(bottomGap).toBeGreaterThanOrEqual(6);
+    expect(errors).toEqual([]);
+  });
+
   test('Internet Explorer includes Machtblick and embedded SongGPT', async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== 'chromium', 'Desktop browser flow is covered once.');
     const errors = collectPageErrors(page);

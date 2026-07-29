@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import { marked } from 'marked';
+import { marked } from 'marked/lib/marked.cjs';
 
 const escapeHtml = value => String(value)
   .replace(/&/g, '&amp;')
