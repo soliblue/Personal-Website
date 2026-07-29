@@ -2215,8 +2215,7 @@ export default {
   width: calc(100vw / 0.9);
   height: calc(100vh / 0.9);
   background: #008080;
-  font-family: 'Pixelated MS Sans Serif', Arial, sans-serif;
-  -webkit-font-smoothing: none;
+  font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
   font-size: 11px;
   overflow: hidden;
   cursor: default;
@@ -2352,6 +2351,8 @@ export default {
 }
 
 .titlebar-text {
+  font-family: 'Pixelated MS Sans Serif', Arial, sans-serif;
+  -webkit-font-smoothing: none;
   margin-right: 24px;
   white-space: nowrap;
   overflow: hidden;
