@@ -18,6 +18,10 @@
 
 /windows95
   Link: </api/md/windows95>; rel="alternate"; type="text/markdown"
+  Cache-Control: no-store
+
+/index.html
+  Cache-Control: no-store
 
 /sitemap.xml
   Content-Type: application/xml; charset=utf-8
@@ -26,7 +30,7 @@
   Content-Type: text/plain; charset=utf-8
 
 /static/js/*
-  Cache-Control: public, max-age=31536000, immutable
+  Cache-Control: public, max-age=0, must-revalidate
 
 /static/css/*
-  Cache-Control: public, max-age=31536000, immutable
+  Cache-Control: public, max-age=0, must-revalidate

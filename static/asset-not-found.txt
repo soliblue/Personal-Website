@@ -1,0 +1,1 @@
+Static asset not found. Reload the page to fetch the current application version.
