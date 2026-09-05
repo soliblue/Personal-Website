@@ -1,3 +1,4 @@
+import { isAllowedOrigin, readJson } from '../_security.js';
 // Cloudflare Pages Function - GET/POST /api/visitor-board
 // Stores a deliberately constrained public guestbook in D1.
 
@@ -25,28 +26,6 @@ const ALLOWED_MESSAGES = new Set([
 const RESERVED_NAMES = new Set([
   'admin', 'administrator', 'moderator', 'soli', 'system', 'visitor board',
 ]);
-const ALLOWED_ORIGINS = new Set([
-  'https://soli.blue',
-  'https://www.soli.blue',
-  'https://soli-blue.pages.dev',
-  'http://localhost:8080',
-  'http://localhost:8081',
-  'http://localhost:8082',
-  'http://localhost:8788',
-]);
-
-const isAllowedOrigin = (request) => {
-  const origin = request.headers.get('Origin');
-  if (!origin || ALLOWED_ORIGINS.has(origin)) return true;
-
-  try {
-    const { hostname, protocol } = new URL(origin);
-    return protocol === 'https:' && hostname.endsWith('.soli-blue.pages.dev');
-  } catch (error) {
-    return false;
-  }
-};
-
 const getCorsHeaders = (request) => {
   const origin = request.headers.get('Origin');
   if (!origin || !isAllowedOrigin(request)) return {};
@@ -150,6 +129,7 @@ export const onRequestGet = async ({ request, env }) => {
       total: Number((totalResult && totalResult.count) || 0),
     });
   } catch (error) {
+    if (error.status) return json(request, { error: error.message }, error.status);
     console.error('Visitor Board read error:', error);
     return json(request, { error: 'The board could not be loaded.' }, 500);
   }
@@ -166,26 +146,7 @@ export const onRequestPost = async ({ request, env }) => {
   }
 
   try {
-    if (!/^application\/json(?:;|$)/i.test(request.headers.get('Content-Type') || '')) {
-      return json(request, { error: 'Content-Type must be application/json.' }, 415);
-    }
-
-    const contentLength = Number(request.headers.get('Content-Length') || 0);
-    if (contentLength > MAX_BODY_BYTES) {
-      return json(request, { error: 'That note is too large.' }, 413);
-    }
-
-    const bodyText = await request.text();
-    if (new TextEncoder().encode(bodyText).length > MAX_BODY_BYTES) {
-      return json(request, { error: 'That note is too large.' }, 413);
-    }
-
-    let payload;
-    try {
-      payload = JSON.parse(bodyText);
-    } catch (error) {
-      return json(request, { error: 'Invalid request.' }, 400);
-    }
+    const payload = await readJson(request, MAX_BODY_BYTES);
 
     // Quietly accept generic form-bot submissions without writing anything.
     if (String(payload.website || '').trim()) return json(request, { ok: true });
@@ -259,6 +220,7 @@ export const onRequestPost = async ({ request, env }) => {
 
     return json(request, { ok: true, entry: serializeEntry(row) }, 201);
   } catch (error) {
+    if (error.status) return json(request, { error: error.message }, error.status);
     console.error('Visitor Board write error:', error);
     return json(request, { error: 'The note could not be pinned. Please try again.' }, 500);
   }

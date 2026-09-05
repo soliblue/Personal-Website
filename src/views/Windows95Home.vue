@@ -6,11 +6,14 @@
         v-for="icon in desktopIcons"
         :key="icon.id"
         class="desktop-icon"
+        role="button"
+        :aria-label="icon.label"
         :class="{ selected: selectedIcon === icon.id, recycle: icon.id === 'recycle' }"
         tabindex="0"
         @click.stop="iconClick(icon)"
         @dblclick="activateIcon(icon)"
         @keyup.enter="activateIcon(icon)"
+        @keydown.space.prevent="activateIcon(icon)"
       >
         <img :src="icon.img" :alt="icon.label" :class="icon.imgClass">
         <span>{{ icon.label }}</span>
@@ -656,6 +659,8 @@ The squirrel got here first.</pre>
 </template>
 
 <script>
+import { safeStorage, safeSessionStorage } from '@/utils/storage';
+
 import resume from '@/assets/resume.json';
 import projects from '@/assets/projects.json';
 import TerminalHome from '@/views/TerminalHome';
@@ -1055,7 +1060,7 @@ export default {
       dragging: null,
       resizing: null,
       dragOffset: { x: 0, y: 0 },
-      soundOn: localStorage.getItem('soli95-sound') !== 'off',
+      soundOn: safeStorage.getItem('soli95-sound') !== 'off',
       selectedIcon: null,
       isTouch: false,
       openMenu: null,
@@ -1491,7 +1496,10 @@ export default {
       themeToggle.style.display = 'none';
     }
   },
-  beforeDestroy() {
+  beforeUnmount() {
+    clearInterval(this.bootTimer);
+    clearTimeout(this.bootFinishTimer);
+    if (this.audioCtx) this.audioCtx.close().catch(() => {});
     this.clearBuddyFrameTimers();
     clearTimeout(this.buddyPokeTimer);
     clearInterval(this.buddyTimer);
@@ -1532,26 +1540,26 @@ export default {
     },
     toggleSound() {
       this.soundOn = !this.soundOn;
-      localStorage.setItem('soli95-sound', this.soundOn ? 'on' : 'off');
+      safeStorage.setItem('soli95-sound', this.soundOn ? 'on' : 'off');
       this.playSound('click');
       this.narrateBuddy(this.soundOn ? 'soundOn' : 'soundOff');
     },
     // --- Boot / shutdown ---
     startBoot() {
       // Skip the boot screen on repeat visits within the same session
-      if (sessionStorage.getItem('soli95-booted')) {
+      if (safeSessionStorage.getItem('soli95-booted')) {
         this.booting = false;
         this.openWindow('about');
         return;
       }
-      const interval = setInterval(() => {
+      this.bootTimer = setInterval(() => {
         this.bootProgress += Math.random() * 15;
         if (this.bootProgress >= 100) {
           this.bootProgress = 100;
-          clearInterval(interval);
-          setTimeout(() => {
+          clearInterval(this.bootTimer);
+          this.bootFinishTimer = setTimeout(() => {
             this.booting = false;
-            sessionStorage.setItem('soli95-booted', '1');
+            safeSessionStorage.setItem('soli95-booted', '1');
             this.playSound('startup');
             // Auto-open About window
             this.openWindow('about');
@@ -2219,7 +2227,7 @@ export default {
       this.narrateBuddy(reactions[url]);
     },
     refreshBrowser(win) {
-      this.$set(win, 'browserRefreshKey', win.browserRefreshKey + 1);
+      win.browserRefreshKey += 1;
       this.narrateBuddy('refresh');
       this.playSound('click');
     },
@@ -2235,8 +2243,8 @@ export default {
 @font-face {
   font-family: 'Pixelated MS Sans Serif';
   src:
-    url('~98.css/dist/ms_sans_serif.woff2') format('woff2'),
-    url('~98.css/dist/ms_sans_serif.woff') format('woff');
+    url('98.css/dist/ms_sans_serif.woff2') format('woff2'),
+    url('98.css/dist/ms_sans_serif.woff') format('woff');
   font-style: normal;
   font-weight: 400;
 }
@@ -2244,8 +2252,8 @@ export default {
 @font-face {
   font-family: 'Pixelated MS Sans Serif';
   src:
-    url('~98.css/dist/ms_sans_serif_bold.woff2') format('woff2'),
-    url('~98.css/dist/ms_sans_serif_bold.woff') format('woff');
+    url('98.css/dist/ms_sans_serif_bold.woff2') format('woff2'),
+    url('98.css/dist/ms_sans_serif_bold.woff') format('woff');
   font-style: normal;
   font-weight: 700;
 }
@@ -2261,9 +2269,8 @@ export default {
   position: fixed;
   top: 0;
   left: 0;
-  /* Compensate for body zoom: 0.9 - Chrome calculates viewport units before zoom is applied */
-  width: calc(100vw / 0.9);
-  height: calc(100vh / 0.9);
+  width: 100vw;
+  height: 100dvh;
   background: #008080;
   font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
   font-size: 11px;
@@ -2281,7 +2288,7 @@ export default {
   gap: 8px;
   padding: 8px;
   /* Reserve the lower-left slot for the absolutely positioned Recycle Bin. */
-  height: calc(100vh / 0.9 - 112px);
+  height: calc(100dvh - 112px);
 }
 
 .desktop-icons.refreshing {
@@ -2447,26 +2454,26 @@ export default {
 }
 
 .win-btn.minimize {
-  background-image: url('~98.css/icon/minimize.svg');
+  background-image: url('98.css/icon/minimize.svg');
   background-position: bottom 3px left 4px;
   background-repeat: no-repeat;
 }
 
 .win-btn.maximize {
-  background-image: url('~98.css/icon/maximize.svg');
+  background-image: url('98.css/icon/maximize.svg');
   background-position: top 2px left 3px;
   background-repeat: no-repeat;
 }
 
 .win-btn.restore {
-  background-image: url('~98.css/icon/restore.svg');
+  background-image: url('98.css/icon/restore.svg');
   background-position: top 2px left 3px;
   background-repeat: no-repeat;
 }
 
 .win-btn.close {
   margin-left: 2px;
-  background-image: url('~98.css/icon/close.svg');
+  background-image: url('98.css/icon/close.svg');
   background-position: top 3px left 4px;
   background-repeat: no-repeat;
 }
@@ -3644,8 +3651,8 @@ export default {
   position: fixed;
   top: 0;
   left: 0;
-  width: calc(100vw / 0.9);
-  height: calc(100vh / 0.9);
+  width: 100vw;
+  height: 100dvh;
   background: #000;
   display: flex;
   align-items: center;
@@ -3688,8 +3695,8 @@ export default {
   position: fixed;
   top: 0;
   left: 0;
-  width: calc(100vw / 0.9);
-  height: calc(100vh / 0.9);
+  width: 100vw;
+  height: 100dvh;
   background: #0000aa;
   color: #fff;
   display: flex;
@@ -3729,8 +3736,8 @@ export default {
   position: fixed;
   top: 0;
   left: 0;
-  width: calc(100vw / 0.9);
-  height: calc(100vh / 0.9);
+  width: 100vw;
+  height: 100dvh;
   background: #000;
   display: flex;
   align-items: center;
@@ -3762,6 +3769,8 @@ export default {
     align-content: start;
     gap: 10px 2px;
     height: auto;
+    max-height: calc(100dvh - 40px);
+    overflow-y: auto;
     padding: 8px 4px;
   }
 

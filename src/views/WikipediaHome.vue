@@ -29,14 +29,14 @@
         <div class="wiki-intro">
           <div class="wiki-infobox">
             <div class="infobox-title">Soli</div>
-            <table class="infobox-data">
+            <table class="infobox-data"><tbody>
               <tr>
                 <th>Occupation</th>
                 <td>{{ currentJob.title }}</td>
               </tr>
               <tr>
                 <th>Employer</th>
-                <td><a :href="currentJob.url" target="_blank">{{ currentJob.subtitle }}</a></td>
+                <td><a :href="currentJob.url" target="_blank" rel="noopener noreferrer">{{ currentJob.subtitle }}</a></td>
               </tr>
               <tr>
                 <th>Known for</th>
@@ -50,13 +50,13 @@
                 <th>Website</th>
                 <td><a href="https://soli.blue">soli.blue</a></td>
               </tr>
-            </table>
+            </tbody></table>
           </div>
 
           <p>
             <strong>Soli</strong> is an AI engineer based in Berlin, Germany.
             He currently works as {{ currentJob.title }} at
-            <a :href="currentJob.url" target="_blank">{{ currentJob.subtitle }}</a>.<sup>[1]</sup>
+            <a :href="currentJob.url" target="_blank" rel="noopener noreferrer">{{ currentJob.subtitle }}</a>.<sup>[1]</sup>
           </p>
           <p>
             He has previously worked at various companies and has founded several projects,
@@ -80,7 +80,7 @@
             <tr v-for="(exp, i) in resume.experience" :key="'career-'+i">
               <td>{{ exp.start }} – {{ exp.end || 'present' }}</td>
               <td>{{ exp.title }}</td>
-              <td><a :href="exp.url" target="_blank">{{ exp.subtitle }}</a></td>
+              <td><a :href="exp.url" target="_blank" rel="noopener noreferrer">{{ exp.subtitle }}</a></td>
             </tr>
           </tbody>
         </table>
@@ -93,7 +93,7 @@
         <h3>Active projects</h3>
         <ul>
           <li v-for="(proj, i) in liveProjects" :key="'live-'+i">
-            <strong><a :href="proj.link" target="_blank">{{ proj.title }}</a></strong> ({{ proj.year }}) –
+            <strong><a :href="proj.link" target="_blank" rel="noopener noreferrer">{{ proj.title }}</a></strong> ({{ proj.year }}) –
             {{ proj.subtitle }}. {{ proj.description.split('.')[0] }}.
           </li>
         </ul>
@@ -115,7 +115,7 @@
         </p>
         <ul>
           <li v-for="(edu, i) in resume.education" :key="'edu-'+i">
-            <strong>{{ edu.title }}</strong> – <a :href="edu.url" target="_blank">{{ edu.subtitle }}</a>, {{ edu.location }}
+            <strong>{{ edu.title }}</strong> – <a :href="edu.url" target="_blank" rel="noopener noreferrer">{{ edu.subtitle }}</a>, {{ edu.location }}
           </li>
         </ul>
 
@@ -131,8 +131,8 @@
 
         <h2 id="see-also">See also <span class="wiki-edit">[<a href="#">edit</a>]</span></h2>
         <ul>
-          <li><a href="https://github.com/soliblue" target="_blank">GitHub profile</a></li>
-          <li><a href="https://twitter.com/_xSoli" target="_blank">Twitter</a></li>
+          <li><a href="https://github.com/soliblue" target="_blank" rel="noopener noreferrer">GitHub profile</a></li>
+          <li><a href="https://twitter.com/_xSoli" target="_blank" rel="noopener noreferrer">Twitter</a></li>
           <li><router-link to="/terminal">Terminal version of this page</router-link></li>
           <li><router-link to="/windows95">Windows 95 version of this page</router-link></li>
           <li><router-link to="/newspaper">Newspaper version of this page</router-link></li>
@@ -141,7 +141,7 @@
 
         <h2 id="references">References <span class="wiki-edit">[<a href="#">edit</a>]</span></h2>
         <ol class="wiki-references">
-          <li>^ <a :href="currentJob.url" target="_blank">{{ currentJob.subtitle }} website</a>. Retrieved {{ currentDate }}.</li>
+          <li>^ <a :href="currentJob.url" target="_blank" rel="noopener noreferrer">{{ currentJob.subtitle }} website</a>. Retrieved {{ currentDate }}.</li>
           <li>^ "Soli's personal website". <a href="https://soli.blue">soli.blue</a>. Retrieved {{ currentDate }}.</li>
         </ol>
 
@@ -213,7 +213,7 @@ export default {
       }
     }
   },
-  beforeDestroy() {
+  beforeUnmount() {
     if (!this.embedded) {
       const themeToggle = document.querySelector('.theme-toggle');
       if (themeToggle) {

@@ -1,3 +1,4 @@
+import { isAllowedOrigin, readJson, checkRateLimit } from '../_security.js';
 // Cloudflare Pages Function - POST /api/contact
 // Sends the Windows 95 contact form to Soli through Resend.
 
@@ -5,31 +6,6 @@ const MAX_BODY_BYTES = 12000;
 const MAX_EMAIL_LENGTH = 254;
 const MAX_SUBJECT_LENGTH = 160;
 const MAX_MESSAGE_LENGTH = 5000;
-const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
-const RATE_LIMIT_MAX = 5;
-const rateLimits = new Map();
-
-const ALLOWED_ORIGINS = new Set([
-  'https://soli.blue',
-  'https://www.soli.blue',
-  'https://soli-blue.pages.dev',
-  'http://localhost:8080',
-  'http://localhost:8081',
-  'http://localhost:8082',
-  'http://localhost:8788',
-]);
-
-const isAllowedOrigin = (request) => {
-  const origin = request.headers.get('Origin');
-  if (!origin || ALLOWED_ORIGINS.has(origin)) return true;
-
-  try {
-    const { hostname, protocol } = new URL(origin);
-    return protocol === 'https:' && hostname.endsWith('.soli-blue.pages.dev');
-  } catch (error) {
-    return false;
-  }
-};
 
 const getCorsHeaders = (request) => {
   const origin = request.headers.get('Origin');
@@ -45,28 +21,9 @@ const getCorsHeaders = (request) => {
 
 const json = (request, body, status = 200) => new Response(JSON.stringify(body), {
   status,
-  headers: { 'Content-Type': 'application/json', ...getCorsHeaders(request) },
+  headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff', ...getCorsHeaders(request) },
 });
 
-const checkRateLimit = (request) => {
-  const now = Date.now();
-  const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
-  const current = rateLimits.get(ip);
-
-  if (rateLimits.size > 1000) {
-    rateLimits.forEach((value, key) => {
-      if (now - value.startedAt > RATE_LIMIT_WINDOW_MS) rateLimits.delete(key);
-    });
-  }
-
-  if (!current || now - current.startedAt > RATE_LIMIT_WINDOW_MS) {
-    rateLimits.set(ip, { startedAt: now, count: 1 });
-    return true;
-  }
-
-  current.count += 1;
-  return current.count <= RATE_LIMIT_MAX;
-};
 
 const isValidEmail = email => (
   email.length <= MAX_EMAIL_LENGTH
@@ -77,26 +34,8 @@ const isValidEmail = email => (
 export const onRequestPost = async ({ request, env }) => {
   try {
     if (!isAllowedOrigin(request)) return json(request, { error: 'Forbidden' }, 403);
-    if (!checkRateLimit(request)) {
-      return json(request, { error: 'Too many messages. Please try again later.' }, 429);
-    }
 
-    const contentLength = Number(request.headers.get('Content-Length') || 0);
-    if (contentLength > MAX_BODY_BYTES) {
-      return json(request, { error: 'Message is too large.' }, 413);
-    }
-
-    const bodyText = await request.text();
-    if (new TextEncoder().encode(bodyText).length > MAX_BODY_BYTES) {
-      return json(request, { error: 'Message is too large.' }, 413);
-    }
-
-    let payload;
-    try {
-      payload = JSON.parse(bodyText);
-    } catch (error) {
-      return json(request, { error: 'Invalid request.' }, 400);
-    }
+    const payload = await readJson(request, MAX_BODY_BYTES);
 
     const email = String(payload.email || '').trim();
     const subject = String(payload.subject || 'Hello!').trim().slice(0, MAX_SUBJECT_LENGTH);
@@ -111,6 +50,9 @@ export const onRequestPost = async ({ request, env }) => {
       return json(request, { error: 'Message is too long.' }, 400);
     }
 
+    if (!await checkRateLimit(request, env, 'contact', 600, 5)) {
+      return json(request, { error: 'Too many messages. Please try again later.' }, 429);
+    }
     if (!env.RESEND_API_KEY) {
       console.error('Contact form: RESEND_API_KEY is not configured');
       return json(request, { error: 'Email service is not configured.' }, 500);
@@ -120,6 +62,7 @@ export const onRequestPost = async ({ request, env }) => {
     const from = env.CONTACT_FROM || 'Soli Website <onboarding@resend.dev>';
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
+      signal: AbortSignal.timeout(15000),
       headers: {
         Authorization: `Bearer ${env.RESEND_API_KEY}`,
         'Content-Type': 'application/json',
@@ -141,6 +84,7 @@ export const onRequestPost = async ({ request, env }) => {
 
     return json(request, { ok: true });
   } catch (error) {
+    if (error.status) return json(request, { error: error.message }, error.status);
     console.error('Contact form error:', error);
     return json(request, { error: 'Email could not be sent. Please try again.' }, 500);
   }

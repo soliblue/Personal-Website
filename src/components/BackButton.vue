@@ -8,12 +8,14 @@
 </template>
 
 <script>
+import { safeStorage } from '@/utils/storage';
+
 export default {
   name: 'BackButton',
   methods: {
     goBack() {
       // Go back to the homepage version the user came from
-      const homeVersion = localStorage.getItem('homeVersion') || 'animation';
+      const homeVersion = safeStorage.getItem('homeVersion') || 'animation';
       this.$router.push(`/${homeVersion}`);
     },
   },

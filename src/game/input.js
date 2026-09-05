@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 // Input handling for keyboard and touch
 
 export class InputSystem {

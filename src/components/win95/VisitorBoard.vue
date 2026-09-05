@@ -201,6 +201,8 @@
 </template>
 
 <script>
+import { safeStorage } from '@/utils/storage';
+
 import boardIcon from '@/assets/win95/visitor-board.svg';
 import refreshIcon from '@/assets/win95/refresh.svg';
 import starStamp from '@/assets/win95/visitor-stamps/star.svg';
@@ -277,7 +279,7 @@ export default {
       clockTimer: null,
       pinTimer: null,
       form: {
-        name: localStorage.getItem('soli95-visitor-name') || '',
+        name: safeStorage.getItem('soli95-visitor-name') || '',
         stamp: 'star',
         color: 'lemon',
         messageKey: 'made-me-smile',
@@ -311,7 +313,7 @@ export default {
     this.loadEntries();
     this.clockTimer = setInterval(() => { this.now = Date.now(); }, 60000);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     clearInterval(this.clockTimer);
     clearTimeout(this.pinTimer);
   },
@@ -372,7 +374,7 @@ export default {
         this.total += 1;
         this.selectedId = data.entry.id;
         this.justPinnedId = data.entry.id;
-        localStorage.setItem('soli95-visitor-name', this.form.name.trim());
+        safeStorage.setItem('soli95-visitor-name', this.form.name.trim());
         this.composerOpen = false;
         this.$emit('signed', data.entry);
         this.$emit('sound', 'send');
@@ -733,7 +735,7 @@ export default {
   width: 18px;
   height: 16px;
   background-color: #c0c0c0;
-  background-image: url('~98.css/icon/close.svg');
+  background-image: url('98.css/icon/close.svg');
   background-position: top 4px left 5px;
   background-repeat: no-repeat;
 }

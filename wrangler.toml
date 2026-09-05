@@ -1,11 +1,6 @@
 # Cloudflare Pages config for soli.blue
 # Static SPA in dist/ + Pages Functions in functions/ (auto-bundled on deploy).
 #
-# Billing: this project is intended to run entirely on the Workers/Pages FREE
-# plan (100k function requests/day, hard-capped — requests 429 instead of
-# billing). Do NOT subscribe the account to "Workers Paid" and there is no way
-# to be charged for Functions usage here. See README / migration notes.
-
 name = "soli-blue"
 compatibility_date = "2026-06-01"
 pages_build_output_dir = "dist"

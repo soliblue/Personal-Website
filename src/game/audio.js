@@ -1,3 +1,4 @@
+import { safeStorage } from '@/utils/storage';
 // Audio system for the space game
 
 export class AudioSystem {
@@ -15,13 +16,13 @@ export class AudioSystem {
     }
 
     // Load preference
-    const saved = localStorage.getItem('spaceGameSound');
+    const saved = safeStorage.getItem('spaceGameSound');
     this.enabled = saved !== 'off';
   }
 
   toggle() {
     this.enabled = !this.enabled;
-    localStorage.setItem('spaceGameSound', this.enabled ? 'on' : 'off');
+    safeStorage.setItem('spaceGameSound', this.enabled ? 'on' : 'off');
     return this.enabled;
   }
 

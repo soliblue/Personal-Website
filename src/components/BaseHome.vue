@@ -9,13 +9,13 @@
       </h2>
       <p class="tagline">ai engineer</p>
       <div class="social-icons animated fadeIn">
-        <a href="https://github.com/soliblue" target="_blank">
+        <a href="https://github.com/soliblue" target="_blank" rel="noopener noreferrer">
           <img src="../assets/github.png" class="social-links" >
         </a>
-        <a href="https://manifold.markets/Soli" target="_blank">
+        <a href="https://manifold.markets/Soli" target="_blank" rel="noopener noreferrer">
           <img src="../assets/manifold.png" class="social-links" >
         </a>
-        <a href="https://twitter.com/_xSoli" target="_blank">
+        <a href="https://twitter.com/_xSoli" target="_blank" rel="noopener noreferrer">
           <img src="../assets/twitter.png" class="social-links" >
         </a>
       </div>
@@ -23,7 +23,7 @@
         <router-link to="/resume">resume</router-link>
         <router-link to="/projects">projects</router-link>
         <router-link to="/pins">pins</router-link>
-        <a href="https://cal.com/solimeet/15min" target="_blank">book a call</a>
+        <a href="https://cal.com/solimeet/15min" target="_blank" rel="noopener noreferrer">book a call</a>
       </div>
       <pre id="style-text" class="css-code" />
     </div>

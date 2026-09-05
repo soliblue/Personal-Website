@@ -16,13 +16,13 @@
         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
       </svg>
     </button>
-    <transition name="fade" mode="out-in">
-      <router-view/>
-    </transition>
+    <router-view v-slot="{ Component }"><transition name="fade" mode="out-in"><component :is="Component" /></transition></router-view>
   </div>
 </template>
 
 <script>
+import { safeStorage } from '@/utils/storage';
+
 export default {
   name: 'App',
   data() {
@@ -38,7 +38,7 @@ export default {
     },
   },
   mounted() {
-    const saved = localStorage.getItem('theme');
+    const saved = safeStorage.getItem('theme');
     if (saved) {
       this.isDark = saved === 'dark';
     } else {
@@ -50,7 +50,7 @@ export default {
   methods: {
     toggleTheme() {
       this.isDark = !this.isDark;
-      localStorage.setItem('theme', this.isDark ? 'dark' : 'light');
+      safeStorage.setItem('theme', this.isDark ? 'dark' : 'light');
       this.applyTheme();
     },
     applyTheme() {
@@ -61,6 +61,10 @@ export default {
 </script>
 
 <style>
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
 :root, body {
   --bg: #ffffff;
   --text: #2c3e50;

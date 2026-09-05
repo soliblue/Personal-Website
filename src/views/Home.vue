@@ -12,6 +12,7 @@ export default {
   mounted() {
     this.processStyles(false);
   },
+  beforeUnmount() { this.stopAnimation(); },
   components: { BaseHome },
 };
 </script>

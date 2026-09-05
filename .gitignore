@@ -18,3 +18,7 @@ ui-debug.log
 functions/ui-debug.log
 .wrangler/
 test-results/
+.dev.vars
+.dev.vars.*
+.env.*
+playwright-report/

@@ -10,13 +10,9 @@ export default {
   name: 'BuildHome',
   mixins: [StyleMixin],
   mounted() {
-    if (performance.navigation.type === performance.navigation.TYPE_RELOAD) {
-      this.processStyles(true);
-    } else {
-      location.reload();
-    }
+    this.processStyles(true);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     this.stopAnimation();
   },
   components: { BaseHome },

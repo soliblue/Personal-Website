@@ -93,7 +93,8 @@
 </template>
 
 <script>
-/* eslint-disable no-mixed-operators, no-param-reassign */
+import { safeStorage } from '@/utils/storage';
+
 import claudeHopsSprite from '@/assets/codehop/claude-hops-mascot.png';
 
 const BEST_SCORE_KEY = 'claudeHopsBest';
@@ -101,7 +102,7 @@ const SOUND_KEY = 'claudeHopsSound';
 
 const readStorage = (key) => {
   try {
-    return window.localStorage.getItem(key);
+    return safeStorage.getItem(key);
   } catch (error) {
     return null;
   }
@@ -109,7 +110,7 @@ const readStorage = (key) => {
 
 const writeStorage = (key, value) => {
   try {
-    window.localStorage.setItem(key, value);
+    safeStorage.setItem(key, value);
   } catch (error) {
     // Storage unavailable (private mode); play on without persistence.
   }
@@ -289,7 +290,7 @@ export default {
     });
   },
 
-  beforeDestroy() {
+  beforeUnmount() {
     this.cleanup();
   },
 
@@ -356,8 +357,8 @@ export default {
 
     resize() {
       const container = this.$refs.gameContainer;
-      this.width = this.embedded ? container.clientWidth || 900 : window.innerWidth / 0.9;
-      this.height = this.embedded ? container.clientHeight || 650 : window.innerHeight / 0.9;
+      this.width = this.embedded ? container.clientWidth || 900 : window.innerWidth;
+      this.height = this.embedded ? container.clientHeight || 650 : window.innerHeight;
       this.dpr = clamp(window.devicePixelRatio || 1, 1, 2);
       this.canvas.width = Math.floor(this.width * this.dpr);
       this.canvas.height = Math.floor(this.height * this.dpr);
@@ -1421,8 +1422,8 @@ export default {
   position: fixed;
   top: 0;
   left: 0;
-  width: calc(100vw / 0.9);
-  height: calc(100vh / 0.9);
+  width: 100vw;
+  height: 100dvh;
   overflow: hidden;
   background: #19233d;
   color: #21170f;

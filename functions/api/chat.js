@@ -1,3 +1,4 @@
+import { isAllowedOrigin, readJson, checkRateLimit } from '../_security.js';
 // Cloudflare Pages Function — POST /api/chat
 // Proxies the "ask me about Soli" chat to Gemini (replaces the Firebase `chat` fn).
 // Edge functions are stateless, so conversation context comes from client-sent
@@ -12,21 +13,10 @@ const MAX_MESSAGE_LENGTH = 1200;
 const MAX_HISTORY_ITEM_LENGTH = 1600;
 const MAX_BODY_BYTES = 24000;
 const MAX_OUTPUT_TOKENS = 2048;
-const RATE_LIMIT_WINDOW_MS = 60 * 1000;
-const RATE_LIMIT_MAX = 12;
-const rateLimits = new Map();
-
-const ALLOWED_ORIGINS = new Set([
-  'https://soli.blue',
-  'https://www.soli.blue',
-  'http://localhost:8080',
-  'http://localhost:8081',
-  'http://localhost:8788',
-]);
 
 const getCorsHeaders = (request) => {
   const origin = request.headers.get('Origin');
-  if (!origin || !ALLOWED_ORIGINS.has(origin)) return {};
+  if (!origin || !isAllowedOrigin(request)) return {};
 
   return {
     'Access-Control-Allow-Origin': origin,
@@ -36,65 +26,34 @@ const getCorsHeaders = (request) => {
   };
 };
 
-const isAllowedOrigin = request => (
-  !request.headers.get('Origin') || ALLOWED_ORIGINS.has(request.headers.get('Origin'))
-);
 
 const json = (request, body, status = 200) =>
   new Response(JSON.stringify(body), {
     status,
-    headers: { 'Content-Type': 'application/json', ...getCorsHeaders(request) },
+    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff', ...getCorsHeaders(request) },
   });
 
-const checkRateLimit = (request) => {
-  const now = Date.now();
-  const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
-  const current = rateLimits.get(ip);
-
-  if (rateLimits.size > 1000) {
-    for (const [key, value] of rateLimits) {
-      if (now - value.startedAt > RATE_LIMIT_WINDOW_MS) rateLimits.delete(key);
-    }
-  }
-
-  if (!current || now - current.startedAt > RATE_LIMIT_WINDOW_MS) {
-    rateLimits.set(ip, { startedAt: now, count: 1 });
-    return true;
-  }
-
-  current.count += 1;
-  return current.count <= RATE_LIMIT_MAX;
-};
 
 export const onRequestPost = async ({ request, env }) => {
   try {
     if (!isAllowedOrigin(request)) return json(request, { error: 'Forbidden' }, 403);
-    if (!checkRateLimit(request)) return json(request, { error: 'Too many requests' }, 429);
 
-    const contentLength = Number(request.headers.get('Content-Length') || 0);
-    if (contentLength > MAX_BODY_BYTES) {
-      return json(request, { error: 'Request is too large' }, 413);
-    }
-
-    const bodyText = await request.text();
-    if (new TextEncoder().encode(bodyText).length > MAX_BODY_BYTES) {
-      return json(request, { error: 'Request is too large' }, 413);
-    }
-
-    let payload;
-    try {
-      payload = JSON.parse(bodyText);
-    } catch (error) {
-      return json(request, { error: 'Invalid JSON' }, 400);
-    }
+    const payload = await readJson(request, MAX_BODY_BYTES);
 
     const { message, history } = payload;
-    const normalizedMessage = String(message || '').trim();
+    if (typeof message !== 'string' || (history !== undefined && !Array.isArray(history))) {
+      return json(request, { error: 'Invalid request.' }, 400);
+    }
+    const normalizedMessage = message.trim();
     if (!normalizedMessage) return json(request, { error: 'Message is required' }, 400);
     if (normalizedMessage.length > MAX_MESSAGE_LENGTH) {
       return json(request, { error: 'Message is too long' }, 400);
     }
 
+    if (!await checkRateLimit(request, env, 'chat-minute', 60, 12)
+      || !await checkRateLimit(request, env, 'chat-day', 86400, 100)) {
+      return json(request, { error: 'Too many requests' }, 429);
+    }
     const apiKey = env.GOOGLE_AI_API_KEY;
     if (!apiKey) return json(request, { error: 'API key not configured' }, 500);
 
@@ -102,7 +61,7 @@ export const onRequestPost = async ({ request, env }) => {
     const contents = [];
     if (Array.isArray(history)) {
       for (const m of history.slice(-MAX_HISTORY)) {
-        if (!m || !m.content) continue;
+        if (!m || typeof m.content !== 'string' || !['user', 'assistant'].includes(m.role)) continue;
         const text = String(m.content).slice(0, MAX_HISTORY_ITEM_LENGTH);
         contents.push({
           role: m.role === 'assistant' ? 'model' : 'user',
@@ -113,10 +72,11 @@ export const onRequestPost = async ({ request, env }) => {
     contents.push({ role: 'user', parts: [{ text: normalizedMessage }] });
 
     const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:streamGenerateContent?alt=sse&key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:streamGenerateContent?alt=sse`,
       {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
+        signal: AbortSignal.timeout(45000),
         body: JSON.stringify({
           systemInstruction: { parts: [{ text: systemPrompt }] },
           contents,
@@ -135,12 +95,13 @@ export const onRequestPost = async ({ request, env }) => {
     return new Response(res.body, {
       headers: {
         'Content-Type': 'text/event-stream; charset=utf-8',
-        'Cache-Control': 'no-cache, no-transform',
+        'Cache-Control': 'no-store, no-transform',
         'X-Content-Type-Options': 'nosniff',
         ...getCorsHeaders(request),
       },
     });
   } catch (error) {
+    if (error.status) return json(request, { error: error.message }, error.status);
     console.error('Error:', error);
     return json(request, { error: 'Something went wrong' }, 500);
   }

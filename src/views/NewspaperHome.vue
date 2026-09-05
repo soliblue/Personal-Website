@@ -230,6 +230,8 @@
 </template>
 
 <script>
+import { safeStorage } from '@/utils/storage';
+
 import resume from '@/assets/resume.json';
 import projects from '@/assets/projects.json';
 import pins from '@/assets/pins.json';
@@ -286,13 +288,13 @@ export default {
   },
   mounted() {
     // Check for saved newspaper theme
-    const saved = localStorage.getItem('newspaperTheme');
+    const saved = safeStorage.getItem('newspaperTheme');
     if (saved) {
       this.localTheme = saved;
     }
     if (!this.embedded) {
       // Save that user visited newspaper version
-      localStorage.setItem('homeVersion', 'newspaper');
+      safeStorage.setItem('homeVersion', 'newspaper');
       // Hide the global theme toggle (we have our own)
       const globalToggle = document.querySelector('.theme-toggle');
       if (globalToggle) {
@@ -300,7 +302,7 @@ export default {
       }
     }
   },
-  beforeDestroy() {
+  beforeUnmount() {
     if (!this.embedded) {
       // Show the global theme toggle again when leaving
       const globalToggle = document.querySelector('.theme-toggle');
@@ -315,6 +317,7 @@ export default {
 </script>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display+SC:wght@400;700;900&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&family=IM+Fell+English+SC&family=IM+Fell+DW+Pica:ital@0;1&display=swap');
 /* ==================== CSS VARIABLES ==================== */
 .newspaper {
   --paper-bg: #f5f5f0;
@@ -343,7 +346,7 @@ export default {
 
 /* ==================== BASE STYLES ==================== */
 /* Old London for masthead, Playfair Display SC for headlines, Old Standard TT for body */
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display+SC:wght@400;700;900&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&family=IM+Fell+English+SC&family=IM+Fell+DW+Pica:ital@0;1&display=swap');
+
 
 .newspaper {
   min-height: 100vh;

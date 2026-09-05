@@ -1,22 +1,21 @@
-import Vue from 'vue';
-import Router from 'vue-router';
-import Home from '@/views/Home';
-import Pins from '@/views/Pins';
-import Resume from '@/views/Resume';
-import Projects from '@/views/Projects';
-import BuildHome from '@/views/BuildHome';
-import TerminalHome from '@/views/TerminalHome';
-import NewspaperHome from '@/views/NewspaperHome';
-import Windows95Home from '@/views/Windows95Home';
-import WikipediaHome from '@/views/WikipediaHome';
-import SpaceGameHome from '@/views/SpaceGameHome';
-import CodeHopHome from '@/views/CodeHopHome';
-import AppDoc from '@/views/AppDoc';
+import { safeStorage } from '@/utils/storage';
+import { createRouter, createWebHistory } from 'vue-router';
+const Home = () => import('@/views/Home.vue');
+const Pins = () => import('@/views/Pins.vue');
+const Resume = () => import('@/views/Resume.vue');
+const Projects = () => import('@/views/Projects.vue');
+const BuildHome = () => import('@/views/BuildHome.vue');
+const TerminalHome = () => import('@/views/TerminalHome.vue');
+const NewspaperHome = () => import('@/views/NewspaperHome.vue');
+const Windows95Home = () => import('@/views/Windows95Home.vue');
+const WikipediaHome = () => import('@/views/WikipediaHome.vue');
+const SpaceGameHome = () => import('@/views/SpaceGameHome.vue');
+const CodeHopHome = () => import('@/views/CodeHopHome.vue');
+const AppDoc = () => import('@/views/AppDoc.vue');
 
-Vue.use(Router);
-
-export default new Router({
-  mode: 'history',
+const router = createRouter({
+  history: createWebHistory(),
+  scrollBehavior: () => ({ top: 0 }),
   routes: [
     {
       path: '/',
@@ -27,7 +26,7 @@ export default new Router({
       name: 'BuildHome',
       component: BuildHome,
       beforeEnter: (to, from, next) => {
-        localStorage.setItem('homeVersion', 'animation');
+        safeStorage.setItem('homeVersion', 'animation');
         next();
       },
     },
@@ -36,7 +35,7 @@ export default new Router({
       name: 'TerminalHome',
       component: TerminalHome,
       beforeEnter: (to, from, next) => {
-        localStorage.setItem('homeVersion', 'terminal');
+        safeStorage.setItem('homeVersion', 'terminal');
         next();
       },
     },
@@ -45,7 +44,7 @@ export default new Router({
       name: 'NewspaperHome',
       component: NewspaperHome,
       beforeEnter: (to, from, next) => {
-        localStorage.setItem('homeVersion', 'newspaper');
+        safeStorage.setItem('homeVersion', 'newspaper');
         next();
       },
     },
@@ -54,7 +53,7 @@ export default new Router({
       name: 'Windows95Home',
       component: Windows95Home,
       beforeEnter: (to, from, next) => {
-        localStorage.setItem('homeVersion', 'windows95');
+        safeStorage.setItem('homeVersion', 'windows95');
         next();
       },
     },
@@ -63,7 +62,7 @@ export default new Router({
       name: 'WikipediaHome',
       component: WikipediaHome,
       beforeEnter: (to, from, next) => {
-        localStorage.setItem('homeVersion', 'wikipedia');
+        safeStorage.setItem('homeVersion', 'wikipedia');
         next();
       },
     },
@@ -72,7 +71,7 @@ export default new Router({
       name: 'SpaceGameHome',
       component: SpaceGameHome,
       beforeEnter: (to, from, next) => {
-        localStorage.setItem('homeVersion', 'space');
+        safeStorage.setItem('homeVersion', 'space');
         next();
       },
     },
@@ -81,7 +80,7 @@ export default new Router({
       name: 'CodeHopHome',
       component: CodeHopHome,
       beforeEnter: (to, from, next) => {
-        localStorage.setItem('homeVersion', 'code-hop');
+        safeStorage.setItem('homeVersion', 'code-hop');
         next();
       },
     },
@@ -110,5 +109,11 @@ export default new Router({
       name: 'AppDoc',
       component: AppDoc,
     },
+    { path: '/:pathMatch(.*)*', component: () => import('@/views/NotFound.vue') },
   ],
 });
+router.afterEach((to) => {
+  const canonical = document.querySelector('link[rel=canonical]');
+  if (canonical) canonical.href = `https://soli.blue${to.path}`;
+});
+export default router;

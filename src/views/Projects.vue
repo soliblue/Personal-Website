@@ -24,8 +24,7 @@
         <a
           v-if="project.link"
           :href="project.link"
-          target="_blank"
-          rel="noopener noreferrer"
+          target="_blank" rel="noopener noreferrer"
           class="external-link"
           :title="project.linkLabel || 'Open project'"
         >
@@ -48,8 +47,7 @@
         <a
           v-if="project.website"
           :href="project.website"
-          target="_blank"
-          rel="noopener noreferrer"
+          target="_blank" rel="noopener noreferrer"
           class="external-link"
           title="Website"
         >
@@ -75,8 +73,7 @@
         <a
           v-if="project.github"
           :href="project.github"
-          target="_blank"
-          rel="noopener noreferrer"
+          target="_blank" rel="noopener noreferrer"
           class="external-link"
           title="Source code"
         >
@@ -103,8 +100,7 @@
         <a
           v-if="project.press"
           :href="project.press"
-          target="_blank"
-          rel="noopener noreferrer"
+          target="_blank" rel="noopener noreferrer"
           class="external-link"
           title="Press coverage"
         >

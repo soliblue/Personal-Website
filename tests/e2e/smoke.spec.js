@@ -1,5 +1,5 @@
-const { expect, test } = require('@playwright/test');
-const projects = require('../../src/assets/projects.json');
+import { expect, test } from '@playwright/test';
+import projects from '../../src/assets/projects.json' with { type: 'json' };
 
 const projectCount = projects.length;
 const liveProjectCount = projects.filter(project => project.status !== 'graveyard').length;
@@ -574,8 +574,8 @@ test.describe('site smoke', () => {
   test('terminal escapes typed HTML while keeping command formatting', async ({ page }) => {
     const errors = collectPageErrors(page);
     await page.route('**/api/chat', route => route.fulfill({
-      contentType: 'application/json',
-      body: JSON.stringify({ response: 'Safe stub response.' }),
+      contentType: 'text/event-stream',
+      body: `data: ${JSON.stringify({ candidates: [{ content: { parts: [{ text: 'Safe stub response.' }] } }] })}\n\n`,
     }));
 
     await page.goto('/terminal');
@@ -734,8 +734,10 @@ test.describe('site smoke', () => {
     await expect(page.locator('.hud-stats')).toContainText('COMBO:');
     await expect(page.locator('.hud-stats')).toContainText('SAFE:');
 
+    // Vue only exposes component internals in development; production still tests the actual UI above.
+    if (!process.env.E2E_BASE_URL) {
     const upgradedState = await page.evaluate(() => {
-      const game = document.querySelector('.code-hop').__vue__;
+      const game = document.querySelector('.code-hop').__vueParentComponent.proxy;
       game.obstacles = [];
       game.powerups = [{
         x: game.player.x + game.player.width / 2,
@@ -792,6 +794,7 @@ test.describe('site smoke', () => {
     });
     await expect(page.locator('.code-hop')).toHaveAttribute('data-world', '2');
     await expect(page.locator('.world-banner')).toContainText('CHECKPOINT +100');
+    }
     expect(errors).toEqual([]);
   });
 

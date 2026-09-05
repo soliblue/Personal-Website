@@ -72,7 +72,7 @@ export default {
   mounted() {
     document.addEventListener('mouseup', this.onDocMouseUp);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     document.removeEventListener('mouseup', this.onDocMouseUp);
     this.stopTimer();
     clearTimeout(this.touchTimer);

@@ -13,14 +13,7 @@
 </template>
 
 <script>
-import { marked } from 'marked/lib/marked.cjs';
-
-const escapeHtml = value => String(value)
-  .replace(/&/g, '&amp;')
-  .replace(/</g, '&lt;')
-  .replace(/>/g, '&gt;')
-  .replace(/"/g, '&quot;')
-  .replace(/'/g, '&#39;');
+import { renderMarkdown } from '@/utils/markdown';
 
 export default {
   name: 'AppDoc',
@@ -41,22 +34,25 @@ export default {
   methods: {
     async loadContent() {
       const { app, page } = this.$route.params;
+      const requestId = (this.requestId || 0) + 1;
+      this.requestId = requestId;
       this.loading = true;
       this.content = null;
 
+      if (!['habibi', 'habibis'].includes(app) || !['marketing', 'privacy', 'terms'].includes(page)) {
+        this.loading = false;
+        return;
+      }
       try {
         const response = await fetch(`/static/apps/${app}/${page}.md`);
         if (response.ok) {
           const markdown = await response.text();
-          this.content = marked(escapeHtml(markdown), {
-            headerIds: false,
-            mangle: false,
-          });
+          if (requestId === this.requestId) this.content = renderMarkdown(markdown);
         }
       } catch (e) {
         // Page not found
       }
-      this.loading = false;
+      if (requestId === this.requestId) this.loading = false;
     },
   },
 };
@@ -76,57 +72,57 @@ export default {
   color: #333;
 }
 
-.doc-content >>> h1 {
+.doc-content :deep(h1 ){
   font-size: 2.5em;
   margin-bottom: 30px;
   color: #1a1a1a;
 }
 
-.doc-content >>> h2 {
+.doc-content :deep(h2 ){
   font-size: 1.8em;
   margin-top: 40px;
   margin-bottom: 20px;
   color: #1a1a1a;
 }
 
-.doc-content >>> h3 {
+.doc-content :deep(h3 ){
   font-size: 1.4em;
   margin-top: 30px;
   margin-bottom: 15px;
   color: #333;
 }
 
-.doc-content >>> p {
+.doc-content :deep(p ){
   margin-bottom: 16px;
   font-size: 1.1em;
 }
 
-.doc-content >>> ul, .doc-content >>> ol {
+.doc-content :deep(ul, .doc-content >>> ol ){
   margin-bottom: 16px;
   padding-left: 30px;
 }
 
-.doc-content >>> li {
+.doc-content :deep(li ){
   margin-bottom: 8px;
 }
 
-.doc-content >>> a {
+.doc-content :deep(a ){
   color: #1E90FF;
   text-decoration: none;
 }
 
-.doc-content >>> a:hover {
+.doc-content :deep(a:hover ){
   text-decoration: underline;
 }
 
-.doc-content >>> code {
+.doc-content :deep(code ){
   background: #f4f4f4;
   padding: 2px 6px;
   border-radius: 3px;
   font-family: monospace;
 }
 
-.doc-content >>> pre {
+.doc-content :deep(pre ){
   background: #f4f4f4;
   padding: 16px;
   border-radius: 6px;

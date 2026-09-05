@@ -1,9 +1,9 @@
-const { defineConfig, devices } = require('@playwright/test');
+import { defineConfig, devices } from '@playwright/test';
 
 const port = process.env.E2E_PORT || 8082;
-const baseURL = `http://127.0.0.1:${port}`;
+const baseURL = process.env.E2E_BASE_URL || `http://127.0.0.1:${port}`;
 
-module.exports = defineConfig({
+export default defineConfig({
   testDir: './tests/e2e',
   timeout: 30 * 1000,
   expect: {
@@ -14,7 +14,7 @@ module.exports = defineConfig({
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
   },
-  webServer: {
+  webServer: process.env.E2E_BASE_URL ? undefined : {
     command: `HOST=127.0.0.1 PORT=${port} npm run dev`,
     url: baseURL,
     reuseExistingServer: !process.env.CI,

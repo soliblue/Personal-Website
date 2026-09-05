@@ -38,12 +38,12 @@
         <div class="menu-divider" v-if="!embedded"></div>
         <div class="menu-submenu" v-if="!embedded">
           <span class="menu-label">Other Homepages</span>
-          <a href="/animation" target="_blank" class="menu-item small">Animation</a>
-          <a href="/terminal" target="_blank" class="menu-item small">Terminal</a>
-          <a href="/newspaper" target="_blank" class="menu-item small">Newspaper</a>
-          <a href="/windows95" target="_blank" class="menu-item small">Windows 95</a>
-          <a href="/wikipedia" target="_blank" class="menu-item small">Wikipedia</a>
-          <a href="/code-hop" target="_blank" class="menu-item small">Claude Hops</a>
+          <a href="/animation" target="_blank" rel="noopener noreferrer" class="menu-item small">Animation</a>
+          <a href="/terminal" target="_blank" rel="noopener noreferrer" class="menu-item small">Terminal</a>
+          <a href="/newspaper" target="_blank" rel="noopener noreferrer" class="menu-item small">Newspaper</a>
+          <a href="/windows95" target="_blank" rel="noopener noreferrer" class="menu-item small">Windows 95</a>
+          <a href="/wikipedia" target="_blank" rel="noopener noreferrer" class="menu-item small">Wikipedia</a>
+          <a href="/code-hop" target="_blank" rel="noopener noreferrer" class="menu-item small">Claude Hops</a>
         </div>
       </div>
     </div>
@@ -60,7 +60,7 @@
             <div v-for="(job, idx) in resumeData.experience" :key="'exp-' + idx" class="content-item">
               <div class="item-title">{{ job.title }}</div>
               <div class="item-subtitle">
-                <a v-if="job.url" :href="job.url" target="_blank">{{ job.subtitle }}</a>
+                <a v-if="job.url" :href="job.url" target="_blank" rel="noopener noreferrer">{{ job.subtitle }}</a>
                 <span v-else>{{ job.subtitle }}</span>
               </div>
               <div class="item-date">{{ job.start }} - {{ job.end || 'Present' }}</div>
@@ -101,7 +101,7 @@
               <span v-for="tag in proj.tags" :key="tag" class="tag">{{ tag }}</span>
             </div>
             <div class="item-desc">{{ proj.description }}</div>
-            <a v-if="proj.link" :href="proj.link" target="_blank" class="item-link">View Project →</a>
+            <a v-if="proj.link" :href="proj.link" target="_blank" rel="noopener noreferrer" class="item-link">View Project →</a>
           </div>
         </div>
 
@@ -171,6 +171,8 @@
 </template>
 
 <script>
+import { safeStorage } from '@/utils/storage';
+
 // Asset imports
 import spaceshipImg from '@/assets/space/spaceship.png';
 import asteroid1Img from '@/assets/space/asteroid1.png';
@@ -274,7 +276,7 @@ export default {
     });
   },
 
-  beforeDestroy() {
+  beforeUnmount() {
     this.cleanup();
   },
 
@@ -295,8 +297,8 @@ export default {
       this.loadSprites();
 
       // Load preferences
-      this.highScore = parseInt(localStorage.getItem('spaceGameHighScore') || '0', 10);
-      const savedTheme = localStorage.getItem('spaceGameTheme');
+      this.highScore = parseInt(safeStorage.getItem('spaceGameHighScore') || '0', 10);
+      const savedTheme = safeStorage.getItem('spaceGameTheme');
       this.isDarkTheme = savedTheme !== 'light';
 
       // Detect mobile
@@ -420,7 +422,7 @@ export default {
     // Game state methods
     toggleTheme() {
       this.isDarkTheme = !this.isDarkTheme;
-      localStorage.setItem('spaceGameTheme', this.isDarkTheme ? 'dark' : 'light');
+      safeStorage.setItem('spaceGameTheme', this.isDarkTheme ? 'dark' : 'light');
     },
 
     toggleSound() {
@@ -489,7 +491,7 @@ export default {
       if (this.gameplay.score > this.highScore) {
         this.highScore = this.gameplay.score;
         this.isNewHighScore = true;
-        localStorage.setItem('spaceGameHighScore', this.highScore.toString());
+        safeStorage.setItem('spaceGameHighScore', this.highScore.toString());
       }
     },
 
@@ -642,9 +644,8 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  /* Compensate for body zoom: 0.9 - Chrome calculates viewport units before zoom is applied */
-  width: calc(100vw / 0.9);
-  height: calc(100vh / 0.9);
+  width: 100vw;
+  height: 100dvh;
   overflow: hidden;
   font-family: 'Courier New', monospace;
   margin: 0;

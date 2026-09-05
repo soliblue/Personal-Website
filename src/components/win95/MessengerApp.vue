@@ -31,6 +31,7 @@
         rows="2"
         :maxlength="maxMessageLength"
         placeholder="Type a message..."
+        aria-label="Message to Soli’s AI"
         @keydown.enter.exact.prevent="sendMessage"
       ></textarea>
       <div class="messenger-buttons">
@@ -50,29 +51,10 @@
 </template>
 
 <script>
-import { marked } from 'marked/lib/marked.cjs';
-
-const MAX_MESSAGE_LENGTH = 1200; // mirrors functions/api/chat.js
+import { renderMarkdown } from '@/utils/markdown';
+import { streamChat } from '@/utils/chat';
+const MAX_MESSAGE_LENGTH = 1200;
 const MAX_HISTORY = 12;
-
-const escapeHtml = value => String(value)
-  .replace(/&/g, '&amp;')
-  .replace(/</g, '&lt;')
-  .replace(/>/g, '&gt;')
-  .replace(/"/g, '&quot;')
-  .replace(/'/g, '&#39;');
-
-const markdownRenderer = new marked.Renderer();
-
-markdownRenderer.html = html => escapeHtml(html);
-markdownRenderer.image = (href, title, text) => escapeHtml(text || '');
-markdownRenderer.link = (href, title, text) => {
-  const safeHref = /^(https?:\/\/|mailto:|\/(?!\/)|#)/i.test(href || '');
-  if (!safeHref) return text;
-
-  const titleAttribute = title ? ` title="${escapeHtml(title)}"` : '';
-  return `<a href="${escapeHtml(href)}"${titleAttribute} target="_blank" rel="noopener noreferrer">${text}</a>`;
-};
 
 export default {
   name: 'MessengerApp',
@@ -92,15 +74,9 @@ export default {
     });
     this.scrollToBottom();
   },
+  beforeUnmount() { this.chatController?.abort(); },
   methods: {
-    renderMarkdown(content) {
-      return marked(content || '', {
-        renderer: markdownRenderer,
-        headerIds: false,
-        mangle: false,
-        breaks: true,
-      });
-    },
+    renderMarkdown,
     async sendMessage() {
       const input = this.draft.trim();
       if (!input || this.isSending) return;
@@ -111,69 +87,16 @@ export default {
       this.isSending = true;
       this.scrollToBottom();
 
-      const assistantMessage = { role: 'assistant', content: '' };
-      this.messages.push(assistantMessage);
+      const history = this.messages.slice(0, -1).slice(-MAX_HISTORY);
+      this.messages.push({ role: 'assistant', content: '' });
+      const assistantMessage = this.messages[this.messages.length - 1];
+      this.chatController = new AbortController();
 
       try {
-        // `wrangler pages dev` serves /api/* locally, same as production.
-        const res = await fetch('/api/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          // Edge functions are stateless — send recent history for context.
-          body: JSON.stringify({
-            message: input,
-            history: this.messages.slice(0, -1).slice(-MAX_HISTORY),
-          }),
-        });
-        if (res.status === 429) {
-          throw new Error('whoa, slow down! give me a minute to catch my breath 😅');
-        }
-        if (!res.ok || !res.body) {
-          throw new Error('hmm, something broke on my end. try again in a sec?');
-        }
-
-        const reader = res.body.getReader();
-        const decoder = new TextDecoder();
-        let buffer = '';
-
-        const consumeEvents = (flush = false) => {
-          const events = buffer.split(/\r?\n\r?\n/);
-          buffer = flush ? '' : events.pop();
-
-          events.forEach((event) => {
-            const payload = event
-              .split(/\r?\n/)
-              .filter(line => line.startsWith('data:'))
-              .map(line => line.slice(5).trimStart())
-              .join('\n');
-            if (!payload || payload === '[DONE]') return;
-
-            const data = JSON.parse(payload);
-            if (data.error) throw new Error('hmm, something broke on my end. try again in a sec?');
-
-            const candidate = data.candidates && data.candidates[0];
-            const parts = candidate && candidate.content && candidate.content.parts;
-            const chunk = (parts || [])
-              .map(part => part.text || '')
-              .join('');
-            if (chunk) {
-              assistantMessage.content += chunk;
-              this.scrollToBottom();
-            }
-          });
-        };
-
-        const readNextChunk = async () => {
-          const { value, done } = await reader.read();
-          buffer += decoder.decode(value || new Uint8Array(), { stream: !done });
-          consumeEvents(done);
-          if (!done) await readNextChunk();
-        };
-        await readNextChunk();
-
-        if (!assistantMessage.content) {
-          throw new Error('hmm, i came up blank. try asking that another way?');
-        }
+        await streamChat(input, history, (chunk) => {
+          assistantMessage.content += chunk;
+          this.scrollToBottom();
+        }, this.chatController.signal);
         this.$emit('sound', 'receive');
       } catch (error) {
         const errorMessage = error.message || 'hmm, something broke on my end. try again in a sec?';
@@ -305,43 +228,43 @@ export default {
   white-space: normal;
 }
 
-.markdown-body >>> p {
+.markdown-body :deep(p ){
   margin: 0 0 6px;
 }
 
-.markdown-body >>> p:last-child {
+.markdown-body :deep(p:last-child ){
   margin-bottom: 0;
 }
 
-.markdown-body >>> a {
+.markdown-body :deep(a ){
   color: #0000ee;
   text-decoration: underline;
 }
 
-.markdown-body >>> ul,
-.markdown-body >>> ol {
+.markdown-body :deep(ul),
+.markdown-body :deep(ol ){
   margin: 4px 0 6px;
   padding-left: 22px;
 }
 
-.markdown-body >>> li {
+.markdown-body :deep(li ){
   margin-bottom: 2px;
 }
 
-.markdown-body >>> h1,
-.markdown-body >>> h2,
-.markdown-body >>> h3 {
+.markdown-body :deep(h1),
+.markdown-body :deep(h2),
+.markdown-body :deep(h3 ){
   margin: 6px 0 4px;
   font-size: 11px;
 }
 
-.markdown-body >>> code {
+.markdown-body :deep(code ){
   padding: 1px 2px;
   background: #e8e8e8;
   font-family: 'Courier New', monospace;
 }
 
-.markdown-body >>> pre {
+.markdown-body :deep(pre ){
   margin: 4px 0 6px;
   padding: 5px;
   overflow-x: auto;
@@ -350,11 +273,11 @@ export default {
   white-space: pre-wrap;
 }
 
-.markdown-body >>> pre code {
+.markdown-body :deep(pre code ){
   padding: 0;
 }
 
-.markdown-body >>> blockquote {
+.markdown-body :deep(blockquote ){
   margin: 4px 0 6px 8px;
   padding-left: 7px;
   border-left: 2px solid #808080;
@@ -387,7 +310,6 @@ export default {
    Bump to 16px on touch devices to keep the phone from zooming in. */
 @media (pointer: coarse) {
   .messenger-input {
-    /* The page uses body zoom: .9, so 18px remains above Safari's 16px threshold. */
     font-size: 18px;
   }
 }

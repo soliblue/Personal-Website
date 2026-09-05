@@ -4,7 +4,7 @@
       <button @click="openModal('resume')">resume</button>
       <button @click="openModal('projects')">projects</button>
       <button @click="openModal('pins')">pins</button>
-      <a href="https://cal.com/solimeet/15min" target="_blank">book a call</a>
+      <a href="https://cal.com/solimeet/15min" target="_blank" rel="noopener noreferrer">book a call</a>
     </div>
     <div class="terminal">
       <div class="terminal-header" v-if="!embedded">
@@ -26,7 +26,8 @@
         </div>
         <div v-for="(msg, index) in messages" :key="index" class="terminal-line" :class="msg.role">
           <span class="prompt">{{ msg.role === 'user' ? '>' : '$' }}</span>
-          <span v-html="formatMessage(msg.content)"></span>
+          <span v-if="msg.role === 'user'">{{ msg.content }}</span>
+          <span v-else v-html="formatMessage(msg.content)"></span>
         </div>
         <div v-if="isLoading" class="terminal-line assistant">
           <span class="prompt">$</span>
@@ -146,7 +147,7 @@
           <!-- Resume -->
           <div v-if="activeModal === 'resume'">
             <div v-for="exp in resume.experience" :key="exp.title" class="modal-item">
-              <h3><a :href="exp.url" target="_blank">{{ exp.title }}</a></h3>
+              <h3><a :href="exp.url" target="_blank" rel="noopener noreferrer">{{ exp.title }}</a></h3>
               <p class="subtitle">{{ exp.subtitle }} · {{ exp.start }} - {{ exp.end || 'Present' }}</p>
               <p v-if="exp.description">{{ exp.description }}</p>
             </div>
@@ -171,14 +172,14 @@
             <div v-for="project in filteredProjects" :key="project.title" class="modal-item">
               <h3>
                 {{ project.title }}
-                <a v-if="project.link" :href="project.link" target="_blank" class="icon-link" title="Open project">
+                <a v-if="project.link" :href="project.link" target="_blank" rel="noopener noreferrer" class="icon-link" title="Open project">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
                     <polyline points="15 3 21 3 21 9"></polyline>
                     <line x1="10" y1="14" x2="21" y2="3"></line>
                   </svg>
                 </a>
-                <a v-if="project.press" :href="project.press" target="_blank" class="icon-link" title="Press coverage">
+                <a v-if="project.press" :href="project.press" target="_blank" rel="noopener noreferrer" class="icon-link" title="Press coverage">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"></path>
                     <path d="M18 14h-8"></path>
@@ -221,17 +222,8 @@ import resume from '../assets/resume.json';
 import projects from '../assets/projects.json';
 import pins from '../assets/pins.json';
 
-const escapeHtml = value => String(value)
-  .replace(/&/g, '&amp;')
-  .replace(/</g, '&lt;')
-  .replace(/>/g, '&gt;')
-  .replace(/"/g, '&quot;')
-  .replace(/'/g, '&#39;');
-
-const isSafeLink = (url) => {
-  const trimmed = String(url).trim();
-  return /^(https?:\/\/|mailto:|\/(?!\/))/i.test(trimmed);
-};
+import { renderMarkdown } from '@/utils/markdown';
+import { streamChat } from '@/utils/chat';
 
 export default {
   name: 'TerminalHome',
@@ -263,12 +255,13 @@ export default {
     },
   },
   mounted() {
-    this.$refs.input.focus();
+    this.$refs.input?.focus();
   },
+  beforeUnmount() { this.chatController?.abort(); },
   methods: {
     async sendMessage() {
       const input = this.userInput.trim();
-      if (!input || this.isLoading) return;
+      if (!input || this.isLoading || input.length > 1200) return;
 
       this.messages.push({ role: 'user', content: input });
       this.userInput = '';
@@ -317,24 +310,14 @@ export default {
       this.scrollToBottom();
 
       try {
-        // `wrangler pages dev` serves /api/* locally, same as production.
-        const res = await fetch('/api/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          // Edge functions are stateless — send recent history for context.
-          body: JSON.stringify({
-            message: input,
-            history: this.messages.slice(0, -1).slice(-12),
-          }),
-        });
-        const data = await res.json();
-
-        if (data.error) {
-          throw new Error(data.error);
-        }
-
-        // Stream the response word by word
-        await this.streamResponse(data.response);
+        const history = this.messages.slice(0, -1);
+        this.messages.push({ role: 'assistant', content: '' });
+        const reply = this.messages[this.messages.length - 1];
+        this.chatController = new AbortController();
+        await streamChat(input, history, (chunk) => {
+          reply.content += chunk;
+          this.scrollToBottom();
+        }, this.chatController.signal);
       } catch (error) {
         console.error('Error:', error);
         this.messages.push({
@@ -345,50 +328,14 @@ export default {
 
       this.isLoading = false;
       this.scrollToBottom();
-      this.$nextTick(() => this.$refs.input.focus());
+      this.$nextTick(() => this.$refs.input?.focus());
     },
-    formatMessage(content) {
-      return escapeHtml(content)
-        // Code blocks (```code```)
-        .replace(/```(\w*)\n?([\s\S]*?)```/g, '<pre><code>$2</code></pre>')
-        // Inline code (`code`)
-        .replace(/`([^`]+)`/g, '<code>$1</code>')
-        // Bold (**text**)
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        // Italic (*text*)
-        .replace(/\*([^*]+)\*/g, '<em>$1</em>')
-        // Links [text](url)
-        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, label, url) => {
-          if (!isSafeLink(url)) return label;
-          return `<a href="${url}" target="_blank" rel="noopener noreferrer">${label}</a>`;
-        })
-        // Headers (## text)
-        .replace(/^### (.*$)/gm, '<strong class="h3">$1</strong>')
-        .replace(/^## (.*$)/gm, '<strong class="h2">$1</strong>')
-        .replace(/^# (.*$)/gm, '<strong class="h1">$1</strong>')
-        // Unordered lists (- item)
-        .replace(/^- (.*$)/gm, '<span class="list-item">• $1</span>')
-        // Newlines
-        .replace(/\n/g, '<br>');
-    },
+    formatMessage: renderMarkdown,
     scrollToBottom() {
       this.$nextTick(() => {
         const body = this.$refs.terminalBody;
-        body.scrollTop = body.scrollHeight;
+        if (body) body.scrollTop = body.scrollHeight;
       });
-    },
-    async streamResponse(text) {
-      const msg = { role: 'assistant', content: '' };
-      this.messages.push(msg);
-      const words = text.split(/(\s+)/); // Split but keep whitespace
-      for (let i = 0; i < words.length; i++) {
-        msg.content += words[i];
-        this.scrollToBottom();
-        // Small delay between words (faster for whitespace)
-        if (words[i].trim()) {
-          await new Promise(r => setTimeout(r, 30));
-        }
-      }
     },
     updateSuggestions() {
       const input = this.userInput.toLowerCase();
@@ -423,7 +370,7 @@ export default {
     selectSuggestion(cmd) {
       this.userInput = cmd;
       this.closeSuggestions();
-      this.$refs.input.focus();
+      this.$refs.input?.focus();
     },
     closeSuggestions() {
       this.showSuggestions = false;

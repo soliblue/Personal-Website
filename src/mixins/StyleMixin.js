@@ -1,5 +1,3 @@
-/* eslint-disable no-param-reassign */
-/* eslint-disable no-plusplus */
 const styles = `
 /*
  * hi there!
@@ -130,6 +128,7 @@ export default {
   },
   methods: {
     processStyles(animation = false) {
+      document.getElementById('style-tag').textContent = '';
       let processedStyles = '';
       let openComment = false;
 
@@ -147,7 +146,7 @@ export default {
           processedStyles += char;
         } else if (char === '/' && openComment) {
           openComment = false;
-          processedStyles = processedStyles.replace(/(\/[^\/]*\*)$/, '<em class="comment">$1/</em>');
+          processedStyles = processedStyles.replace(/(\/[^/]*\*)$/, '<em class="comment">$1/</em>');
         } else if (char === ':') {
           processedStyles = processedStyles.replace(/([a-zA-Z- ^\n]*)$/, '<em class="key">$1</em>:');
         } else if (char === ';') {
@@ -194,6 +193,8 @@ export default {
     },
     stopAnimation() {
       clearTimeout(this.animationTimeout);
+      const style = document.getElementById('style-tag');
+      if (style) style.textContent = '';
     },
   },
 };

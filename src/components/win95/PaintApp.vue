@@ -102,7 +102,8 @@
 </template>
 
 <script>
-/* eslint-disable no-mixed-operators */
+import { safeStorage } from '@/utils/storage';
+
 const STORAGE_KEY = 'soli95-paint-document';
 const MAX_HISTORY = 20;
 
@@ -166,7 +167,7 @@ export default {
   methods: {
     readSavedDocument() {
       try {
-        return window.localStorage.getItem(STORAGE_KEY);
+        return safeStorage.getItem(STORAGE_KEY);
       } catch (error) {
         return null;
       }
@@ -174,7 +175,7 @@ export default {
 
     writeSavedDocument(dataUrl) {
       try {
-        window.localStorage.setItem(STORAGE_KEY, dataUrl);
+        safeStorage.setItem(STORAGE_KEY, dataUrl);
       } catch (error) {
         this.status = 'Drawing saved for this session';
       }
