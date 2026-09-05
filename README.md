@@ -36,6 +36,6 @@ npx wrangler pages deploy dist --project-name soli-blue --branch master
 
 Before deployment, pass lint, unit tests, browser tests, build, and `npm audit`. Afterwards, verify both the deployment URL and custom domain, asset hashes, guestbook reads, and chat. Test contact delivery with a stub to avoid sending unsolicited email.
 
-Chat/contact writes use bounded JSON parsing, origin validation, upstream timeouts, and atomic D1 rate limits. Chat permits 12 requests/minute and 100/day per IP; contact permits five/10 minutes. These controls limit abuse but are not authentication. The board accepts predefined notes and retains rate-limit identifiers for one day. No session-replay tracker is included.
+Chat/contact writes use bounded JSON parsing, origin validation, upstream timeouts, and atomic D1 rate limits. Chat permits 12 requests/minute and 100/day per IP; contact permits five/10 minutes. These controls limit abuse but are not authentication. The board accepts optional plain-text notes of up to 160 characters and retains rate-limit identifiers for one day. No session-replay tracker is included.
 
 Rollback: redeploy the checkpoint commit from a separate worktree or select the previous Pages deployment. Migration 0002 is additive and compatible with the previous version.

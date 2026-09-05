@@ -13,16 +13,6 @@ const ALLOWED_STAMPS = new Set([
   'star', 'heart', 'floppy', 'flower', 'globe', 'coffee', 'rocket', 'smile',
 ]);
 const ALLOWED_COLORS = new Set(['lemon', 'mint', 'peach', 'lavender', 'sky', 'rose']);
-const ALLOWED_MESSAGES = new Set([
-  'was-here',
-  'made-me-smile',
-  'tiny-internet',
-  'squirrel',
-  'clicked-everything',
-  'keep-weird',
-  'hello-future',
-  'good-vibes',
-]);
 const RESERVED_NAMES = new Set([
   'admin', 'administrator', 'moderator', 'soli', 'system', 'visitor board',
 ]);
@@ -94,6 +84,7 @@ const serializeEntry = row => ({
   stamp: row.stamp,
   color: row.color,
   messageKey: row.messageKey,
+  message: row.message,
   createdAt: Number(row.createdAt),
 });
 
@@ -115,6 +106,7 @@ export const onRequestGet = async ({ request, env }) => {
         stamp,
         color,
         message_key AS messageKey,
+        message,
         created_at AS createdAt
       FROM visitor_board_entries
       ORDER BY id DESC
@@ -151,19 +143,27 @@ export const onRequestPost = async ({ request, env }) => {
     // Quietly accept generic form-bot submissions without writing anything.
     if (String(payload.website || '').trim()) return json(request, { ok: true });
 
+    if (typeof payload.name !== 'string') return json(request, { error: 'Enter a display name.' }, 400);
     const name = normalizeName(payload.name);
     const stamp = String(payload.stamp || '');
     const color = String(payload.color || '');
-    const messageKey = String(payload.messageKey || '');
+    if (payload.message !== undefined && typeof payload.message !== 'string') {
+      return json(request, { error: 'The note must be plain text.' }, 400);
+    }
+    const rawMessage = payload.message || '';
+    // Reject invisible control characters in public notes.
+    // eslint-disable-next-line no-control-regex
+    if (rawMessage.length > 160 || /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f\u061c\u200b\u200e\u200f\u202a-\u202e\u2060-\u206f\ufeff]/u.test(rawMessage)) {
+      return json(request, { error: 'Use up to 160 characters without hidden control characters.' }, 400);
+    }
+    const message = rawMessage.normalize('NFC').replace(/\s+/g, ' ').trim();
+    if (message.length > 160) return json(request, { error: 'Use up to 160 characters.' }, 400);
+    const messageKey = 'was-here';
     const nameError = validateName(name);
 
     if (nameError) return json(request, { error: nameError }, 400);
     if (!ALLOWED_STAMPS.has(stamp)) return json(request, { error: 'Pick a valid stamp.' }, 400);
     if (!ALLOWED_COLORS.has(color)) return json(request, { error: 'Pick a valid paper color.' }, 400);
-    if (!ALLOWED_MESSAGES.has(messageKey)) {
-      return json(request, { error: 'Pick one of the available notes.' }, 400);
-    }
-
     const ipHash = await hashIp(request, env.BOARD_HASH_SALT);
     const insertResult = await env.VISITOR_BOARD_DB.prepare(`
       INSERT INTO visitor_board_entries (
@@ -171,10 +171,11 @@ export const onRequestPost = async ({ request, env }) => {
         stamp,
         color,
         message_key,
+        message,
         ip_hash,
         created_at
       )
-      SELECT ?, ?, ?, ?, ?, unixepoch()
+      SELECT ?, ?, ?, ?, ?, ?, unixepoch()
       WHERE (
         SELECT COUNT(*) FROM visitor_board_entries
         WHERE ip_hash = ? AND created_at >= unixepoch() - 3600
@@ -188,6 +189,7 @@ export const onRequestPost = async ({ request, env }) => {
       stamp,
       color,
       messageKey,
+      message,
       ipHash,
       ipHash,
       HOURLY_LIMIT,
@@ -213,6 +215,7 @@ export const onRequestPost = async ({ request, env }) => {
         stamp,
         color,
         message_key AS messageKey,
+        message,
         created_at AS createdAt
       FROM visitor_board_entries
       WHERE id = ?

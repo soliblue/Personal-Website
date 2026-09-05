@@ -192,7 +192,7 @@ test.describe('site smoke', () => {
     expect(errors).toEqual([]);
   });
 
-  test('Visitor Board previews and pins a constrained note', async ({ page }, testInfo) => {
+  test('Visitor Board previews and pins a short free-text note', async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== 'chromium', 'Desktop board flow is covered once.');
     const errors = collectPageErrors(page);
     const now = Math.floor(Date.now() / 1000);
@@ -238,7 +238,7 @@ test.describe('site smoke', () => {
             name: requestBody.name,
             stamp: requestBody.stamp,
             color: requestBody.color,
-            messageKey: requestBody.messageKey,
+            message: requestBody.message,
             createdAt: now,
           },
         }),
@@ -260,7 +260,7 @@ test.describe('site smoke', () => {
     await boardWindow.getByLabel('Display name').fill('Visitor-42');
     await boardWindow.getByRole('button', { name: 'Rocket' }).click();
     await boardWindow.getByRole('button', { name: 'Rose pink' }).click();
-    await boardWindow.getByLabel('Leave a note').selectOption('keep-weird');
+    await boardWindow.getByLabel('Leave a note').fill('Keep building weird things.');
     await expect(boardWindow.locator('.preview-note')).toContainText('Visitor-42');
     await expect(boardWindow.locator('.preview-note')).toContainText(
       'Keep building weird things.',
@@ -276,7 +276,7 @@ test.describe('site smoke', () => {
       name: 'Visitor-42',
       stamp: 'rocket',
       color: 'rose',
-      messageKey: 'keep-weird',
+      message: 'Keep building weird things.',
       website: '',
     });
     expect(errors).toEqual([]);

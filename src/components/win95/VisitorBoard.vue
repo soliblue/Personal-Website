@@ -44,14 +44,14 @@
           ]"
           type="button"
           role="listitem"
-          :aria-label="`${entry.name}: ${messageFor(entry.messageKey)}`"
+          :aria-label="`${entry.name}: ${messageFor(entry)}`"
           @click="selectEntry(entry)"
         >
           <span class="note-pin" aria-hidden="true"></span>
           <img class="note-stamp" :src="stampSource(entry.stamp)" alt="">
           <span class="note-copy">
             <strong class="note-name">{{ entry.name }}</strong>
-            <span class="note-message">{{ messageFor(entry.messageKey) }}</span>
+            <span class="note-message">{{ messageFor(entry) }}</span>
             <span class="note-time">{{ relativeTime(entry.createdAt) }}</span>
           </span>
         </button>
@@ -145,12 +145,10 @@
               </div>
             </fieldset>
 
-            <label class="board-field-label" for="visitor-message">Leave a note</label>
-            <select id="visitor-message" v-model="form.messageKey" class="board-select">
-              <option v-for="message in messages" :key="message.id" :value="message.id">
-                {{ message.text }}
-              </option>
-            </select>
+            <label class="board-field-label" for="visitor-message">Leave a note (optional)</label>
+            <textarea id="visitor-message" v-model="form.message" class="board-input board-message"
+              maxlength="160" rows="3" placeholder="A little hello…" aria-describedby="visitor-message-help"></textarea>
+            <small id="visitor-message-help">{{ form.message.length }}/160 · Public, plain text. No private information.</small>
 
             <input
               v-model="form.website"
@@ -170,7 +168,7 @@
               <img class="note-stamp" :src="stampSource(form.stamp)" alt="">
               <span class="note-copy">
                 <strong class="note-name">{{ previewName }}</strong>
-                <span class="note-message">{{ messageFor(form.messageKey) }}</span>
+                <span class="note-message">{{ form.message.trim() }}</span>
                 <span class="note-time">just now</span>
               </span>
             </div>
@@ -265,7 +263,6 @@ export default {
       refreshIcon,
       stamps: STAMPS,
       colors: COLORS,
-      messages: MESSAGES,
       entries: [],
       total: 0,
       loading: true,
@@ -282,7 +279,7 @@ export default {
         name: safeStorage.getItem('soli95-visitor-name') || '',
         stamp: 'star',
         color: 'lemon',
-        messageKey: 'made-me-smile',
+        message: '',
         website: '',
       },
     };
@@ -361,7 +358,7 @@ export default {
             name: this.form.name,
             stamp: this.form.stamp,
             color: this.form.color,
-            messageKey: this.form.messageKey,
+            message: this.form.message,
             website: this.form.website,
           }),
         });
@@ -391,8 +388,9 @@ export default {
       this.selectedId = this.selectedId === entry.id ? null : entry.id;
       this.$emit('sound', 'click');
     },
-    messageFor(key) {
-      return MESSAGE_TEXT[key] || 'I was here.';
+    messageFor(entry) {
+      if (typeof entry.message === 'string') return entry.message;
+      return MESSAGE_TEXT[entry.messageKey] || 'I was here.';
     },
     stampSource(id) {
       return STAMP_SOURCES[id] || starStamp;
@@ -418,6 +416,8 @@ export default {
 </script>
 
 <style scoped>
+.board-message { width: 100%; box-sizing: border-box; resize: vertical; min-height: 64px; }
+.note-message { overflow-wrap: anywhere; white-space: pre-wrap; }
 .visitor-board {
   position: relative;
   display: flex;

@@ -60,3 +60,29 @@ test('desktop icons stay inside the visible viewport and control icons load', as
   expect(closeIcon).not.toContain('~98');
   expect(closeIcon).not.toBe('none');
 });
+
+test('visitor free text is inert and a note can be submitted empty', async ({ page }) => {
+  const attack = '<img src=x onerror="window.boardXss=1"> [click](javascript:alert(1))';
+  let sent;
+  await page.route('**/api/visitor-board', async route => {
+    if (route.request().method() === 'GET') {
+      return route.fulfill({ json: { total: 1, entries: [{ id: 1, name: 'AI Visitor', message: attack, stamp: 'globe', color: 'sky', createdAt: 1 }] } });
+    }
+    sent = route.request().postDataJSON();
+    return route.fulfill({ status: 201, json: { entry: { ...sent, id: 2, createdAt: 2 } } });
+  });
+  await page.addInitScript(() => sessionStorage.setItem('soli95-booted', '1'));
+  await page.goto('/windows95');
+  await page.getByRole('button', { name: 'OK', exact: true }).click();
+  const icon = page.locator('.desktop-icon', { hasText: 'Visitor Board' });
+  if (test.info().project.name === 'chromium') await icon.dblclick(); else await icon.click();
+  await expect(page.locator('.note-message').first()).toHaveText(attack);
+  await expect(page.locator('.note-message img, .note-message a, .note-message script')).toHaveCount(0);
+  expect(await page.evaluate(() => window.boardXss)).toBeUndefined();
+  await page.getByRole('button', { name: 'Sign the board' }).click();
+  await page.getByLabel('Display name').fill('Another visitor');
+  await expect(page.getByLabel('Leave a note')).toHaveAttribute('maxlength', '160');
+  await page.getByRole('button', { name: 'Pin my note' }).click();
+  await expect(page.locator('.board-dialog')).toHaveCount(0);
+  expect(sent.message).toBe('');
+});
