@@ -21,6 +21,24 @@
     "status": "live"
   },
   {
+    "title": "turing machine",
+    "subtitle": "binary addition, step by step",
+    "year": "2026",
+    "tags": ["React", "Education", "Computer Science", "Interactive"],
+    "description": "An interactive Turing machine that makes computation visible. Enter two binary numbers, then play or step through every read, write, state change, and tape movement as the machine adds them.",
+    "link": "https://turing.soli.blue/",
+    "status": "live"
+  },
+  {
+    "title": "economics of intelligence",
+    "subtitle": "notes on the ai economy",
+    "year": "2026",
+    "tags": ["AI", "Economics", "Research", "Data"],
+    "description": "An essay and research notebook about what happens as AI labs catch up faster and fewer tasks require frontier intelligence. Includes predictions, cost notes, and a searchable database of model releases.",
+    "link": "https://intelligence.soli.blue/",
+    "status": "live"
+  },
+  {
     "title": "habibi",
     "subtitle": "couples & relationships",
     "year": "2024",

@@ -11,6 +11,7 @@ const MAX_HISTORY = 12; // cap turns forwarded upstream to bound token usage
 const MAX_MESSAGE_LENGTH = 1200;
 const MAX_HISTORY_ITEM_LENGTH = 1600;
 const MAX_BODY_BYTES = 24000;
+const MAX_OUTPUT_TOKENS = 2048;
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_MAX = 12;
 const rateLimits = new Map();
@@ -112,7 +113,7 @@ export const onRequestPost = async ({ request, env }) => {
     contents.push({ role: 'user', parts: [{ text: normalizedMessage }] });
 
     const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:streamGenerateContent?alt=sse&key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -120,7 +121,7 @@ export const onRequestPost = async ({ request, env }) => {
           systemInstruction: { parts: [{ text: systemPrompt }] },
           contents,
           generationConfig: {
-            maxOutputTokens: 512,
+            maxOutputTokens: MAX_OUTPUT_TOKENS,
           },
         }),
       },
@@ -131,12 +132,14 @@ export const onRequestPost = async ({ request, env }) => {
       return json(request, { error: 'Something went wrong' }, 500);
     }
 
-    const data = await res.json();
-    const response = (data.candidates?.[0]?.content?.parts || [])
-      .map(p => p.text || '')
-      .join('');
-
-    return json(request, { response });
+    return new Response(res.body, {
+      headers: {
+        'Content-Type': 'text/event-stream; charset=utf-8',
+        'Cache-Control': 'no-cache, no-transform',
+        'X-Content-Type-Options': 'nosniff',
+        ...getCorsHeaders(request),
+      },
+    });
   } catch (error) {
     console.error('Error:', error);
     return json(request, { error: 'Something went wrong' }, 500);

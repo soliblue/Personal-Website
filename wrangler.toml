@@ -10,7 +10,14 @@ name = "soli-blue"
 compatibility_date = "2026-06-01"
 pages_build_output_dir = "dist"
 
+[[d1_databases]]
+binding = "VISITOR_BOARD_DB"
+database_name = "soli-visitor-board"
+database_id = "4a9d1f5b-24b0-4b42-bc02-0d9296596d85"
+migrations_dir = "migrations"
+
 # Secrets (set out-of-band, never commit):
 #   npx wrangler pages secret put GOOGLE_AI_API_KEY
 #   npx wrangler pages secret put RESEND_API_KEY
-# Used by functions/api/chat.js and functions/api/contact.js.
+#   npx wrangler pages secret put BOARD_HASH_SALT
+# Used by functions/api/chat.js, functions/api/contact.js, and functions/api/visitor-board.js.

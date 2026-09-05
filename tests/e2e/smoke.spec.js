@@ -1,4 +1,9 @@
 const { expect, test } = require('@playwright/test');
+const projects = require('../../src/assets/projects.json');
+
+const projectCount = projects.length;
+const liveProjectCount = projects.filter(project => project.status !== 'graveyard').length;
+const archiveProjectCount = projectCount - liveProjectCount;
 
 const collectPageErrors = (page) => {
   const errors = [];
@@ -36,8 +41,8 @@ test.describe('site smoke', () => {
     await page.locator('.menu-item-row', { hasText: 'Projects' }).click();
 
     await expect(page.locator('.titlebar-text', { hasText: 'Projects' })).toBeVisible();
-    await expect(page.locator('.buddy-bubble')).toContainText('11 projects');
-    await expect(page.getByText('11 object(s)')).toBeVisible();
+    await expect(page.locator('.buddy-bubble')).toContainText(`${projectCount} projects`);
+    await expect(page.getByText(`${projectCount} object(s)`)).toBeVisible();
     const projectsWindow = page.locator('.win95-window').filter({
       has: page.locator('.titlebar-text', { hasText: 'Projects' }),
     });
@@ -45,11 +50,15 @@ test.describe('site smoke', () => {
     await expect(
       projectGroups.nth(0).locator('.project-group-header'),
     ).toContainText('Live Projects');
-    await expect(projectGroups.nth(0).locator('.project-group-count')).toHaveText('3');
+    await expect(projectGroups.nth(0).locator('.project-group-count')).toHaveText(
+      String(liveProjectCount),
+    );
     await expect(
       projectGroups.nth(1).locator('.project-group-header'),
     ).toContainText('Archive');
-    await expect(projectGroups.nth(1).locator('.project-group-count')).toHaveText('8');
+    await expect(projectGroups.nth(1).locator('.project-group-count')).toHaveText(
+      String(archiveProjectCount),
+    );
     await expect(projectsWindow.locator('.project-status-dot.live').first()).toBeVisible();
     await expect(projectsWindow.locator('.project-status-dot.archive').first()).toBeVisible();
     await expect(projectsWindow).not.toContainText('.doc');
@@ -183,24 +192,143 @@ test.describe('site smoke', () => {
     expect(errors).toEqual([]);
   });
 
+  test('Visitor Board previews and pins a constrained note', async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== 'chromium', 'Desktop board flow is covered once.');
+    const errors = collectPageErrors(page);
+    const now = Math.floor(Date.now() / 1000);
+    let requestBody;
+
+    await page.route('**/api/visitor-board', async (route) => {
+      if (route.request().method() === 'GET') {
+        await route.fulfill({
+          contentType: 'application/json',
+          body: JSON.stringify({
+            total: 2,
+            entries: [
+              {
+                id: 2,
+                name: 'Ada',
+                stamp: 'flower',
+                color: 'mint',
+                messageKey: 'tiny-internet',
+                createdAt: now - 120,
+              },
+              {
+                id: 1,
+                name: 'soli',
+                stamp: 'floppy',
+                color: 'sky',
+                messageKey: 'welcome',
+                createdAt: now - 3600,
+              },
+            ],
+          }),
+        });
+        return;
+      }
+
+      requestBody = route.request().postDataJSON();
+      await route.fulfill({
+        status: 201,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          ok: true,
+          entry: {
+            id: 3,
+            name: requestBody.name,
+            stamp: requestBody.stamp,
+            color: requestBody.color,
+            messageKey: requestBody.messageKey,
+            createdAt: now,
+          },
+        }),
+      });
+    });
+
+    await page.addInitScript(() => sessionStorage.setItem('soli95-booted', 'true'));
+    await page.goto('/windows95');
+    await page.locator('.desktop-icon', { hasText: 'Visitor Board' }).dblclick();
+
+    const boardWindow = page.locator('.win95-window').filter({
+      has: page.locator('.titlebar-text', { hasText: 'Visitor Board' }),
+    });
+    await expect(boardWindow).toBeVisible();
+    await expect(boardWindow.locator('.visitor-note')).toHaveCount(2);
+    await expect(boardWindow).toContainText('I like this tiny internet.');
+
+    await boardWindow.getByRole('button', { name: 'Sign the board' }).click();
+    await boardWindow.getByLabel('Display name').fill('Visitor-42');
+    await boardWindow.getByRole('button', { name: 'Rocket' }).click();
+    await boardWindow.getByRole('button', { name: 'Rose pink' }).click();
+    await boardWindow.getByLabel('Leave a note').selectOption('keep-weird');
+    await expect(boardWindow.locator('.preview-note')).toContainText('Visitor-42');
+    await expect(boardWindow.locator('.preview-note')).toContainText(
+      'Keep building weird things.',
+    );
+    await boardWindow.getByRole('button', { name: 'Pin my note' }).click();
+
+    await expect(boardWindow.locator('.board-dialog')).toHaveCount(0);
+    await expect(boardWindow.locator('.visitor-note')).toHaveCount(3);
+    await expect(boardWindow.locator('.visitor-note').first()).toContainText('Visitor-42');
+    await expect(boardWindow.locator('.visitor-note').first()).toHaveClass(/paper-rose/);
+    await expect(boardWindow.locator('.board-count')).toContainText('3 notes');
+    expect(requestBody).toEqual({
+      name: 'Visitor-42',
+      stamp: 'rocket',
+      color: 'rose',
+      messageKey: 'keep-weird',
+      website: '',
+    });
+    expect(errors).toEqual([]);
+  });
+
+  test('Visitor Board composer stays usable on a phone', async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== 'mobile-chrome', 'Mobile board sizing is covered once.');
+
+    await page.route('**/api/visitor-board', route => route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({ total: 0, entries: [] }),
+    }));
+    await page.addInitScript(() => sessionStorage.setItem('soli95-booted', 'true'));
+    await page.goto('/windows95');
+    await page.locator('.win95-window.active .win-btn.close').click();
+    await page.locator('.desktop-icon', { hasText: 'Visitor Board' }).click();
+    await page.getByRole('button', { name: 'Sign the board' }).click();
+
+    const nameInput = page.getByLabel('Display name');
+    await nameInput.focus();
+    const fontSize = await nameInput.evaluate(el => parseFloat(getComputedStyle(el).fontSize));
+    expect(fontSize).toBeGreaterThanOrEqual(18);
+    const horizontalOverflow = await page.locator('.board-dialog').evaluate(
+      dialog => dialog.scrollWidth - dialog.clientWidth,
+    );
+    expect(horizontalOverflow).toBeLessThanOrEqual(1);
+  });
+
   test('Messenger renders safe Markdown with comfortable composer spacing', async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== 'chromium', 'Desktop messenger flow is covered once.');
     const errors = collectPageErrors(page);
 
     await page.route('**/api/chat', route => route.fulfill({
-      contentType: 'application/json',
-      body: JSON.stringify({
-        response: [
+      contentType: 'text/event-stream',
+      body: [
+        `data: ${JSON.stringify({ candidates: [{ content: { parts: [{ text: [
           '**Useful link:** [Machtblick](https://machtblick.de/)',
           '',
           '- One thing',
           '- Another thing',
+        ].join('\n') }] } }] })}`,
+        `data: ${JSON.stringify({ candidates: [{ content: { parts: [{ text: [
           '',
           '<script>window.messengerXss = true</script>',
           '![Tracker](https://example.com/pixel.gif)',
           '[Unsafe link](javascript:window.messengerXss=true)',
-        ].join('\n'),
-      }),
+          '',
+          'Final streamed chunk.',
+        ].join('\n') }] } }] })}`,
+        'data: [DONE]',
+        '',
+      ].join('\n\n'),
     }));
 
     await page.addInitScript(() => sessionStorage.setItem('soli95-booted', 'true'));
@@ -223,6 +351,8 @@ test.describe('site smoke', () => {
     await expect(reply.locator('script')).toHaveCount(0);
     await expect(reply.locator('img')).toHaveCount(0);
     await expect(reply.getByRole('link', { name: 'Unsafe link' })).toHaveCount(0);
+    await expect(reply).toContainText('Final streamed chunk.');
+    await expect(page.locator('.sender-soli')).toHaveCount(2);
     await expect.poll(() => page.evaluate(() => window.messengerXss)).not.toBe(true);
 
     const bottomGap = await page.locator('.messenger-app').evaluate((app) => {
@@ -231,6 +361,20 @@ test.describe('site smoke', () => {
     });
     expect(bottomGap).toBeGreaterThanOrEqual(6);
     expect(errors).toEqual([]);
+  });
+
+  test('Messenger input does not trigger iPhone Safari focus zoom', async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== 'mobile-chrome', 'Mobile composer sizing is covered once.');
+
+    await page.addInitScript(() => sessionStorage.setItem('soli95-booted', 'true'));
+    await page.goto('/windows95');
+    await page.locator('.win95-window.active .win-btn.close').click();
+    await page.locator('.desktop-icon', { hasText: 'Messenger' }).dblclick();
+
+    const input = page.getByPlaceholder('Type a message...');
+    await input.focus();
+    const fontSize = await input.evaluate(el => parseFloat(getComputedStyle(el).fontSize));
+    expect(fontSize).toBeGreaterThanOrEqual(18);
   });
 
   test('Internet Explorer includes Machtblick and embedded SongGPT', async ({ page }, testInfo) => {
@@ -465,6 +609,12 @@ test.describe('site smoke', () => {
       'href',
       'https://machtblick.de/',
     );
+    await expect(
+      page.locator('.project', { hasText: 'turing machine' }).locator('a[title="Open project"]'),
+    ).toHaveAttribute('href', 'https://turing.soli.blue/');
+    await expect(
+      page.locator('.project', { hasText: 'economics of intelligence' }).locator('a[title="Open project"]'),
+    ).toHaveAttribute('href', 'https://intelligence.soli.blue/');
 
     await page.getByRole('button', { name: 'Graveyard' }).click();
     await expect(page.locator('.tabs button.active')).toHaveText('Graveyard');

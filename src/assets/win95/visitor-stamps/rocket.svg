@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" shape-rendering="crispEdges">
+  <path d="M17 2h8v3h3v9h-3v5h-3v4h-9v-3H9v-9h3V6h5z" fill="#202020"/>
+  <path d="M18 4h5v3h3v6h-3v5h-3v3h-5v-3h-4v-6h3V7h4z" fill="#f2f2ed"/>
+  <rect x="19" y="7" width="5" height="5" fill="#4e98d4"/>
+  <rect x="10" y="17" width="4" height="8" fill="#d34848"/>
+  <rect x="22" y="17" width="4" height="8" fill="#d34848"/>
+  <rect x="15" y="23" width="6" height="4" fill="#e04b2f"/>
+  <rect x="16" y="27" width="4" height="4" fill="#f3bc3d"/>
+</svg>

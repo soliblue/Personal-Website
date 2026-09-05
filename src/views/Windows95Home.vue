@@ -434,6 +434,15 @@ The squirrel got here first.</pre>
           <MessengerApp v-if="win.open" @sound="playSound" />
         </div>
 
+        <!-- Visitor Board Window - stays mounted while minimized to preserve the composer -->
+        <div v-if="win.id === 'visitorboard'" class="app-window">
+          <VisitorBoard
+            v-if="win.open"
+            @sound="playSound"
+            @signed="onVisitorBoardSigned"
+          />
+        </div>
+
         <!-- Minesweeper Window - stays mounted while minimized to keep the game -->
         <div v-if="win.id === 'minesweeper'" class="app-window minesweeper-host">
           <Minesweeper v-if="win.open" @sound="playSound" />
@@ -570,6 +579,10 @@ The squirrel got here first.</pre>
           <img src="../assets/win95/msn.svg">
           <span>Messenger</span>
         </div>
+        <div class="menu-item-row" @click="openWindow('visitorboard')">
+          <img src="../assets/win95/visitor-board.svg">
+          <span>Visitor Board</span>
+        </div>
         <div class="menu-item-row" @click="openWindow('paint')">
           <img src="../assets/win95/paint.svg">
           <span>Paint</span>
@@ -651,6 +664,7 @@ import NewspaperHome from '@/views/NewspaperHome';
 import SpaceGameHome from '@/views/SpaceGameHome';
 import CodeHopHome from '@/views/CodeHopHome';
 import MessengerApp from '@/components/win95/MessengerApp';
+import VisitorBoard from '@/components/win95/VisitorBoard';
 import Minesweeper from '@/components/win95/Minesweeper';
 import PaintApp from '@/components/win95/PaintApp';
 import ProjectExplorer from '@/components/win95/ProjectExplorer';
@@ -667,6 +681,7 @@ import terminalIcon from '@/assets/win95/terminal.svg';
 import globeIcon from '@/assets/win95/globe.svg';
 import recycleIcon from '@/assets/win95/recycle.svg';
 import msnIcon from '@/assets/win95/msn.svg';
+import visitorBoardIcon from '@/assets/win95/visitor-board.svg';
 import mineIcon from '@/assets/win95/mine.svg';
 import paintIcon from '@/assets/win95/paint.svg';
 import spaceshipIcon from '@/assets/space/spaceship.png';
@@ -691,6 +706,8 @@ import piassoIcon from '@/assets/win95/projects/piasso.svg';
 import remoteClaudeIcon from '@/assets/win95/projects/remote-claude.svg';
 import songgptIcon from '@/assets/win95/projects/songgpt.svg';
 import toy2lifeIcon from '@/assets/win95/projects/toy2life.svg';
+import turingIcon from '@/assets/win95/projects/turing.svg';
+import intelligenceIcon from '@/assets/win95/projects/intelligence.svg';
 
 const PET_SPRITES = {
   annoyed: squirrelAnnoyed,
@@ -717,6 +734,8 @@ const PROJECT_ICONS = {
   happy: happyIcon,
   piasso: piassoIcon,
   biddz: biddzIcon,
+  'turing machine': turingIcon,
+  'economics of intelligence': intelligenceIcon,
 };
 
 // Tiny Web Audio synth: each sound is a list of [freq, startOffset, duration, waveType, volume]
@@ -818,6 +837,14 @@ const BUDDY_REACTIONS = {
   contact: [
     'A real form. We are getting serious.',
     'Type carefully. This one actually sends.',
+  ],
+  visitorboard: [
+    'A public write operation. I reviewed the input constraints.',
+    'Leave a note. Future internet archaeologists will appreciate it.',
+  ],
+  visitorSigned: [
+    'Pinned. You are officially part of the desktop now.',
+    'A tiny note with global distribution. Beautiful.',
   ],
   control: [
     'Personality settings are managed automatically. Convenient.',
@@ -950,6 +977,7 @@ const BUDDY_MOODS = {
   sendSuccess: 'excited',
   soundOff: 'annoyed',
   spacegame: 'excited',
+  visitorSigned: 'excited',
   windows: 'annoyed',
 };
 
@@ -992,6 +1020,8 @@ const BUDDY_FRAMES = {
   spacegame: 'excited',
   taskbarFocus: 'curious',
   taskbarHide: 'sit',
+  visitorboard: 'curious',
+  visitorSigned: 'excited',
   windows: 'annoyed',
 };
 
@@ -1004,6 +1034,7 @@ export default {
     SpaceGameHome,
     CodeHopHome,
     MessengerApp,
+    VisitorBoard,
     Minesweeper,
     PaintApp,
     ProjectExplorer,
@@ -1071,6 +1102,7 @@ export default {
         { id: 'projects', label: 'Projects', img: folderIcon },
         { id: 'about', label: 'About Me', img: aboutIcon },
         { id: 'contact', label: 'Contact', img: mailIcon },
+        { id: 'visitorboard', label: 'Visitor Board', img: visitorBoardIcon },
         { id: 'paint', label: 'Paint', img: paintIcon },
         { id: 'minesweeper', label: 'Minesweeper', img: mineIcon },
         {
@@ -1243,6 +1275,21 @@ export default {
           zIndex: 10,
           showMenu: false,
           contentClass: '',
+        },
+        {
+          id: 'visitorboard',
+          title: 'Visitor Board',
+          icon: visitorBoardIcon,
+          open: false,
+          minimized: false,
+          maximized: false,
+          x: 115,
+          y: 45,
+          width: 760,
+          height: 560,
+          zIndex: 10,
+          showMenu: false,
+          contentClass: 'app-container',
         },
         {
           id: 'recycle',
@@ -1721,6 +1768,9 @@ export default {
       this.buddyMood = mood || BUDDY_MOODS[key] || 'curious';
       this.setBuddyFrame(BUDDY_FRAMES[key] || 'curious');
       this.recordBuddy(key, this.buddyMessage);
+    },
+    onVisitorBoardSigned() {
+      this.narrateBuddy('visitorSigned');
     },
     pokeBuddy() {
       if (this.buddySleeping) {

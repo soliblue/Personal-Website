@@ -16,3 +16,5 @@ yarn-error.log*
 functions/.env
 ui-debug.log
 functions/ui-debug.log
+.wrangler/
+test-results/

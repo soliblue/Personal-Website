@@ -111,6 +111,9 @@ export default {
       this.isSending = true;
       this.scrollToBottom();
 
+      const assistantMessage = { role: 'assistant', content: '' };
+      this.messages.push(assistantMessage);
+
       try {
         // `wrangler pages dev` serves /api/* locally, same as production.
         const res = await fetch('/api/chat', {
@@ -122,22 +125,61 @@ export default {
             history: this.messages.slice(0, -1).slice(-MAX_HISTORY),
           }),
         });
-        const data = await res.json();
-
         if (res.status === 429) {
           throw new Error('whoa, slow down! give me a minute to catch my breath 😅');
         }
-        if (data.error) {
+        if (!res.ok || !res.body) {
           throw new Error('hmm, something broke on my end. try again in a sec?');
         }
 
-        this.messages.push({ role: 'assistant', content: data.response });
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        const consumeEvents = (flush = false) => {
+          const events = buffer.split(/\r?\n\r?\n/);
+          buffer = flush ? '' : events.pop();
+
+          events.forEach((event) => {
+            const payload = event
+              .split(/\r?\n/)
+              .filter(line => line.startsWith('data:'))
+              .map(line => line.slice(5).trimStart())
+              .join('\n');
+            if (!payload || payload === '[DONE]') return;
+
+            const data = JSON.parse(payload);
+            if (data.error) throw new Error('hmm, something broke on my end. try again in a sec?');
+
+            const candidate = data.candidates && data.candidates[0];
+            const parts = candidate && candidate.content && candidate.content.parts;
+            const chunk = (parts || [])
+              .map(part => part.text || '')
+              .join('');
+            if (chunk) {
+              assistantMessage.content += chunk;
+              this.scrollToBottom();
+            }
+          });
+        };
+
+        const readNextChunk = async () => {
+          const { value, done } = await reader.read();
+          buffer += decoder.decode(value || new Uint8Array(), { stream: !done });
+          consumeEvents(done);
+          if (!done) await readNextChunk();
+        };
+        await readNextChunk();
+
+        if (!assistantMessage.content) {
+          throw new Error('hmm, i came up blank. try asking that another way?');
+        }
         this.$emit('sound', 'receive');
       } catch (error) {
-        this.messages.push({
-          role: 'assistant',
-          content: error.message || 'hmm, something broke on my end. try again in a sec?',
-        });
+        const errorMessage = error.message || 'hmm, something broke on my end. try again in a sec?';
+        assistantMessage.content = assistantMessage.content
+          ? `${assistantMessage.content}\n\n*The reply was interrupted. Please try again.*`
+          : errorMessage;
       }
 
       this.isSending = false;
@@ -345,7 +387,8 @@ export default {
    Bump to 16px on touch devices to keep the phone from zooming in. */
 @media (pointer: coarse) {
   .messenger-input {
-    font-size: 16px;
+    /* The page uses body zoom: .9, so 18px remains above Safari's 16px threshold. */
+    font-size: 18px;
   }
 }
 
