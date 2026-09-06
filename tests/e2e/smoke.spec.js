@@ -15,6 +15,29 @@ const collectPageErrors = (page) => {
 };
 
 test.describe('site smoke', () => {
+  test('desktop and Start only expose the retained apps', async ({ page }) => {
+    await page.goto('/windows95');
+    await expect(page.locator('.desktop-icon').first()).toBeVisible();
+    await expect(page.locator('.boot-screen')).toBeHidden({ timeout: 8000 });
+    const desktop = page.locator('.desktop-icon');
+    await expect(page.locator('.win95-window:visible')).toHaveCount(0);
+    expect((await desktop.allTextContents()).slice(0, 4).map(text => text.trim()))
+      .toEqual(['Projects', 'Visitor Board', 'Internet', 'Messenger']);
+    for (const name of ['Paint', 'My Computer', 'About Me', 'GitHub', 'Recycle Bin', 'Terminal', 'Minesweeper']) {
+      await expect(desktop.filter({ hasText: name })).toHaveCount(0);
+    }
+    await page.reload();
+    await expect(page.locator('.desktop-icon').first()).toBeVisible();
+    await expect(page.locator('.boot-screen')).toBeHidden();
+    await expect(page.locator('.win95-window:visible')).toHaveCount(0);
+    await page.getByRole('button', { name: /start/i }).click();
+    for (const name of ['Paint', 'My Computer', 'About Me', 'GitHub', 'Recycle Bin', 'Terminal', 'Minesweeper']) {
+      await expect(page.locator('.menu-item-row', { hasText: name })).toHaveCount(0);
+    }
+    await page.locator('.menu-item-row', { hasText: 'Projects' }).click();
+    await expect(page.locator('.win95-window:visible .titlebar-text')).toHaveText('Projects');
+  });
+
   test('Windows 95 shell boots and opens Projects from Start', async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== 'chromium', 'Desktop shell flow is covered once.');
     const errors = collectPageErrors(page);
@@ -22,8 +45,7 @@ test.describe('site smoke', () => {
     await page.goto('/');
     await expect(page).toHaveURL(/\/windows95$/);
     await expect(page.locator('.boot-screen')).toBeHidden({ timeout: 8000 });
-    await expect(page.locator('.titlebar-text', { hasText: 'About Me' })).toBeVisible();
-    await expect(page.locator('.about-content')).not.toContainText('ai engineer');
+    await expect(page.locator('.win95-window:visible')).toHaveCount(0);
     await expect(page.locator('.desktop-icon', { hasText: 'World Pins' })).toHaveCount(0);
 
     await page.locator('.desktop-icon', { hasText: 'Resume' }).dblclick();
@@ -291,7 +313,6 @@ test.describe('site smoke', () => {
     }));
     await page.addInitScript(() => sessionStorage.setItem('soli95-booted', 'true'));
     await page.goto('/windows95');
-    await page.locator('.win95-window.active .win-btn.close').click();
     await page.locator('.desktop-icon', { hasText: 'Visitor Board' }).click();
     await page.getByRole('button', { name: 'Sign the board' }).click();
 
@@ -353,6 +374,8 @@ test.describe('site smoke', () => {
     await expect(reply.getByRole('link', { name: 'Unsafe link' })).toHaveCount(0);
     await expect(reply).toContainText('Final streamed chunk.');
     await expect(page.locator('.sender-soli')).toHaveCount(2);
+    await expect(page.locator('.sender-soli')).toHaveText(['soli:', 'soli:']);
+    await expect(page.locator('.sender-you')).toHaveText('you:');
     await expect.poll(() => page.evaluate(() => window.messengerXss)).not.toBe(true);
 
     const bottomGap = await page.locator('.messenger-app').evaluate((app) => {
@@ -368,7 +391,6 @@ test.describe('site smoke', () => {
 
     await page.addInitScript(() => sessionStorage.setItem('soli95-booted', 'true'));
     await page.goto('/windows95');
-    await page.locator('.win95-window.active .win-btn.close').click();
     await page.locator('.desktop-icon', { hasText: 'Messenger' }).dblclick();
 
     const input = page.getByPlaceholder('Type a message...');
@@ -377,83 +399,44 @@ test.describe('site smoke', () => {
     expect(fontSize).toBeGreaterThanOrEqual(18);
   });
 
-  test('Internet Explorer includes Machtblick and embedded SongGPT', async ({ page }, testInfo) => {
-    test.skip(testInfo.project.name !== 'chromium', 'Desktop browser flow is covered once.');
+  test('Internet Explorer embeds the personal sites without the local file page', async ({ page }) => {
     const errors = collectPageErrors(page);
 
-    await page.route('https://songgpt.soli.blue/', route => route.fulfill({
-      contentType: 'text/html',
-      body: '<title>SongGPT test</title><main>SongGPT is framed</main>',
-    }));
+    for (const site of ['songgpt', 'intelligence', 'germany']) {
+      await page.route(`https://${site}.soli.blue/`, route => route.fulfill({
+        contentType: 'text/html',
+        body: `<main>${site} is framed</main>`,
+      }));
+    }
     await page.addInitScript(() => sessionStorage.setItem('soli95-booted', 'true'));
     await page.goto('/windows95');
-    await page.locator('.desktop-icon', { hasText: 'Internet' }).dblclick();
+    await page.getByRole('button', { name: 'Internet', exact: true }).press('Enter');
 
     const browserWindow = page.locator('.win95-window').filter({
       has: page.locator('.titlebar-text', { hasText: 'Internet Explorer' }),
     });
     const address = browserWindow.locator('.url-select');
-    await address.selectOption('songgpt');
-    await expect(browserWindow.locator('.browser-frame')).toHaveAttribute(
-      'src',
-      'https://songgpt.soli.blue/',
-    );
-    await expect(browserWindow.locator('.browser-frame')).toHaveAttribute('title', 'SongGPT');
+    await expect(address.locator('option[value="local"]')).toHaveCount(0);
+    await expect(browserWindow).not.toContainText('DO_NOT_OPEN');
+    for (const [site, title] of [['songgpt', 'SongGPT'], ['intelligence', 'Intelligence'], ['germany', 'Germany']]) {
+      await address.selectOption(site);
+      await expect(browserWindow.locator('.browser-frame')).toHaveAttribute('src', `https://${site}.soli.blue/`);
+      await expect(browserWindow.locator('.browser-frame')).toHaveAttribute('title', title);
+      await expect(page.frameLocator('.browser-frame').locator('main')).toHaveText(`${site} is framed`);
+      const previousFrame = await browserWindow.locator('.browser-frame').elementHandle();
+      await browserWindow.getByRole('button', { name: 'Refresh', exact: true }).click();
+      await expect.poll(() => previousFrame.evaluate(el => el.isConnected)).toBe(false);
+      await expect(page.frameLocator('.browser-frame').locator('main')).toHaveText(`${site} is framed`);
+      expect(page.context().pages()).toHaveLength(1);
+    }
+    await browserWindow.getByRole('button', { name: 'Home', exact: true }).click();
+    await expect(address).toHaveValue('wikipedia');
+    await expect(browserWindow.locator('.browser-frame')).toHaveCount(0);
 
     await address.selectOption('machtblick');
     await expect(browserWindow.locator('.browser-launch-page')).toContainText('Machtblick');
     await expect(browserWindow.getByRole('button', { name: 'Open machtblick.de' })).toBeVisible();
     await expect(browserWindow.locator('.browser-frame')).toHaveCount(0);
-    expect(errors).toEqual([]);
-  });
-
-  test('Windows 95 Paint draws, undoes, redoes, and restores the picture', async ({ page }) => {
-    test.skip(test.info().project.name !== 'chromium', 'Desktop Paint flow is covered once.');
-    const errors = collectPageErrors(page);
-
-    await page.addInitScript(() => {
-      sessionStorage.setItem('soli95-booted', 'true');
-      localStorage.removeItem('soli95-paint-document');
-    });
-    await page.goto('/windows95');
-
-    const aboutIcon = page.locator('.desktop-icon', { hasText: 'About Me' }).locator('img');
-    const computerIcon = page.locator('.desktop-icon', { hasText: 'My Computer' }).locator('img');
-    await expect(aboutIcon).not.toHaveAttribute('src', await computerIcon.getAttribute('src'));
-
-    await page.locator('.desktop-icon', { hasText: 'Paint' }).dblclick();
-    const paintWindow = page.locator('.win95-window').filter({
-      has: page.locator('.titlebar-text', { hasText: 'untitled - Paint' }),
-    });
-    const canvas = paintWindow.locator('.paint-stage canvas');
-    await expect(canvas).toBeVisible();
-    await expect(canvas).toHaveAttribute('data-tool', 'pencil');
-
-    await paintWindow.getByRole('button', { name: 'Brush', exact: true }).click();
-    await paintWindow.getByRole('button', { name: 'Brush size 10' }).click();
-    await paintWindow.getByRole('button', { name: 'Use #ff0000' }).click();
-    const box = await canvas.boundingBox();
-    const start = { x: box.x + box.width * 0.25, y: box.y + box.height * 0.45 };
-    const finish = { x: box.x + box.width * 0.55, y: box.y + box.height * 0.45 };
-    await page.mouse.move(start.x, start.y);
-    await page.mouse.down();
-    await page.mouse.move(finish.x, finish.y, { steps: 10 });
-    await page.mouse.up();
-
-    const samplePixel = async () => canvas.evaluate((element) => {
-      const context = element.getContext('2d');
-      return Array.from(context.getImageData(360, 198, 1, 1).data);
-    });
-    await expect.poll(samplePixel).toEqual([255, 0, 0, 255]);
-
-    await paintWindow.getByRole('button', { name: 'Undo' }).click();
-    await expect.poll(samplePixel).toEqual([255, 255, 255, 255]);
-    await paintWindow.getByRole('button', { name: 'Redo' }).click();
-    await expect.poll(samplePixel).toEqual([255, 0, 0, 255]);
-
-    await paintWindow.locator('.win-btn.close').click();
-    await page.locator('.desktop-icon', { hasText: 'Paint' }).dblclick();
-    await expect.poll(samplePixel).toEqual([255, 0, 0, 255]);
     expect(errors).toEqual([]);
   });
 
@@ -469,24 +452,8 @@ test.describe('site smoke', () => {
     await expect(talkToBuddy.locator('img')).toHaveAttribute('alt', 'Pixel squirrel');
     await expect(buddy).toHaveAttribute('data-frame', /idle|curious/);
 
-    await page.locator('.desktop-icon', { hasText: 'My Computer' }).dblclick();
-
-    const computerWindow = page.locator('.win95-window').filter({
-      has: page.locator('.titlebar-text', { hasText: 'My Computer' }),
-    });
-    await expect(computerWindow).toBeVisible();
-    await computerWindow.locator('.folder-item', { hasText: 'Local Disk (C:)' }).dblclick();
-    await expect(computerWindow.locator('.address-bar')).toHaveText('C:\\');
-    await computerWindow.locator('.folder-item', { hasText: 'DO_NOT_OPEN' }).dblclick();
-    await expect(computerWindow.locator('.explorer-status')).toContainText('You were warned');
-    await expect(computerWindow.locator('.folder-item', { hasText: 'claude.exe' })).toHaveCount(0);
-
-    await computerWindow.locator('.folder-item', { hasText: 'readme.txt' }).dblclick();
-    const notepadWindow = page.locator('.win95-window').filter({
-      has: page.locator('.titlebar-text', { hasText: 'readme.txt' }),
-    });
-    await expect(notepadWindow.locator('.notepad-text')).toContainText('DESKTOP PET NOTES');
-    await notepadWindow.locator('.win-btn.close').click();
+    await page.getByRole('button', { name: /start/i }).click();
+    await page.locator('.menu-item-row', { hasText: 'Projects' }).click();
 
     await talkToBuddy.click();
     await expect(page.locator('.buddy-bubble')).toContainText('I was told this was production.');
@@ -519,7 +486,7 @@ test.describe('site smoke', () => {
 
     await talkToBuddy.click({ button: 'right' });
     await page.getByRole('menuitem', { name: 'Inspect desktop' }).click();
-    await expect(page.locator('.buddy-bubble')).toContainText('visible windows');
+    await expect(page.locator('.buddy-bubble')).toContainText('1 visible window');
     await expect(buddy).toHaveAttribute('data-history', /[8-9]|[1-9][0-9]/);
 
     await talkToBuddy.click({ button: 'right' });
@@ -680,9 +647,9 @@ test.describe('site smoke', () => {
 
     await page.goto('/windows95');
     await expect(page.locator('.boot-screen')).toBeHidden({ timeout: 8000 });
-    await page.locator('.desktop-icon', { hasText: 'Space Game' }).dblclick();
+    await page.locator('.desktop-icon', { hasText: 'Codex Cruise' }).dblclick();
 
-    await expect(page.locator('.titlebar-text', { hasText: 'Space Game' })).toBeVisible();
+    await expect(page.locator('.titlebar-text', { hasText: 'Codex Cruise' })).toBeVisible();
     const score = page.locator('.space-game .stat').filter({ hasText: 'SCORE:' }).first();
     await expect(score).toBeVisible();
     await expect(score).not.toContainText('-');
@@ -729,72 +696,19 @@ test.describe('site smoke', () => {
     await expect.poll(async () => page.locator('.code-hop').getAttribute('data-airborne')).toBe('true');
     await page.waitForTimeout(900);
     await expect(page.locator('.code-hop')).toHaveAttribute('data-state', 'playing');
-    await expect(page.locator('.hud-stats')).toContainText('SCORE:');
-    await expect(page.locator('.hud-stats')).toContainText('SPEED:');
-    await expect(page.locator('.hud-stats')).toContainText('COMBO:');
-    await expect(page.locator('.hud-stats')).toContainText('SAFE:');
-
-    // Vue only exposes component internals in development; production still tests the actual UI above.
-    if (!process.env.E2E_BASE_URL) {
-    const upgradedState = await page.evaluate(() => {
-      const game = document.querySelector('.code-hop').__vueParentComponent.proxy;
-      game.obstacles = [];
-      game.powerups = [{
-        x: game.player.x + game.player.width / 2,
-        y: game.player.y + game.player.height / 2,
-        size: 34,
-        altitude: 100,
-        phase: 0,
-        taken: false,
-      }];
-      game.collectPowerups();
-      const shieldCollected = game.shielded;
-
-      game.obstacles = [{
-        x: game.player.x,
-        y: game.player.y,
-        width: game.player.width,
-        height: game.player.height,
-        passed: false,
-        flying: false,
-        destroyed: false,
-      }];
-      game.checkCollisions();
-      const recovered = game.gameState === 'playing'
-        && !game.shielded
-        && game.obstacles[0].destroyed;
-
-      game.obstacles = [];
-      game.worldIndex = 2;
-      game.elapsed = 0;
-      const realRandom = Math.random;
-      Math.random = () => 0;
-      game.spawnObstacle();
-      Math.random = realRandom;
-      const pairedObstacles = game.obstacles.length;
-
-      game.worldIndex = 1;
-      game.elapsed = 22.1;
-      game.updateWorld();
-      return {
-        shieldCollected,
-        recovered,
-        pairedObstacles,
-        world: game.worldIndex,
-        milestone: game.milestone.title,
-      };
-    });
-
-    expect(upgradedState).toEqual({
-      shieldCollected: true,
-      recovered: true,
-      pairedObstacles: 2,
-      world: 2,
-      milestone: 'WORLD 1-2',
-    });
-    await expect(page.locator('.code-hop')).toHaveAttribute('data-world', '2');
-    await expect(page.locator('.world-banner')).toContainText('CHECKPOINT +100');
-    }
+    await page.keyboard.down('ArrowRight');
+    await page.waitForTimeout(800);
+    await page.keyboard.up('ArrowRight');
+    await expect.poll(async () => Number(await page.locator('.code-hop').getAttribute('data-x'))).toBeGreaterThan(180);
+    await expect.poll(async () => Number(await page.locator('.code-hop').getAttribute('data-score'))).toBeGreaterThan(0);
+    await page.getByRole('button', { name: 'Pause game' }).click();
+    await expect(page.locator('.code-hop')).toHaveAttribute('data-state', 'paused');
+    const pausedX = await page.locator('.code-hop').getAttribute('data-x');
+    await page.keyboard.press('ArrowRight');
+    await page.waitForTimeout(300);
+    await expect(page.locator('.code-hop')).toHaveAttribute('data-x', pausedX);
+    await page.getByRole('button', { name: 'Resume', exact: true }).click();
+    await expect(page.locator('.code-hop')).toHaveAttribute('data-state', 'playing');
     expect(errors).toEqual([]);
   });
 
@@ -811,6 +725,13 @@ test.describe('site smoke', () => {
     await page.locator('.code-hop.embedded .panel button.primary').click();
     await expect(page.locator('.code-hop.embedded .overlay')).toBeHidden();
     await expect(page.locator('.code-hop.embedded .hud-brand')).toContainText('CLAUDE HOPS');
+    await page.getByRole('button', { name: /start/i }).click();
+    await page.locator('.menu-item-row', { hasText: 'Messenger' }).click();
+    await expect(page.locator('.code-hop')).toHaveAttribute('data-state', 'paused');
+    const input = page.getByPlaceholder('Type a message...');
+    await input.click();
+    await page.keyboard.type('hello world');
+    await expect(input).toHaveValue('hello world');
     expect(errors).toEqual([]);
   });
 

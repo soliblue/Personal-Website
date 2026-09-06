@@ -1,20 +1,18 @@
 <template>
   <div class="space-game" :class="{ embedded }" ref="gameContainer">
-    <canvas ref="canvas"></canvas>
+    <canvas ref="canvas" aria-label="Codex Cruise game"></canvas>
 
     <!-- HUD -->
     <div class="hud">
       <div class="hud-left">
         <button class="menu-btn" @click="toggleMenu">MENU</button>
-        <!-- Audio button hidden - not working reliably
-        <button class="sound-btn" @click="toggleSound" :title="audio.enabled ? 'Mute sounds' : 'Enable sounds'">
-          {{ audio.enabled ? '🔊' : '🔇' }}
-        </button>
-        -->
+        <button class="menu-btn" :disabled="pulseCharge < 100 || gameState !== 'playing'" @click="pulse">{{ pulseCharge >= 100 ? 'PULSE' : Math.floor(pulseCharge) + '%' }}</button>
+        <button class="menu-btn" @click="toggleSound" :aria-label="audio.enabled ? 'Mute sound' : 'Enable sound'">{{ audio.enabled ? '♪' : '♫' }}</button>
       </div>
       <div class="hud-right" :style="gameplay.getHudRightStyle()">
         <div class="stat">SCORE: {{ gameplay.score }}</div>
         <div class="stat">LEVEL: {{ gameplay.level }}</div>
+        <div class="stat shield-stat">SHIELD: {{ shield ? 'READY' : 'EMPTY' }}</div>
         <div class="stat multiplier" v-if="gameplay.multiplier > 1" :style="gameplay.getMultiplierStyle()">{{ gameplay.multiplier.toFixed(1) }}x</div>
         <div class="stat high">HIGH: {{ highScore }}</div>
       </div>
@@ -23,14 +21,18 @@
     <!-- Controls legend (desktop only) -->
     <div class="controls-legend" v-if="!isMobile">
       <span>[P] Pause</span>
+      <span>[Space] Pulse</span>
       <span>[←][→][↑][↓] Move</span>
     </div>
 
     <!-- Pause Menu -->
     <div class="menu-overlay" v-if="gameState === 'paused' && !contentView" @click.self="toggleMenu">
       <div class="menu-panel">
+        <img :src="spaceshipImg" class="flight-emblem" alt="OpenAI-inspired spaceship">
+        <div class="flight-title">CODEX CRUISE</div>
         <h2>PAUSED</h2>
         <button @click="resumeGame" class="menu-item">Resume Game</button>
+        <button @click="restartGame" class="menu-item">New flight</button>
         <div class="menu-divider"></div>
         <button @click="showContent('resume')" class="menu-item">Resume/CV</button>
         <button @click="showContent('projects')" class="menu-item">Projects</button>
@@ -174,7 +176,7 @@
 import { safeStorage } from '@/utils/storage';
 
 // Asset imports
-import spaceshipImg from '@/assets/space/spaceship.png';
+import spaceshipImg from '@/assets/space/codex-flies-ship.png';
 import asteroid1Img from '@/assets/space/asteroid1.png';
 import asteroid2Img from '@/assets/space/asteroid2.png';
 import asteroid3Img from '@/assets/space/asteroid3.png';
@@ -220,6 +222,7 @@ export default {
 
   data() {
     return {
+      spaceshipImg,
       // Canvas
       canvas: null,
       ctx: null,
@@ -250,6 +253,12 @@ export default {
       stars: [],
       obstacles: [],
       obstacleSpawnState: { timer: 0 },
+      pulseCharge: 100,
+      pulseRadius: 0,
+      shield: true,
+      grace: 120,
+      supplyTimer: 0,
+      supplies: [],
 
       // Animation
       animationId: null,
@@ -307,6 +316,8 @@ export default {
       // Setup canvas
       this.resize();
       window.addEventListener('resize', this.resize);
+      window.addEventListener('blur', this.pauseOnBlur);
+      document.addEventListener('visibilitychange', this.pauseWhenHidden);
 
       // For embedded mode, observe container size changes (e.g., window resize in Win95)
       if (this.embedded && typeof ResizeObserver !== 'undefined') {
@@ -327,6 +338,8 @@ export default {
           }
         },
         isPlaying: () => this.gameState === 'playing',
+        isActive: () => !this.embedded || !!this.$refs.gameContainer.closest('.win95-window.active'),
+        onPulse: this.pulse,
       });
 
       // Initialize game objects
@@ -379,6 +392,8 @@ export default {
         cancelAnimationFrame(this.animationId);
       }
       window.removeEventListener('resize', this.resize);
+      window.removeEventListener('blur', this.pauseOnBlur);
+      document.removeEventListener('visibilitychange', this.pauseWhenHidden);
       if (this.resizeObserver) {
         this.resizeObserver.disconnect();
       }
@@ -420,6 +435,22 @@ export default {
     },
 
     // Game state methods
+    pauseOnBlur() {
+      this.input.reset();
+      if (this.gameState === 'playing' && !this.gameplay.isDying) this.toggleMenu();
+    },
+    pauseWhenHidden() { if (document.hidden) this.pauseOnBlur(); },
+    pulse() {
+      if (this.gameState !== 'playing' || this.gameplay.isDying || this.pulseCharge < 100) return;
+      this.pulseCharge = 0;
+      this.pulseRadius = 12;
+      const radius = Math.max(160, this.width * 0.3);
+      const removed = this.obstacles.filter(o => Math.hypot(o.x - this.ship.x, o.y - this.ship.y) < radius);
+      this.obstacles = this.obstacles.filter(o => !removed.includes(o));
+      this.gameplay.distance += removed.length * 40;
+      this.grace = 45;
+      this.audio.playCloseCall();
+    },
     toggleTheme() {
       this.isDarkTheme = !this.isDarkTheme;
       safeStorage.setItem('spaceGameTheme', this.isDarkTheme ? 'dark' : 'light');
@@ -445,12 +476,14 @@ export default {
           this.audio.startEngine();
         }
       } else if (this.gameState === 'gameover') {
-        // From game over, go to paused menu
+        this.restartGame();
         this.gameState = 'paused';
+        this.audio.stopEngine();
       }
     },
 
     resumeGame() {
+      if (this.gameplay.isDying) { this.restartGame(); return; }
       this.contentView = null;
       this.gameState = 'playing';
       this.lastTime = 0;
@@ -468,6 +501,13 @@ export default {
     },
 
     restartGame() {
+      this.input.reset();
+      this.pulseCharge = 100;
+      this.pulseRadius = 0;
+      this.shield = true;
+      this.grace = 120;
+      this.supplies = [];
+      this.supplyTimer = 0;
       this.gameplay.reset();
       this.obstacles = [];
       this.obstacleSpawnState.timer = 0;
@@ -487,6 +527,7 @@ export default {
     },
 
     completeGameOver() {
+      this.gameplay.isDying = false;
       this.gameState = 'gameover';
       if (this.gameplay.score > this.highScore) {
         this.highScore = this.gameplay.score;
@@ -498,6 +539,8 @@ export default {
     // Game loop
     gameLoop(currentTime = 0) {
       this.animationId = requestAnimationFrame(this.gameLoop);
+      const host = this.$refs.gameContainer.closest('.win95-window');
+      if (this.gameState === 'playing' && host && (!host.classList.contains('active') || !host.getClientRects().length)) this.pauseOnBlur();
 
       if (!this.lastTime) {
         this.lastTime = currentTime;
@@ -535,10 +578,27 @@ export default {
       });
 
       // Skip other updates if dying
+      if (this.gameState === 'gameover') return;
       if (this.gameplay.isDying) {
         this.gameplay.updateExplosionParticles(dt);
         return;
       }
+
+      this.pulseCharge = Math.min(100, this.pulseCharge + dt * 100 / 480);
+      this.grace = Math.max(0, this.grace - dt);
+      this.pulseRadius = this.pulseRadius > 0 && this.pulseRadius < this.width ? this.pulseRadius + dt * 12 : 0;
+      this.supplyTimer += dt;
+      if (this.supplyTimer > 600) {
+        this.supplyTimer = 0;
+        this.supplies.push({ x: 40 + Math.random() * Math.max(1, this.width - 80), y: -20 });
+      }
+      this.supplies = this.supplies.filter(supply => {
+        supply.y += dt * 2.5;
+        if (Math.hypot(supply.x - this.ship.x, supply.y - this.ship.y) < 35) {
+          this.shield = true; this.gameplay.distance += 150; this.audio.playCloseCall(); return false;
+        }
+        return supply.y < this.height + 30;
+      });
 
       // Update ship position
       const touchTarget = this.input.getTargetPosition();
@@ -552,9 +612,17 @@ export default {
       updateObstacles(this.obstacles, this.height, dt);
 
       // Check collisions
-      if (checkCollisions(this.ship, this.obstacles)) {
-        this.gameOver();
-        return;
+      if (this.grace === 0 && checkCollisions(this.ship, this.obstacles)) {
+        if (this.shield) {
+          this.shield = false;
+          this.grace = 100;
+          this.obstacles = this.obstacles.filter(o => Math.hypot(o.x - this.ship.x, o.y - this.ship.y) > 100);
+          this.gameplay.screenShakeIntensity = 0.3;
+          this.audio.playCloseCall();
+        } else {
+          this.gameOver();
+          return;
+        }
       }
 
       // Check close calls (pass screen width for relative distance calculation)
@@ -591,6 +659,14 @@ export default {
       // Stars
       renderStars(ctx, this.stars, this.isDarkTheme);
 
+      ctx.strokeStyle = '#81efc1'; ctx.lineWidth = 2;
+      for (const supply of this.supplies) {
+        ctx.fillStyle = '#123c35'; ctx.fillRect(supply.x - 12, supply.y - 12, 24, 24);
+        ctx.strokeRect(supply.x - 12, supply.y - 12, 24, 24);
+        ctx.fillStyle = '#81efc1'; ctx.font = 'bold 18px monospace'; ctx.fillText('+', supply.x - 5, supply.y + 6);
+      }
+      if (this.pulseRadius > 0) { ctx.beginPath(); ctx.arc(this.ship.x, this.ship.y, this.pulseRadius, 0, Math.PI * 2); ctx.stroke(); }
+
       // Progress bar to next level
       renderProgressBar(ctx, this.width, this.gameplay.score, this.gameplay.level, LEVEL_CONFIG.pointsPerLevel);
 
@@ -601,7 +677,7 @@ export default {
       renderObstacles(ctx, this.obstacles, this.sprites, this.spritesLoaded, this.theme);
 
       // Ship (if not completely dead)
-      if (!this.gameplay.isDying || this.gameplay.deathTimer < 10) {
+      if (this.gameState !== 'gameover' && (!this.gameplay.isDying || this.gameplay.deathTimer < 10)) {
         renderShip(
           ctx,
           this.ship,
@@ -669,6 +745,22 @@ canvas {
 }
 
 /* HUD */
+.flight-emblem {
+  display: block;
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 8px;
+  image-rendering: pixelated;
+  mix-blend-mode: screen;
+}
+
+.flight-title {
+  color: #c7f7ef;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+}
+
 .hud {
   position: fixed;
   top: 0;
@@ -723,7 +815,11 @@ canvas {
 .hud-left {
   display: flex;
   align-items: center;
+  gap: 6px;
 }
+
+.hud-left .menu-btn:nth-child(2) { min-width: 82px; }
+.menu-btn:disabled { opacity: 0.55; cursor: default; }
 
 .stat {
   color: #00d4ff;
@@ -807,6 +903,10 @@ canvas {
   padding: 30px 40px;
   min-width: 250px;
   text-align: center;
+  box-sizing: border-box;
+  max-width: calc(100% - 24px);
+  max-height: calc(100% - 24px);
+  overflow-y: auto;
 }
 
 .menu-panel h2 {
@@ -1330,17 +1430,22 @@ canvas {
 /* Mobile adjustments */
 @media (max-width: 600px) {
   .hud {
-    padding: 10px 15px;
+    padding: 10px;
+    gap: 8px;
+    flex-wrap: wrap;
   }
 
   .menu-btn {
-    padding: 10px 14px;
+    padding: 10px 8px;
     font-size: 12px;
   }
 
   .stat {
-    font-size: 18px;
+    font-size: 14px;
   }
+
+  .hud-right { margin-left: auto; }
+  .hud-left .menu-btn:nth-child(2) { min-width: 62px; }
 
   .stat.multiplier {
     font-size: 20px;

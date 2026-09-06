@@ -37,7 +37,7 @@
         @dblclick="toggleMaximize(win)"
       >
         <div class="titlebar-left">
-          <img :src="win.icon" class="titlebar-icon">
+          <img :src="win.icon" class="titlebar-icon" :class="{ 'codex-ship': win.id === 'spacegame' }">
           <span class="titlebar-text title-bar-text">{{ win.title }}</span>
         </div>
         <div class="titlebar-buttons title-bar-controls">
@@ -383,7 +383,7 @@
               <img src="../assets/win95/home.svg" alt="Home">
             </button>
             <div class="browser-address">
-              <span>{{ win.browserUrl === 'local' ? 'file:///' : 'https://' }}</span>
+              <span>https://</span>
               <select
                 v-model="win.browserUrl"
                 class="url-select"
@@ -393,7 +393,8 @@
                 <option value="newspaper">thedailysoli.com</option>
                 <option value="machtblick">machtblick.de/votes/</option>
                 <option value="songgpt">songgpt.soli.blue</option>
-                <option value="local">C:/DO_NOT_OPEN/readme.txt</option>
+                <option value="intelligence">intelligence.soli.blue</option>
+                <option value="germany">germany.soli.blue</option>
               </select>
             </div>
             <button class="toolbar-btn" title="Refresh" @click="refreshBrowser(win)">
@@ -404,12 +405,12 @@
             <WikipediaHome v-if="win.browserUrl === 'wikipedia'" :embedded="true" />
             <NewspaperHome v-if="win.browserUrl === 'newspaper'" :embedded="true" />
             <iframe
-              v-if="win.browserUrl === 'songgpt'"
-              :key="`songgpt-${win.browserRefreshKey}`"
+              v-if="browserPages[win.browserUrl]"
+              :key="`${win.browserUrl}-${win.browserRefreshKey}`"
               class="browser-frame"
-              src="https://songgpt.soli.blue/"
-              title="SongGPT"
-              allow="autoplay"
+              :src="browserPages[win.browserUrl].url"
+              :title="browserPages[win.browserUrl].title"
+              :allow="win.browserUrl === 'songgpt' ? 'autoplay' : undefined"
             ></iframe>
             <div v-if="win.browserUrl === 'machtblick'" class="browser-launch-page">
               <img src="../assets/win95/globe.svg" alt="">
@@ -421,13 +422,6 @@
                 Open machtblick.de
               </button>
               <small>This website opens in its own window.</small>
-            </div>
-            <div v-if="win.browserUrl === 'local'" class="local-file-page">
-              <div class="local-file-title">C:\DO_NOT_OPEN\readme.txt</div>
-              <pre>There is no executable here anymore.
-
-The squirrel got here first.</pre>
-              <button class="win95-btn" @click="openSecretFolder">Open containing folder</button>
             </div>
           </div>
         </div>
@@ -448,7 +442,7 @@ The squirrel got here first.</pre>
 
         <!-- Minesweeper Window - stays mounted while minimized to keep the game -->
         <div v-if="win.id === 'minesweeper'" class="app-window minesweeper-host">
-          <Minesweeper v-if="win.open" @sound="playSound" />
+          <Minesweeper v-if="win.open" @sound="playSound" @resize="win.width = $event.width; win.height = $event.height" />
         </div>
 
         <!-- Paint Window - stays mounted while minimized to preserve the current drawing -->
@@ -456,7 +450,7 @@ The squirrel got here first.</pre>
           <PaintApp v-if="win.open" @sound="playSound" />
         </div>
 
-        <!-- Space Game Window - only mount when open and not minimized -->
+        <!-- Codex Cruise Window - only mount when open and not minimized -->
         <div v-if="win.id === 'spacegame'" class="app-window">
           <SpaceGameHome v-if="win.open && !win.minimized" :embedded="true" />
         </div>
@@ -478,40 +472,53 @@ The squirrel got here first.</pre>
           leftward: !buddyFacingRight,
           poked: buddyPoked,
           sleeping: buddySleeping,
+          'game-in-front': ['codehop', 'spacegame'].includes(activeWindow),
+          ['activity-' + buddyActivity]: true,
         },
         'mood-' + buddyMood,
       ]"
-      :style="{ left: buddyX + 'px' }"
+      :style="{ left: buddyX + 'px', '--bubble-offset': buddyBubbleOffset + 'px' }"
       :data-history="buddyHistory.length"
       :data-frame="buddyFrame"
       :data-mood="buddyMood"
       :data-pokes="buddyPokeCount"
       :data-sleeping="String(buddySleeping)"
+      :data-activity="buddyActivity"
+      :data-treats="buddyTreats"
+      :data-following="String(buddyFollowing)"
       @contextmenu.stop.prevent="openBuddyContextMenu"
     >
       <div class="buddy-bubble" role="status" aria-live="polite">
         <span>{{ buddyMessage }}</span>
       </div>
+      <span v-if="buddyActivity === 'petted'" class="buddy-hearts" aria-hidden="true">♥</span>
       <button
         class="buddy-character"
         title="Talk to the desktop squirrel"
         aria-label="Talk to the desktop squirrel"
         @click.stop="onBuddyClick"
         @pointerdown.stop="startBuddyDrag"
+        @keydown="onBuddyCharacterKeydown"
       >
         <img :src="petSprites[buddyFrame]" alt="Pixel squirrel" draggable="false">
       </button>
     </div>
+    <img v-if="buddyAcorn !== null" :src="acornIcon" alt="" class="buddy-acorn" :style="{ left: buddyAcorn + 'px' }">
 
     <div
       v-if="buddyContext.open"
       class="buddy-context-menu"
       :style="{ left: buddyContext.x + 'px', top: buddyContext.y + 'px' }"
       role="menu"
+      @keydown.stop="onBuddyMenuKeydown"
       @click.stop
       @contextmenu.stop.prevent
     >
       <button role="menuitem" @click="buddyContextAction('talk')">Say something</button>
+      <button role="menuitem" @click="buddyContextAction('feed')">Toss an acorn</button>
+      <button role="menuitem" @click="buddyContextAction('pet')">Head pats</button>
+      <button role="menuitem" @click="buddyContextAction('dance')">Do a little dance</button>
+      <button v-if="!isTouch" role="menuitem" @click="buddyContextAction('follow')">{{ buddyFollowing ? 'Stop following' : 'Follow my cursor' }}</button>
       <button role="menuitem" @click="buddyContextAction('inspect')">Inspect desktop</button>
       <button role="menuitem" @click="buddyContextAction('stroll')">Take a stroll</button>
       <div class="menu-divider"></div>
@@ -540,7 +547,7 @@ The squirrel got here first.</pre>
           :class="{ active: win.id === activeWindow && !win.minimized }"
           @click="toggleWindowFromTaskbar(win)"
         >
-          <img :src="win.icon">
+          <img :src="win.icon" :class="{ 'codex-ship': win.id === 'spacegame' }">
           <span>{{ win.title }}</span>
         </button>
       </div>
@@ -562,10 +569,6 @@ The squirrel got here first.</pre>
         <span class="sidebar-text">soli<strong>95</strong></span>
       </div>
       <div class="start-menu-items">
-        <div class="menu-item-row" @click="openWindow('about')">
-          <img src="../assets/win95/computer.svg">
-          <span>About Me</span>
-        </div>
         <div class="menu-item-row" @click="openWindow('resume')">
           <img src="../assets/win95/doc.svg">
           <span>Resume</span>
@@ -586,20 +589,12 @@ The squirrel got here first.</pre>
           <img src="../assets/win95/visitor-board.svg">
           <span>Visitor Board</span>
         </div>
-        <div class="menu-item-row" @click="openWindow('paint')">
-          <img src="../assets/win95/paint.svg">
-          <span>Paint</span>
-        </div>
-        <div class="menu-item-row" @click="openWindow('minesweeper')">
-          <img src="../assets/win95/mine.svg">
-          <span>Minesweeper</span>
-        </div>
         <div class="menu-item-row" @click="openWindow('spacegame')">
-          <img src="../assets/space/spaceship.png">
-          <span>Space Game</span>
+          <img :src="spaceshipIcon" class="codex-ship">
+          <span>Codex Cruise</span>
         </div>
         <div class="menu-item-row" @click="openWindow('codehop')">
-          <img src="../assets/codehop/claude-hops-mascot.png">
+          <img :src="codeHopIcon">
           <span>Claude Hops</span>
         </div>
         <div class="menu-divider"></div>
@@ -619,8 +614,6 @@ The squirrel got here first.</pre>
     >
       <div class="dropdown-item" @click="contextAction('arrange')">Arrange Icons</div>
       <div class="dropdown-item" @click="contextAction('refresh')">Refresh</div>
-      <div class="menu-divider"></div>
-      <div class="dropdown-item" @click="contextAction('properties')">Properties</div>
     </div>
 
     <!-- Boot Screen (shown first) -->
@@ -659,6 +652,8 @@ The squirrel got here first.</pre>
 </template>
 
 <script>
+import { EXTRA_BUDDY_LINES, EXTRA_BUDDY_REACTIONS } from '@/utils/buddy-personality';
+import acornIcon from '@/assets/win95/pet/acorn.svg';
 import { safeStorage, safeSessionStorage } from '@/utils/storage';
 
 import resume from '@/assets/resume.json';
@@ -674,14 +669,13 @@ import Minesweeper from '@/components/win95/Minesweeper';
 import PaintApp from '@/components/win95/PaintApp';
 import ProjectExplorer from '@/components/win95/ProjectExplorer';
 import projectMedia from '@/assets/project-media';
-import codeHopIcon from '@/assets/codehop/claude-hops-mascot.png';
+import codeHopIcon from '@/assets/codehop/claude-hops-icon.svg';
 import aboutIcon from '@/assets/win95/about.svg';
 import docIcon from '@/assets/win95/doc.svg';
 import folderIcon from '@/assets/win95/folder.svg';
 import imageFileIcon from '@/assets/win95/image-file.svg';
 import computerIcon from '@/assets/win95/computer.svg';
 import mailIcon from '@/assets/win95/mail.svg';
-import networkIcon from '@/assets/win95/network.svg';
 import terminalIcon from '@/assets/win95/terminal.svg';
 import globeIcon from '@/assets/win95/globe.svg';
 import recycleIcon from '@/assets/win95/recycle.svg';
@@ -689,7 +683,7 @@ import msnIcon from '@/assets/win95/msn.svg';
 import visitorBoardIcon from '@/assets/win95/visitor-board.svg';
 import mineIcon from '@/assets/win95/mine.svg';
 import paintIcon from '@/assets/win95/paint.svg';
-import spaceshipIcon from '@/assets/space/spaceship.png';
+import spaceshipIcon from '@/assets/space/codex-flies-ship.png';
 import squirrelAnnoyed from '@/assets/win95/pet/squirrel-annoyed.png';
 import squirrelBlink from '@/assets/win95/pet/squirrel-blink.png';
 import squirrelCurious from '@/assets/win95/pet/squirrel-curious.png';
@@ -805,9 +799,13 @@ const BUDDY_REACTIONS = {
     'Back to the homepage. A classic retreat.',
     'Wikipedia will know what to do with us.',
   ],
-  browserLocal: [
-    'That is not the internet. That is evidence.',
-    'You found the browser breadcrumb. Nicely done.',
+  browserIntelligence: [
+    'Big questions. Small browser window.',
+    'The future of intelligence, running inside 1995.',
+  ],
+  browserGermany: [
+    'A little economics between games.',
+    'Germany, one question at a time.',
   ],
   browserNewspaper: [
     'Fresh news from a deeply suspicious publication.',
@@ -969,7 +967,6 @@ const BUDDY_REACTIONS = {
 };
 
 const BUDDY_MOODS = {
-  browserLocal: 'surprised',
   codehop: 'excited',
   dll: 'suspicious',
   floppy: 'annoyed',
@@ -990,7 +987,8 @@ const BUDDY_FRAMES = {
   about: 'curious',
   browser: 'curious',
   browserHome: 'sit',
-  browserLocal: 'curious',
+  browserIntelligence: 'curious',
+  browserGermany: 'curious',
   browserMachtblick: 'curious',
   browserNewspaper: 'curious',
   browserSonggpt: 'excited',
@@ -1049,6 +1047,13 @@ export default {
       resume,
       projects,
       projectMedia,
+      browserPages: {
+        songgpt: { url: 'https://songgpt.soli.blue/', title: 'SongGPT' },
+        intelligence: { url: 'https://intelligence.soli.blue/', title: 'Intelligence' },
+        germany: { url: 'https://germany.soli.blue/', title: 'Germany' },
+      },
+      codeHopIcon,
+      spaceshipIcon,
       booting: true,
       bootProgress: 0,
       shuttingDown: false,
@@ -1069,6 +1074,12 @@ export default {
       bsod: false,
       computerPath: 'computer',
       buddyContext: { open: false, x: 0, y: 0 },
+      acornIcon,
+      buddyActivity: 'idle',
+      buddyAcorn: null,
+      buddyTreats: Math.max(0, Math.min(9999, Number(safeStorage.getItem('soli95-acorns')) || 0)),
+      buddyFollowing: false,
+      buddyViewportWidth: 900,
       buddyDragging: false,
       buddyFrame: 'idle',
       buddyHistory: [],
@@ -1102,31 +1113,19 @@ export default {
         folder: folderIcon,
       },
       desktopIcons: [
-        { id: 'mycomputer', label: 'My Computer', img: computerIcon },
-        { id: 'resume', label: 'Resume.doc', img: docIcon },
         { id: 'projects', label: 'Projects', img: folderIcon },
-        { id: 'about', label: 'About Me', img: aboutIcon },
-        { id: 'contact', label: 'Contact', img: mailIcon },
         { id: 'visitorboard', label: 'Visitor Board', img: visitorBoardIcon },
-        { id: 'paint', label: 'Paint', img: paintIcon },
-        { id: 'minesweeper', label: 'Minesweeper', img: mineIcon },
-        {
-          id: 'spacegame',
-          label: 'Space Game',
-          img: spaceshipIcon,
-          imgClass: 'space-icon',
-        },
-        { id: 'codehop', label: 'Claude Hops', img: codeHopIcon, imgClass: 'codehop-icon' },
-        {
-          id: 'github',
-          label: 'GitHub',
-          img: networkIcon,
-          href: 'https://github.com/soliblue',
-        },
-        { id: 'terminal', label: 'Terminal', img: terminalIcon },
         { id: 'browser', label: 'Internet', img: globeIcon },
         { id: 'messenger', label: 'Messenger', img: msnIcon },
-        { id: 'recycle', label: 'Recycle Bin', img: recycleIcon },
+        {
+          id: 'spacegame',
+          label: 'Codex Cruise',
+          img: spaceshipIcon,
+          imgClass: 'space-icon codex-ship',
+        },
+        { id: 'codehop', label: 'Claude Hops', img: codeHopIcon, imgClass: 'codehop-icon' },
+        { id: 'resume', label: 'Resume.doc', img: docIcon },
+        { id: 'contact', label: 'Contact', img: mailIcon },
       ],
       menuBar: [
         {
@@ -1151,13 +1150,6 @@ export default {
         {
           name: 'View',
           items: [{ label: 'Options...', disabled: true }],
-        },
-        {
-          name: 'Help',
-          items: [
-            { label: 'Help Topics', disabled: true },
-            { label: 'About soli95...', action: 'about' },
-          ],
         },
       ],
       recycleFiles: [
@@ -1367,8 +1359,8 @@ export default {
           maximized: false,
           x: 240,
           y: 70,
-          width: 210,
-          height: 245,
+          width: 450,
+          height: 550,
           zIndex: 10,
           showMenu: false,
           contentClass: 'app-container',
@@ -1390,7 +1382,7 @@ export default {
         },
         {
           id: 'spacegame',
-          title: 'Space Game',
+          title: 'Codex Cruise',
           icon: spaceshipIcon,
           open: false,
           minimized: false,
@@ -1422,6 +1414,11 @@ export default {
     };
   },
   computed: {
+    buddyBubbleOffset() {
+      const center = this.buddyX + 39;
+      const half = this.isTouch ? 94 : 110;
+      return Math.max(half + 4, Math.min(this.buddyViewportWidth - half - 4, center)) - center;
+    },
     openWindows() {
       return this.windows.filter(w => w.open);
     },
@@ -1476,6 +1473,12 @@ export default {
     this.buddyPokeTimer = null;
     this.buddyReactionIndexes = Object.create(null);
     this.buddyTimer = null;
+    this.buddyActivityTimer = null;
+    this.buddyLastSpoke = Date.now();
+    this.buddyIdleTick = 0;
+    this.buddyFollowTimer = null;
+    this.buddyFollowTarget = null;
+    this.buddyHiddenAt = 0;
     this.clockTimer = null;
     this.movedWindow = false;
     this.resizedWindow = false;
@@ -1489,6 +1492,8 @@ export default {
     document.addEventListener('pointerup', this.onPointerUp);
     document.addEventListener('pointercancel', this.onPointerUp);
     document.addEventListener('keydown', this.onKeyDown);
+    document.addEventListener('visibilitychange', this.onBuddyVisibility);
+    window.addEventListener('resize', this.resizeBuddy);
     this.$nextTick(this.initializeBuddy);
     // Hide the global theme toggle
     const themeToggle = document.querySelector('.theme-toggle');
@@ -1503,11 +1508,15 @@ export default {
     this.clearBuddyFrameTimers();
     clearTimeout(this.buddyPokeTimer);
     clearInterval(this.buddyTimer);
+    clearTimeout(this.buddyActivityTimer);
+    clearInterval(this.buddyFollowTimer);
     clearInterval(this.clockTimer);
     document.removeEventListener('pointermove', this.onPointerMove);
     document.removeEventListener('pointerup', this.onPointerUp);
     document.removeEventListener('pointercancel', this.onPointerUp);
     document.removeEventListener('keydown', this.onKeyDown);
+    document.removeEventListener('visibilitychange', this.onBuddyVisibility);
+    window.removeEventListener('resize', this.resizeBuddy);
     // Restore theme toggle
     const themeToggle = document.querySelector('.theme-toggle');
     if (themeToggle) {
@@ -1549,7 +1558,6 @@ export default {
       // Skip the boot screen on repeat visits within the same session
       if (safeSessionStorage.getItem('soli95-booted')) {
         this.booting = false;
-        this.openWindow('about');
         return;
       }
       this.bootTimer = setInterval(() => {
@@ -1561,8 +1569,6 @@ export default {
             this.booting = false;
             safeSessionStorage.setItem('soli95-booted', '1');
             this.playSound('startup');
-            // Auto-open About window
-            this.openWindow('about');
           }, 500);
         }
       }, 200);
@@ -1612,7 +1618,6 @@ export default {
       if (item.disabled) return;
       this.openMenu = null;
       if (item.action === 'close') this.closeWindow(win);
-      if (item.action === 'about') this.openWindow('about');
     },
     onDesktopContextMenu(e) {
       // Let apps (e.g. Minesweeper flagging) handle right-clicks inside windows
@@ -1630,7 +1635,6 @@ export default {
         setTimeout(() => { this.refreshFlash = false; }, 120);
         this.narrateBuddy('refresh');
       }
-      if (action === 'properties') this.openWindow('about');
     },
     // --- Desktop icons ---
     iconClick(icon) {
@@ -1704,13 +1708,9 @@ export default {
         );
       }
     },
-    openSecretFolder() {
-      this.computerPath = 'secret';
-      this.openWindow('mycomputer');
-      this.narrateBuddy('secret');
-    },
     initializeBuddy() {
       const width = this.$el ? this.$el.clientWidth : window.innerWidth;
+      this.buddyViewportWidth = width;
       const maxX = Math.max(20, width - 110);
       this.buddyX = Math.min(Math.max(Math.round(width * 0.66), 20), maxX);
       this.buddyFacingRight = false;
@@ -1719,13 +1719,92 @@ export default {
       this.startBuddyWanderTimer();
     },
     startBuddyWanderTimer() {
-      const reduceMotion = window.matchMedia
-        && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (!reduceMotion && !this.buddySleeping && !this.buddyTimer) {
-        this.buddyTimer = setInterval(() => this.wanderBuddy(), 12000);
+      if (!this.buddySleeping && !this.buddyTimer) {
+        this.buddyTimer = setInterval(() => this.tickBuddy(), 7000);
       }
     },
+    reduceBuddyMotion() {
+      return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    },
+    resizeBuddy() {
+      this.buddyViewportWidth = this.$el.clientWidth;
+      this.buddyX = Math.max(20, Math.min(this.buddyX, this.buddyViewportWidth - 110));
+      this.buddyContext.open = false;
+    },
+    onBuddyVisibility() {
+      if (document.hidden) {
+        this.buddyHiddenAt = Date.now();
+        this.stopBuddyFollowing();
+        this.cancelBuddyActivity();
+      } else if (this.buddyHiddenAt && Date.now() - this.buddyHiddenAt > 30000 && !this.buddySleeping) {
+        this.narrateBuddy('return');
+        this.buddyHiddenAt = 0;
+      }
+    },
+    tickBuddy() {
+      if (document.hidden || this.booting || this.bsod || this.buddySleeping || this.buddyDragging
+        || this.buddyContext.open || this.dragging || this.resizing || this.buddyActivity !== 'idle'
+        || ['codehop', 'spacegame', 'minesweeper'].includes(this.activeWindow)) return;
+      this.buddyIdleTick += 1;
+      if (Date.now() - this.buddyLastSpoke > 24000) {
+        const hour = new Date().getHours();
+        const windows = this.openWindows.filter(win => !win.minimized).length;
+        const contextual = this.buddyIdleTick % 4 === 0;
+        this.narrateBuddy(contextual && windows >= 4 ? 'busy' : contextual && hour < 6 ? 'night'
+          : contextual && hour < 11 ? 'morning' : 'idle');
+      } else if (this.buddyIdleTick % 3 === 0 && !this.buddyFollowing) {
+        this.wanderBuddy();
+      } else {
+        this.playBuddyFrames(this.buddyIdleTick % 2 ? ['blink', 'idle'] : ['sit', 'curious', 'sit'], 280);
+      }
+    },
+    cancelBuddyActivity() {
+      clearTimeout(this.buddyActivityTimer);
+      this.buddyActivity = 'idle';
+      this.buddyAcorn = null;
+    },
+    stopBuddyFollowing() {
+      this.buddyFollowing = false;
+      this.buddyFollowTarget = null;
+      clearInterval(this.buddyFollowTimer);
+    },
+    stepBuddyFollow() {
+      if (!this.buddyFollowing || this.buddyFollowTarget === null || document.hidden || this.buddySleeping
+        || this.buddyDragging || this.buddyContext.open || this.buddyActivity !== 'idle'
+        || ['codehop', 'spacegame', 'minesweeper'].includes(this.activeWindow)) return;
+      const difference = this.buddyFollowTarget - this.buddyX;
+      if (Math.abs(difference) < 18) return;
+      this.buddyFacingRight = difference > 0;
+      if (this.reduceBuddyMotion()) return;
+      this.buddyX += Math.sign(difference) * Math.min(65, Math.abs(difference));
+      this.playBuddyFrames(['walk-a', 'walk-b'], 140);
+    },
+    animateBuddyActivity(activity, duration) {
+      this.cancelBuddyActivity();
+      this.buddyActivity = activity;
+      this.buddyActivityTimer = setTimeout(() => { this.buddyActivity = 'idle'; }, duration);
+    },
+    feedBuddy() {
+      this.cancelBuddyActivity();
+      this.narrateBuddy('fetch', 'excited');
+      this.buddyActivity = 'fetching';
+      const target = Math.max(20, Math.min(this.buddyX + (this.buddyFacingRight ? 140 : -140), this.buddyViewportWidth - 110));
+      this.buddyAcorn = (this.reduceBuddyMotion() ? this.buddyX : target) + 26;
+      this.buddyFacingRight = target > this.buddyX;
+      if (!this.reduceBuddyMotion()) this.buddyX = target;
+      this.playBuddyFrames(['walk-a', 'walk-b', 'hop', 'walk-a', 'walk-b'], 240, 'sit');
+      this.buddyActivityTimer = setTimeout(() => {
+        this.buddyTreats = Math.min(9999, this.buddyTreats + 1);
+        safeStorage.setItem('soli95-acorns', String(this.buddyTreats));
+        this.buddyAcorn = null;
+        this.narrateBuddy('feed', 'excited');
+        this.animateBuddyActivity('eating', 1800);
+        this.playBuddyFrames(['sit', 'blink', 'sit', 'excited', 'sit'], 280);
+        this.playSound('receive');
+      }, this.reduceBuddyMotion() ? 400 : 1400);
+    },
     recordBuddy(action, message) {
+      this.buddyLastSpoke = Date.now();
       const time = new Date().toLocaleTimeString('en-US', {
         hour: 'numeric',
         minute: '2-digit',
@@ -1750,6 +1829,7 @@ export default {
     },
     playBuddyFrames(sequence, interval = 180, finalFrame = 'idle') {
       this.clearBuddyFrameTimers();
+      if (this.reduceBuddyMotion()) { this.buddyFrame = finalFrame; return; }
       sequence.forEach((frame, index) => {
         this.buddyFrameTimers.push(setTimeout(() => {
           this.buddyFrame = frame;
@@ -1760,7 +1840,12 @@ export default {
       }, sequence.length * interval));
     },
     narrateBuddy(key, mood) {
-      if (!BUDDY_REACTIONS[key]) return;
+      const lines = [...(BUDDY_REACTIONS[key] || []), ...(EXTRA_BUDDY_REACTIONS[key] || [])];
+      if (!lines.length) return;
+      if (!['fetch', 'feed', 'pet', 'dance', 'follow', 'stopFollow'].includes(key)) {
+        this.cancelBuddyActivity();
+        this.buddyFollowTarget = null;
+      }
 
       if (this.buddySleeping) {
         this.buddySleeping = false;
@@ -1768,10 +1853,10 @@ export default {
         this.startBuddyWanderTimer();
       }
 
-      const lines = BUDDY_REACTIONS[key];
       const index = this.buddyReactionIndexes[key] || 0;
       this.buddyMessage = lines[index % lines.length]
-        .replace('{projectCount}', this.projects.length);
+        .replace('{projectCount}', this.projects.length).replace('{treats}', this.buddyTreats);
+      this.buddyLastSpoke = Date.now();
       this.buddyReactionIndexes[key] = index + 1;
       this.buddyMood = mood || BUDDY_MOODS[key] || 'curious';
       this.setBuddyFrame(BUDDY_FRAMES[key] || 'curious');
@@ -1781,6 +1866,8 @@ export default {
       this.narrateBuddy('visitorSigned');
     },
     pokeBuddy() {
+      this.cancelBuddyActivity();
+      this.buddyLastSpoke = Date.now();
       if (this.buddySleeping) {
         this.wakeBuddy('That was a terrible alarm clock.');
         this.playSound('nudge');
@@ -1788,7 +1875,8 @@ export default {
       }
 
       this.buddyPokeCount += 1;
-      this.buddyMessage = BUDDY_LINES[this.buddyLineIndex % BUDDY_LINES.length];
+      const lines = [...BUDDY_LINES, ...EXTRA_BUDDY_LINES];
+      this.buddyMessage = lines[this.buddyLineIndex % lines.length];
       this.buddyLineIndex += 1;
       if (this.buddyPokeCount === 1) this.buddyMood = 'surprised';
       else if (this.buddyPokeCount < 4) this.buddyMood = 'suspicious';
@@ -1812,7 +1900,7 @@ export default {
       if (e.detail === 0) this.pokeBuddy();
     },
     wanderBuddy(shortStep = false, reactionFrame = 'idle') {
-      if (this.buddySleeping || this.buddyDragging) return;
+      if (this.buddySleeping || this.buddyDragging || this.buddyActivity !== 'idle' || this.reduceBuddyMotion()) return;
 
       const width = this.$el ? this.$el.clientWidth : window.innerWidth;
       const minX = 20;
@@ -1833,13 +1921,16 @@ export default {
         return;
       }
       this.buddyWanderCount += 1;
-      if (this.buddyWanderCount % 2 === 0) this.narrateBuddy('idle');
       this.playBuddyFrames(
         ['walk-a', 'walk-b', 'walk-a', 'walk-b', 'walk-a', 'walk-b'],
       );
     },
     startBuddyDrag(e) {
-      if (e.button !== 0 || this.buddySleeping) return;
+      if (e.button !== 0) return;
+      if (this.buddySleeping) { this.wakeBuddy('That was a terrible alarm clock.'); return; }
+      this.cancelBuddyActivity();
+      this.clearBuddyFrameTimers();
+      this.stopBuddyFollowing();
       const buddy = e.currentTarget.parentElement;
       const buddyRect = buddy.getBoundingClientRect();
       const scale = buddy.offsetWidth ? buddyRect.width / buddy.offsetWidth : 1;
@@ -1854,13 +1945,14 @@ export default {
       this.buddyDragOffset = pointerX - this.buddyX;
     },
     openBuddyContextMenu(e) {
-      const menuWidth = 174;
-      const menuHeight = 154;
+      const menuWidth = 190;
+      const menuHeight = 300;
       const scale = this.$el && this.$el.offsetWidth
         ? this.$el.getBoundingClientRect().width / this.$el.offsetWidth
         : 1;
-      const pointerX = e.clientX / scale;
-      const pointerY = e.clientY / scale;
+      const anchor = e.currentTarget.getBoundingClientRect();
+      const pointerX = (e.clientX || anchor.left + anchor.width / 2) / scale;
+      const pointerY = (e.clientY || anchor.top) / scale;
       const menuX = pointerX + 34 + menuWidth <= this.$el.clientWidth
         ? pointerX + 34
         : pointerX - menuWidth - 12;
@@ -1874,11 +1966,56 @@ export default {
           Math.min(pointerY - menuHeight - 76, this.$el.clientHeight - menuHeight - 2),
         ),
       };
+      this.$nextTick(() => this.$el.querySelector('.buddy-context-menu [role="menuitem"]')?.focus({ preventScroll: true }));
       this.playSound('click');
+    },
+    onBuddyCharacterKeydown(event) {
+      if (event.key === 'ContextMenu' || (event.shiftKey && event.key === 'F10')) {
+        event.preventDefault();
+        event.stopPropagation();
+        this.openBuddyContextMenu(event);
+      }
+    },
+    onBuddyMenuKeydown(event) {
+      const items = [...event.currentTarget.querySelectorAll('[role="menuitem"]')];
+      const index = items.indexOf(document.activeElement);
+      if (['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
+        event.preventDefault();
+        const next = event.key === 'Home' ? 0 : event.key === 'End' ? items.length - 1
+          : (index + (event.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length;
+        items[next]?.focus();
+      }
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        this.buddyContext.open = false;
+        this.$el.querySelector('.buddy-character')?.focus({ preventScroll: true });
+      }
     },
     buddyContextAction(action) {
       this.buddyContext.open = false;
       this.playSound('click');
+      this.$nextTick(() => this.$el.querySelector('.buddy-character')?.focus({ preventScroll: true }));
+      if (this.buddySleeping && ['inspect', 'stroll'].includes(action)) this.wakeBuddy('All right, I am up. What are we doing?');
+      if (action === 'feed') this.feedBuddy();
+      if (action === 'pet') {
+        this.narrateBuddy('pet', 'excited');
+        this.animateBuddyActivity('petted', 2200);
+        this.playBuddyFrames(['blink', 'sit', 'blink', 'sit'], 380);
+      }
+      if (action === 'dance') {
+        this.narrateBuddy('dance', 'excited');
+        this.animateBuddyActivity('dancing', 2400);
+        this.playBuddyFrames(['excited', 'hop', 'walk-a', 'hop', 'walk-b', 'excited'], 350);
+        this.playSound('win');
+      }
+      if (action === 'follow') {
+        if (this.buddyFollowing) this.stopBuddyFollowing();
+        else {
+          this.buddyFollowing = true;
+          this.buddyFollowTimer = setInterval(() => this.stepBuddyFollow(), 250);
+        }
+        this.narrateBuddy(this.buddyFollowing ? 'follow' : 'stopFollow');
+      }
 
       if (action === 'talk') {
         if (this.buddySleeping) this.wakeBuddy('I was having a perfectly optimized dream.');
@@ -1920,6 +2057,8 @@ export default {
       this.openNotepad('desktop.log', text);
     },
     sleepBuddy() {
+      this.cancelBuddyActivity();
+      this.stopBuddyFollowing();
       this.buddySleeping = true;
       this.buddyMood = 'sleeping';
       this.buddyMessage = 'tiny nap. wake me if the desktop develops a strategy.';
@@ -2048,6 +2187,11 @@ export default {
       };
     },
     onPointerMove(e) {
+      if (this.buddyFollowing && e.pointerType !== 'touch') {
+        const overApp = e.target.closest('.win95-window, .desktop-buddy, .buddy-context-menu, .start-menu, .taskbar');
+        const scale = this.$el.getBoundingClientRect().width / this.$el.offsetWidth;
+        this.buddyFollowTarget = overApp ? null : Math.max(20, Math.min(e.clientX / scale - 39, this.buddyViewportWidth - 110));
+      }
       if (this.buddyDragging) {
         const width = this.$el ? this.$el.clientWidth : window.innerWidth;
         const pointerX = e.clientX / this.buddyDragScale;
@@ -2218,7 +2362,8 @@ export default {
     },
     narrateBrowser(url) {
       const reactions = {
-        local: 'browserLocal',
+        intelligence: 'browserIntelligence',
+        germany: 'browserGermany',
         machtblick: 'browserMachtblick',
         newspaper: 'browserNewspaper',
         songgpt: 'browserSonggpt',
@@ -2287,8 +2432,7 @@ export default {
   align-content: flex-start;
   gap: 8px;
   padding: 8px;
-  /* Reserve the lower-left slot for the absolutely positioned Recycle Bin. */
-  height: calc(100dvh - 112px);
+  height: calc(100dvh - 44px);
 }
 
 .desktop-icons.refreshing {
@@ -2316,17 +2460,20 @@ export default {
 }
 
 .desktop-icon img.space-icon {
-  width: 40px;
-  height: 40px;
-  image-rendering: auto;
-  filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.5));
+  width: 32px;
+  height: 32px;
+  image-rendering: pixelated;
+}
+
+.codex-ship {
+  mix-blend-mode: screen;
 }
 
 .desktop-icon img.codehop-icon {
-  width: 38px;
-  height: 38px;
-  image-rendering: auto;
-  filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.5));
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  image-rendering: pixelated;
 }
 
 .desktop-icon span {
@@ -3037,9 +3184,14 @@ export default {
 .minesweeper-host {
   display: flex;
   align-items: flex-start;
-  justify-content: center;
+  justify-content: flex-start;
   background: #c0c0c0;
   overflow: auto;
+}
+
+.minesweeper-host > * {
+  flex-shrink: 0;
+  margin-inline: auto;
 }
 
 /* Browser Window */
@@ -3128,26 +3280,6 @@ export default {
 .browser-launch-page small {
   margin-top: 10px;
   color: #555555;
-}
-
-.local-file-page {
-  height: 100%;
-  padding: 20px;
-  background: #ffffff;
-  font-family: 'Courier New', monospace;
-  font-size: 12px;
-}
-
-.local-file-title {
-  margin-bottom: 16px;
-  padding-bottom: 4px;
-  border-bottom: 1px solid #808080;
-  font-weight: bold;
-}
-
-.local-file-page pre {
-  min-height: 90px;
-  white-space: pre-wrap;
 }
 
 /* Mail Window */
@@ -3299,6 +3431,47 @@ export default {
   cursor: grabbing;
 }
 
+.buddy-acorn {
+  position: fixed;
+  bottom: 37px;
+  width: 26px;
+  height: 26px;
+  z-index: 10000;
+  image-rendering: pixelated;
+  pointer-events: none;
+  animation: buddy-treat 700ms steps(6);
+}
+.buddy-hearts {
+  position: absolute;
+  top: 4px;
+  left: 26px;
+  color: #c53863;
+  font: bold 22px 'Courier New', monospace;
+  pointer-events: none;
+  animation: buddy-affection 2200ms steps(10) forwards;
+}
+@keyframes buddy-affection {
+  0% { transform: translateY(0) scale(0.6); opacity: 0; }
+  30% { opacity: 1; }
+  100% { transform: translateY(-42px) scale(1.1); opacity: 0; }
+}
+@keyframes buddy-treat {
+  0% { transform: translateY(-90px) rotate(-35deg); }
+  65% { transform: translateY(0) rotate(15deg); }
+  82% { transform: translateY(-12px); }
+  100% { transform: translateY(0); }
+}
+@keyframes buddy-dance {
+  0%, 100% { transform: translateY(0) rotate(-8deg); }
+  25% { transform: translateY(-14px) rotate(8deg); }
+  50% { transform: translateY(0) rotate(8deg); }
+  75% { transform: translateY(-10px) rotate(-8deg); }
+}
+.win95-desktop .desktop-buddy.activity-dancing .buddy-character {
+  animation: buddy-dance 600ms steps(4) 4 !important;
+}
+.win95-desktop .desktop-buddy[data-following="true"] { transition: left 280ms linear !important; }
+
 .buddy-character:focus {
   outline: 1px dotted #ffffff;
 }
@@ -3340,7 +3513,7 @@ export default {
   left: 50%;
   width: 190px;
   min-height: 42px;
-  transform: translateX(-50%);
+  transform: translateX(calc(-50% + var(--bubble-offset, 0px)));
   padding: 8px 9px;
   background: #ffffe1;
   border: 2px solid;
@@ -3354,7 +3527,7 @@ export default {
 .buddy-bubble::after {
   content: '';
   position: absolute;
-  left: calc(50% - 6px);
+  left: calc(50% - 6px - var(--bubble-offset, 0px));
   bottom: -8px;
   width: 10px;
   height: 10px;
@@ -3394,7 +3567,9 @@ export default {
 .buddy-context-menu {
   position: fixed;
   z-index: 10002;
-  width: 170px;
+  width: 190px;
+  max-height: calc(100dvh - 12px);
+  overflow-y: auto;
   padding: 2px;
   background: #c0c0c0;
   border: 2px solid;
@@ -3407,8 +3582,8 @@ export default {
 .buddy-context-menu button {
   display: block;
   width: 100%;
-  min-height: 22px;
-  padding: 3px 20px;
+  min-height: 28px;
+  padding: 5px 14px;
   border: 0;
   border-radius: 0;
   background: transparent;
@@ -3433,13 +3608,21 @@ export default {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .win95-desktop .desktop-buddy {
+  .win95-desktop .desktop-buddy,
+  .win95-desktop .desktop-buddy[data-following="true"] {
     transition: none !important;
   }
 
-  .win95-desktop .desktop-buddy.poked .buddy-character {
+  .win95-desktop .desktop-buddy.poked .buddy-character,
+  .win95-desktop .desktop-buddy.activity-dancing .buddy-character,
+  .buddy-hearts,
+  .buddy-acorn {
     animation: none !important;
   }
+}
+
+@media (pointer: coarse) {
+  .buddy-context-menu button { min-height: 34px; }
 }
 
 /* Taskbar */
@@ -3806,6 +3989,10 @@ export default {
 
   .buddy-bubble {
     width: 160px;
+  }
+
+  .desktop-buddy.game-in-front {
+    visibility: hidden;
   }
 }
 </style>

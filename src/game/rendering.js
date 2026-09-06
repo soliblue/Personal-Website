@@ -106,6 +106,9 @@ export function renderShip(ctx, ship, sprites, spritesLoaded, streak, fireIntens
       ctx.shadowBlur = 15 + streak * 5;
     }
 
+    // The generated ship uses a black matte for additive sprite compositing.
+    ctx.globalCompositeOperation = 'screen';
+    ctx.imageSmoothingEnabled = false;
     ctx.drawImage(sprites.ship, -spriteSize / 2, -spriteSize / 2, spriteSize, spriteSize);
   } else {
     // Fallback shape

@@ -35,7 +35,8 @@
         </div>
         <div class="input-line">
           <span class="prompt">></span>
-          <input
+          <div class="terminal-input">
+            <input
             ref="input"
             v-model="userInput"
             @keydown.enter="sendMessage"
@@ -47,7 +48,8 @@
             placeholder="Type your question..."
             :disabled="isLoading"
             autofocus
-          />
+            />
+          </div>
           <div v-if="showSuggestions && suggestions.length" class="suggestions">
             <div
               v-for="(cmd, i) in suggestions"
@@ -265,6 +267,7 @@ export default {
 
       this.messages.push({ role: 'user', content: input });
       this.userInput = '';
+      this.closeSuggestions();
 
       // Handle local commands
       if (input.startsWith('/')) {
@@ -452,6 +455,8 @@ export default {
 
 <style scoped>
 .terminal-container {
+  --terminal-font: 'Courier New', Courier, monospace;
+  --terminal-text-size: 16px;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -462,6 +467,7 @@ export default {
 }
 
 .terminal-container.embedded {
+  --terminal-text-size: 11px;
   min-height: 100%;
   height: 100%;
   padding: 0;
@@ -477,6 +483,7 @@ export default {
   height: 100%;
   border-radius: 0;
   box-shadow: none;
+  background: #0c0c0c;
 }
 
 .nav-links {
@@ -489,7 +496,7 @@ export default {
   background: none;
   border: none;
   color: #888;
-  font-family: 'SF Mono', 'Fira Code', 'Monaco', monospace;
+  font-family: var(--terminal-font);
   font-size: 0.9em;
   cursor: pointer;
   text-decoration: none;
@@ -550,9 +557,12 @@ export default {
   padding: 1em;
   overflow-y: auto;
   flex: 1;
-  font-family: 'SF Mono', 'Fira Code', 'Monaco', monospace;
-  font-size: 16px;
-  line-height: 1.6;
+  font-family: var(--terminal-font);
+  font-size: var(--terminal-text-size);
+  line-height: 1.5;
+  color: #e0e0e0;
+  user-select: text;
+  min-width: 0;
 }
 
 .terminal-line {
@@ -578,6 +588,11 @@ export default {
   flex: 1;
 }
 
+.terminal-line > span:last-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 .prompt {
   color: #6495ed;
   font-weight: bold;
@@ -597,13 +612,28 @@ export default {
   flex-wrap: wrap;
 }
 
-.input-line input {
+.terminal-input {
   flex: 1;
+  min-width: 0;
+  height: 1.5em;
+  position: relative;
+  overflow: hidden;
+}
+
+.input-line input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
   background: transparent;
   border: none;
   color: #6dd1b0;
-  font-family: inherit;
-  font-size: 16px; /* Prevents iOS zoom on focus */
+  font: inherit;
+  padding: 0;
+  border-radius: 0;
+  box-shadow: none;
   outline: none;
 }
 
@@ -732,6 +762,95 @@ export default {
   padding: 0.15em 0.4em;
   border-radius: 4px;
   color: #6dd1b0;
+}
+
+.terminal-body :deep(code),
+.terminal-body :deep(pre) {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.embedded .terminal-body {
+  padding: 10px 12px;
+}
+
+.embedded .terminal-line.welcome,
+.embedded .input-line input::placeholder {
+  color: #b8b8b8;
+}
+
+.embedded .prompt,
+.embedded .terminal-line.user .prompt,
+.embedded .terminal-line.user,
+.embedded .input-line input {
+  color: #8ce18e;
+}
+
+.embedded .terminal-body :deep(code) {
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  color: #8ce18e;
+}
+
+.embedded .terminal-body :deep(p) {
+  margin: 0 0 6px;
+}
+
+.embedded .terminal-body :deep(p:last-child) {
+  margin-bottom: 0;
+}
+
+.embedded .terminal-body :deep(pre) {
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 8px;
+  margin: 6px 0;
+  border: 1px solid #666;
+  border-radius: 0;
+  background: #171717;
+}
+
+.embedded .terminal-body :deep(h1),
+.embedded .terminal-body :deep(h2),
+.embedded .terminal-body :deep(h3) {
+  font: inherit;
+  font-weight: bold;
+  margin: 8px 0 4px;
+}
+
+.embedded .terminal-body :deep(a) {
+  color: #94d5ff;
+}
+
+.embedded .suggestions {
+  border: 1px solid #808080;
+  border-radius: 0;
+  background: #202020;
+  box-shadow: none;
+}
+
+.embedded .suggestion {
+  font-size: inherit;
+}
+
+.embedded .suggestion.active,
+.embedded .suggestion:hover {
+  background: #c0c0c0;
+  color: #111;
+}
+
+/* Keep iOS's 16px input threshold while visually matching the 11px output. */
+@media (pointer: coarse) {
+  .embedded .input-line input {
+    font-size: 16px;
+    width: calc(100% / 0.6875);
+    height: calc(100% / 0.6875);
+    top: 50%;
+    transform: translateY(-50%) scale(0.6875);
+    transform-origin: left center;
+  }
 }
 
 /* Modal styles */

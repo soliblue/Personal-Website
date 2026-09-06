@@ -25,7 +25,7 @@ test('blocked browser storage still permits desktop navigation', async ({ page }
   });
   await page.goto('/');
   await expect(page.locator('.boot-screen')).toBeHidden({ timeout: 10000 });
-  await expect(page.locator('.titlebar-text', { hasText: 'About Me' })).toBeVisible();
+  await expect(page.locator('.desktop-icon', { hasText: 'Projects' })).toBeVisible();
   expect(errors).toEqual([]);
 });
 
@@ -50,12 +50,15 @@ test('unknown app document shows not found rather than the SPA shell', async ({ 
 test('desktop icons stay inside the visible viewport and control icons load', async ({ page }) => {
   await page.addInitScript(() => sessionStorage.setItem('soli95-booted', 'true'));
   await page.goto('/windows95');
-  await expect(page.locator('.about-content')).toBeVisible();
+  await expect(page.locator('.desktop-icon').first()).toBeVisible();
+  await expect(page.locator('.boot-screen')).toBeHidden();
   const bounds = await page.locator('.desktop-icon').evaluateAll(icons => icons.map(icon => {
     const rect = icon.getBoundingClientRect();
     return { label: icon.textContent, outside: rect.left < 0 || rect.right > innerWidth || rect.top < 0 || rect.bottom > innerHeight - 28 };
   }));
   expect(bounds.filter(icon => icon.outside)).toEqual([]);
+  await page.getByRole('button', { name: /start/i }).click();
+  await page.locator('.menu-item-row', { hasText: 'Projects' }).click();
   const closeIcon = await page.locator('.win95-window:visible .win-btn.close').evaluate(button => getComputedStyle(button).backgroundImage);
   expect(closeIcon).not.toContain('~98');
   expect(closeIcon).not.toBe('none');
@@ -73,7 +76,7 @@ test('visitor free text is inert and a note can be submitted empty', async ({ pa
   });
   await page.addInitScript(() => sessionStorage.setItem('soli95-booted', '1'));
   await page.goto('/windows95');
-  await page.getByRole('button', { name: 'OK', exact: true }).click();
+  await expect(page.locator('.boot-screen')).toBeHidden();
   const icon = page.locator('.desktop-icon', { hasText: 'Visitor Board' });
   if (test.info().project.name === 'chromium') await icon.dblclick(); else await icon.click();
   await expect(page.locator('.note-message').first()).toHaveText(attack);

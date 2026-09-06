@@ -12,7 +12,7 @@
     >
       <div v-for="(msg, index) in messages" :key="index" class="msg">
         <div class="msg-sender" :class="msg.role === 'assistant' ? 'sender-soli' : 'sender-you'">
-          {{ msg.role === 'assistant' ? 'soli says:' : 'you say:' }}
+          {{ msg.role === 'assistant' ? 'soli:' : 'you:' }}
         </div>
         <div
           v-if="msg.role === 'assistant'"

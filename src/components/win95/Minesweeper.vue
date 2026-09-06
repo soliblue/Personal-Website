@@ -1,15 +1,23 @@
 <template>
   <div class="minesweeper" @contextmenu.prevent>
+    <div class="ms-toolbar">
+      <select v-model="difficulty" aria-label="Difficulty" @change="reset">
+        <option value="beginner">Beginner</option><option value="intermediate">Intermediate</option><option value="expert">Expert</option>
+      </select>
+      <button type="button" :aria-pressed="flagMode" aria-label="Flag mode" @click="flagMode = !flagMode">🚩</button>
+    </div>
     <div class="ms-header">
       <div class="ms-led">{{ mineDisplay }}</div>
-      <button class="ms-face" type="button" @click="reset">{{ face }}</button>
+      <button class="ms-face" type="button" aria-label="New game" @click="reset">{{ face }}</button>
       <div class="ms-led">{{ timeDisplay }}</div>
     </div>
-    <div class="ms-grid">
-      <div
+    <div class="ms-grid" :style="{ gridTemplateColumns: `repeat(${cols}, 24px)` }">
+      <button
         v-for="(cell, i) in board"
         :key="i"
         class="ms-cell"
+        type="button"
+        :aria-label="`Row ${Math.floor(i / cols) + 1}, column ${i % cols + 1}: ${cell.revealed ? (cell.mine ? 'mine' : cell.adjacent + ' adjacent mines') : cell.mark === 1 ? 'flagged' : 'covered'}`"
         :class="cellClass(cell, i)"
         @mousedown="onCellDown($event)"
         @click="onCellClick(i)"
@@ -18,23 +26,27 @@
         @touchend="onTouchEnd($event)"
         @touchcancel="onTouchMove"
         @touchmove="onTouchMove"
-      >{{ cellContent(cell) }}</div>
+      >{{ cellContent(cell) }}</button>
     </div>
+    <div class="ms-status" role="status">{{ won ? 'Cleared! ' + time + ' seconds.' : lost ? 'Boom. One more round?' : started ? revealedCount + ' / ' + (rows * cols - mines) + ' cleared' : 'Ready' }}<span v-if="best">Best: {{ best }}s</span></div>
   </div>
 </template>
 
 <script>
-const ROWS = 9;
-const COLS = 9;
-const MINES = 10;
+import { safeStorage } from '@/utils/storage';
+const DIFFICULTIES = { beginner: [9, 9, 10], intermediate: [12, 12, 24], expert: [16, 16, 40] };
 const LONG_PRESS_MS = 400;
 const SYMBOLS = ['💣', '🚩', '❌'];
 
 export default {
   name: 'Minesweeper',
+  emits: ['sound', 'resize'],
   data() {
     return {
       board: [],
+      difficulty: 'beginner',
+      flagMode: false,
+      best: 0,
       started: false,
       lost: false,
       won: false,
@@ -47,6 +59,10 @@ export default {
     };
   },
   computed: {
+    rows() { return DIFFICULTIES[this.difficulty][0]; },
+    cols() { return DIFFICULTIES[this.difficulty][1]; },
+    mines() { return DIFFICULTIES[this.difficulty][2]; },
+    revealedCount() { return this.board.filter(cell => cell.revealed && !cell.mine).length; },
     gameOver() {
       return this.lost || this.won;
     },
@@ -54,7 +70,7 @@ export default {
       return this.board.filter(cell => cell.mark === 1).length;
     },
     mineDisplay() {
-      return this.formatLed(MINES - this.flagCount);
+      return this.formatLed(this.mines - this.flagCount);
     },
     timeDisplay() {
       return this.formatLed(this.time);
@@ -80,8 +96,11 @@ export default {
   methods: {
     reset() {
       this.stopTimer();
+      clearTimeout(this.touchTimer);
+      this.longPressFired = false;
+      this.best = Number(safeStorage.getItem('minesweeper-best-' + this.difficulty)) || 0;
       const board = [];
-      for (let i = 0; i < ROWS * COLS; i += 1) {
+      for (let i = 0; i < this.rows * this.cols; i += 1) {
         board.push({
           mine: false,
           revealed: false,
@@ -90,36 +109,35 @@ export default {
         });
       }
       this.board = board;
-      this.placeMines();
-      this.computeAdjacents();
       this.started = false;
       this.lost = false;
       this.won = false;
       this.pressing = false;
       this.time = 0;
       this.boomIndex = -1;
+      this.$emit('resize', { width: this.cols * 24 + 32, height: this.rows * 24 + 150 });
     },
-    placeMines() {
+    placeMines(excluded = []) {
       let placed = 0;
-      while (placed < MINES) {
+      while (placed < this.mines) {
         const i = Math.floor(Math.random() * this.board.length);
-        if (!this.board[i].mine) {
+        if (!this.board[i].mine && !excluded.includes(i)) {
           this.board[i].mine = true;
           placed += 1;
         }
       }
     },
     neighbors(i) {
-      const r = Math.floor(i / COLS);
-      const c = i % COLS;
+      const r = Math.floor(i / this.cols);
+      const c = i % this.cols;
       const result = [];
       for (let dr = -1; dr <= 1; dr += 1) {
         for (let dc = -1; dc <= 1; dc += 1) {
           if (dr !== 0 || dc !== 0) {
             const nr = r + dr;
             const nc = c + dc;
-            if (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS) {
-              result.push((nr * COLS) + nc);
+            if (nr >= 0 && nr < this.rows && nc >= 0 && nc < this.cols) {
+              result.push((nr * this.cols) + nc);
             }
           }
         }
@@ -140,6 +158,7 @@ export default {
     },
     onCellClick(i) {
       if (this.gameOver) return;
+      if (this.flagMode) { this.cycleMark(i); return; }
       const cell = this.board[i];
       if (cell.revealed) {
         this.chord(i);
@@ -160,18 +179,9 @@ export default {
     },
     handleFirstClick(i) {
       this.started = true;
-      // First click is always safe: relocate the mine if we hit one
-      const cell = this.board[i];
-      if (cell.mine) {
-        for (let j = 0; j < this.board.length; j += 1) {
-          if (!this.board[j].mine && j !== i) {
-            this.board[j].mine = true;
-            break;
-          }
-        }
-        cell.mine = false;
-        this.computeAdjacents();
-      }
+      // Generate after the opening move so its entire neighborhood is safe.
+      this.placeMines([i, ...this.neighbors(i)]);
+      this.computeAdjacents();
       this.startTimer();
     },
     cycleMark(i) {
@@ -231,6 +241,10 @@ export default {
     checkWin() {
       if (this.board.some(cell => !cell.mine && !cell.revealed)) return;
       this.won = true;
+      if (!this.best || this.time < this.best) {
+        this.best = Math.max(1, this.time);
+        safeStorage.setItem('minesweeper-best-' + this.difficulty, String(this.best));
+      }
       this.pressing = false;
       this.stopTimer();
       for (let j = 0; j < this.board.length; j += 1) {
@@ -311,6 +325,11 @@ export default {
   -webkit-user-select: none;
   touch-action: manipulation;
 }
+.ms-toolbar { display: flex; gap: 8px; margin-bottom: 8px; }
+.ms-toolbar select { flex: 1; min-width: 0; color: #111; background: white; font: inherit; min-height: 28px; }
+.ms-toolbar button { min-width: 32px; border-radius: 0; }
+.ms-toolbar button[aria-pressed="true"] { background: #fff2a8; border-style: inset; }
+.ms-status { display: flex; justify-content: space-between; gap: 8px; padding-top: 8px; color: #111; font-size: 11px; }
 
 /* Header: mine counter, smiley, timer */
 .ms-header {
@@ -332,7 +351,7 @@ export default {
   font-size: 16px;
   font-weight: bold;
   line-height: 18px;
-  letter-spacing: 1px;
+  letter-spacing: 0;
   text-align: center;
   border: 1px solid;
   border-color: #808080 #ffffff #ffffff #808080;
@@ -361,17 +380,22 @@ export default {
 /* Minefield */
 .ms-grid {
   display: grid;
-  grid-template-columns: repeat(9, 16px);
-  grid-auto-rows: 16px;
+  grid-template-columns: repeat(9, 24px);
+  grid-auto-rows: 24px;
   border: 3px solid;
   border-color: #808080 #ffffff #ffffff #808080;
-  width: 144px;
+  width: max-content;
   box-sizing: content-box;
 }
 
 .ms-cell {
-  width: 16px;
-  height: 16px;
+  width: 24px;
+  height: 24px;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border-radius: 0;
+  color: #111;
   box-sizing: border-box;
   background: #c0c0c0;
   border: 2px solid;
@@ -402,7 +426,7 @@ export default {
 }
 
 .ms-cell.sym {
-  font-size: 9px;
+  font-size: 13px;
 }
 
 /* Classic number colors */

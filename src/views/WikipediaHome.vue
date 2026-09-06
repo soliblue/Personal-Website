@@ -162,7 +162,7 @@
         <router-link to="/terminal">Terminal</router-link> ·
         <router-link to="/newspaper">Newspaper</router-link> ·
         <router-link to="/windows95">Windows 95</router-link> ·
-        <router-link to="/space">Space Game</router-link> ·
+        <router-link to="/space">Codex Cruise</router-link> ·
         <router-link to="/code-hop">Claude Hops</router-link>
       </div>
     </div>

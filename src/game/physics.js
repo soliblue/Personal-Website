@@ -19,8 +19,8 @@ export function updateShip(ship, keys, touchTarget, width, dt) {
   }
 
   // Apply friction
-  ship.velocityX *= ship.friction;
-  ship.velocityY *= ship.friction;
+  ship.velocityX *= ship.friction ** dt;
+  ship.velocityY *= ship.friction ** dt;
 
   // Clamp velocity
   ship.velocityX = Math.max(-ship.speed, Math.min(ship.speed, ship.velocityX));

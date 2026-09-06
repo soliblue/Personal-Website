@@ -150,6 +150,7 @@ export class GameplaySystem {
           // Calculate bonus
           const closenessBonus = 1 - (gap / closeCallDistance);
           const basePoints = Math.floor(50 + closenessBonus * 50);
+          this.distance += basePoints;
 
           // Increment streak
           this.streak += 1;
@@ -233,6 +234,7 @@ export class GameplaySystem {
     // Threading the needle bonus - higher points for tight squeezes
     const closenessBonus = Math.max(0, 1 - (gap / (closeCallDistance * 1.5)));
     const basePoints = Math.floor(75 + closenessBonus * 75); // Higher base for threading
+    this.distance += basePoints;
 
     // Increment streak
     this.streak += 1;
@@ -343,6 +345,7 @@ export class GameplaySystem {
     const maxDist = ORBIT_CONFIG.maxDistance * scale;
     const closenessBonus = 1 - ((distance - minDist) / (maxDist - minDist));
     const basePoints = Math.floor(ORBIT_CONFIG.basePoints + closenessBonus * 100);
+    this.distance += basePoints;
 
     // Big streak bonus for orbiting
     this.streak += 3;

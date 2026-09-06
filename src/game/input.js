@@ -31,6 +31,7 @@ export class InputSystem {
     canvas.addEventListener('touchstart', this.onTouchStart, { passive: false });
     canvas.addEventListener('touchmove', this.onTouchMove, { passive: false });
     canvas.addEventListener('touchend', this.onTouchEnd);
+    canvas.addEventListener('touchcancel', this.onTouchEnd);
   }
 
   cleanup() {
@@ -40,12 +41,19 @@ export class InputSystem {
       this.canvas.removeEventListener('touchstart', this.onTouchStart);
       this.canvas.removeEventListener('touchmove', this.onTouchMove);
       this.canvas.removeEventListener('touchend', this.onTouchEnd);
+      this.canvas.removeEventListener('touchcancel', this.onTouchEnd);
       this.canvas = null;
     }
   }
 
   onKeyDown(e) {
+    if (this.callbacks.isActive && !this.callbacks.isActive()) return;
+    if (/INPUT|TEXTAREA|SELECT/.test(e.target?.tagName) || e.target?.isContentEditable) return;
+    if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', ' '].includes(e.key)) e.preventDefault();
     switch (e.key) {
+      case ' ':
+        if (!e.repeat) this.callbacks.onPulse?.();
+        break;
       case 'ArrowLeft':
       case 'a':
         this.keys.left = true;
@@ -65,7 +73,7 @@ export class InputSystem {
       case 'p':
       case 'P':
       case 'Escape':
-        if (this.callbacks.onPause) {
+        if (!e.repeat && this.callbacks.onPause) {
           this.callbacks.onPause();
         }
         break;
@@ -119,9 +127,12 @@ export class InputSystem {
   }
 
   getTargetPosition() {
+    if (this.touchX === null || !this.canvas) return { x: null, y: null };
+    const bounds = this.canvas.getBoundingClientRect();
+    if (!bounds.width || !bounds.height) return { x: null, y: null };
     return {
-      x: this.touchX,
-      y: this.touchY,
+      x: (this.touchX - bounds.left) * this.canvas.width / bounds.width,
+      y: (this.touchY - bounds.top) * this.canvas.height / bounds.height - 45,
     };
   }
 

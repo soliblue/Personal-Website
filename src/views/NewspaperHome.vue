@@ -219,7 +219,7 @@
           <span class="footer-divider">|</span>
           <router-link to="/wikipedia" class="footer-link">Wikipedia Home</router-link>
           <span class="footer-divider">|</span>
-          <router-link to="/space" class="footer-link">Space Game</router-link>
+          <router-link to="/space" class="footer-link">Codex Cruise</router-link>
           <span class="footer-divider">|</span>
           <router-link to="/code-hop" class="footer-link">Claude Hops</router-link>
         </div>
