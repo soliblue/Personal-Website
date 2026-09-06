@@ -474,10 +474,18 @@
           sleeping: buddySleeping,
           'game-in-front': ['codehop', 'spacegame'].includes(activeWindow),
           ['activity-' + buddyActivity]: true,
+          performing: buddyMotionActive,
+          repositioning: buddyRepositioning,
         },
         'mood-' + buddyMood,
       ]"
-      :style="{ left: buddyX + 'px', '--bubble-offset': buddyBubbleOffset + 'px' }"
+      :style="{
+        left: buddyX + 'px', '--bubble-offset': buddyBubbleOffset + 'px',
+        '--buddy-lift': buddyPose.lift + 'px', '--buddy-tilt': buddyPose.tilt + 'deg',
+        '--buddy-scale-x': buddyPose.scaleX, '--buddy-scale-y': buddyPose.scaleY,
+        '--buddy-shadow-scale': 1 - buddyPose.lift / 180,
+        '--buddy-bite-scale': 1 - buddyPose.bite * 0.65,
+      }"
       :data-history="buddyHistory.length"
       :data-frame="buddyFrame"
       :data-mood="buddyMood"
@@ -486,12 +494,16 @@
       :data-activity="buddyActivity"
       :data-treats="buddyTreats"
       :data-following="String(buddyFollowing)"
+      :data-phase="buddyPose.phase"
+      :data-lift="Math.round(buddyPose.lift)"
       @contextmenu.stop.prevent="openBuddyContextMenu"
     >
       <div class="buddy-bubble" role="status" aria-live="polite">
         <span>{{ buddyMessage }}</span>
       </div>
       <span v-if="buddyActivity === 'petted'" class="buddy-hearts" aria-hidden="true">♥</span>
+      <span v-if="buddyMotionActive" class="buddy-ground-shadow" aria-hidden="true"></span>
+      <span v-if="buddyPose.dust" class="buddy-dust" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
       <button
         class="buddy-character"
         title="Talk to the desktop squirrel"
@@ -500,10 +512,18 @@
         @pointerdown.stop="startBuddyDrag"
         @keydown="onBuddyCharacterKeydown"
       >
-        <img :src="petSprites[buddyFrame]" alt="Pixel squirrel" draggable="false">
+        <span class="buddy-pose">
+          <span class="buddy-facing">
+            <img :src="petSprites[buddyFrame]" alt="Pixel squirrel" draggable="false">
+            <img v-if="buddyActivity === 'eating'" :src="acornIcon" alt="" class="buddy-held-acorn" draggable="false">
+            <span v-if="buddyPose.crumbs" class="buddy-crumbs" aria-hidden="true"><i></i><i></i><i></i></span>
+          </span>
+        </span>
       </button>
     </div>
-    <img v-if="buddyAcorn !== null" :src="acornIcon" alt="" class="buddy-acorn" :style="{ left: buddyAcorn + 'px' }">
+    <img v-if="buddyAcorn !== null" :src="acornIcon" alt="" class="buddy-acorn" :style="{
+      left: buddyAcorn.x + 'px', transform: `translate(-50%, ${-buddyAcorn.lift}px) rotate(${buddyAcorn.tilt}deg)`,
+    }">
 
     <div
       v-if="buddyContext.open"
@@ -518,6 +538,8 @@
       <button role="menuitem" @click="buddyContextAction('feed')">Toss an acorn</button>
       <button role="menuitem" @click="buddyContextAction('pet')">Head pats</button>
       <button role="menuitem" @click="buddyContextAction('dance')">Do a little dance</button>
+      <button role="menuitem" @click="buddyContextAction('jump')">Big jump</button>
+      <button role="menuitem" @click="buddyContextAction('flip')">Do a flip</button>
       <button v-if="!isTouch" role="menuitem" @click="buddyContextAction('follow')">{{ buddyFollowing ? 'Stop following' : 'Follow my cursor' }}</button>
       <button role="menuitem" @click="buddyContextAction('inspect')">Inspect desktop</button>
       <button role="menuitem" @click="buddyContextAction('stroll')">Take a stroll</button>
@@ -653,6 +675,7 @@
 
 <script>
 import { EXTRA_BUDDY_LINES, EXTRA_BUDDY_REACTIONS } from '@/utils/buddy-personality';
+import { sampleBuddyMotion } from '@/utils/buddy-motion';
 import acornIcon from '@/assets/win95/pet/acorn.svg';
 import { safeStorage, safeSessionStorage } from '@/utils/storage';
 
@@ -1076,6 +1099,9 @@ export default {
       buddyContext: { open: false, x: 0, y: 0 },
       acornIcon,
       buddyActivity: 'idle',
+      buddyMotionActive: false,
+      buddyRepositioning: false,
+      buddyPose: { lift: 0, tilt: 0, scaleX: 1, scaleY: 1, phase: 'idle', bite: 0, crumbs: false, dust: false },
       buddyAcorn: null,
       buddyTreats: Math.max(0, Math.min(9999, Number(safeStorage.getItem('soli95-acorns')) || 0)),
       buddyFollowing: false,
@@ -1474,6 +1500,9 @@ export default {
     this.buddyReactionIndexes = Object.create(null);
     this.buddyTimer = null;
     this.buddyActivityTimer = null;
+    this.buddyMotionRaf = null;
+    this.buddyLongPressTimer = null;
+    this.buddyResizeTimer = null;
     this.buddyLastSpoke = Date.now();
     this.buddyIdleTick = 0;
     this.buddyFollowTimer = null;
@@ -1509,6 +1538,9 @@ export default {
     clearTimeout(this.buddyPokeTimer);
     clearInterval(this.buddyTimer);
     clearTimeout(this.buddyActivityTimer);
+    cancelAnimationFrame(this.buddyMotionRaf);
+    clearTimeout(this.buddyLongPressTimer);
+    clearTimeout(this.buddyResizeTimer);
     clearInterval(this.buddyFollowTimer);
     clearInterval(this.clockTimer);
     document.removeEventListener('pointermove', this.onPointerMove);
@@ -1727,12 +1759,18 @@ export default {
       return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     },
     resizeBuddy() {
+      this.cancelBuddyActivity();
+      this.buddyRepositioning = true;
+      clearTimeout(this.buddyResizeTimer);
+      this.buddyResizeTimer = setTimeout(() => { this.buddyRepositioning = false; }, 100);
       this.buddyViewportWidth = this.$el.clientWidth;
       this.buddyX = Math.max(20, Math.min(this.buddyX, this.buddyViewportWidth - 110));
       this.buddyContext.open = false;
     },
     onBuddyVisibility() {
       if (document.hidden) {
+        clearTimeout(this.buddyLongPressTimer);
+        this.buddyDragging = false;
         this.buddyHiddenAt = Date.now();
         this.stopBuddyFollowing();
         this.cancelBuddyActivity();
@@ -1746,6 +1784,14 @@ export default {
         || this.buddyContext.open || this.dragging || this.resizing || this.buddyActivity !== 'idle'
         || ['codehop', 'spacegame', 'minesweeper'].includes(this.activeWindow)) return;
       this.buddyIdleTick += 1;
+      if (!this.buddyFollowing && this.buddyIdleTick % 7 === 0) {
+        this.feedBuddy();
+        return;
+      }
+      if (!this.buddyFollowing && this.buddyIdleTick % 5 === 0) {
+        this.jumpBuddy(this.buddyIdleTick % 10 === 0);
+        return;
+      }
       if (Date.now() - this.buddyLastSpoke > 24000) {
         const hour = new Date().getHours();
         const windows = this.openWindows.filter(win => !win.minimized).length;
@@ -1760,8 +1806,14 @@ export default {
     },
     cancelBuddyActivity() {
       clearTimeout(this.buddyActivityTimer);
+      cancelAnimationFrame(this.buddyMotionRaf);
+      this.buddyMotionRaf = null;
+      this.buddyMotionActive = false;
+      this.clearBuddyFrameTimers();
       this.buddyActivity = 'idle';
       this.buddyAcorn = null;
+      this.buddyPose = { lift: 0, tilt: 0, scaleX: 1, scaleY: 1, phase: 'idle', bite: 0, crumbs: false, dust: false };
+      if (!this.buddySleeping) this.buddyFrame = 'idle';
     },
     stopBuddyFollowing() {
       this.buddyFollowing = false;
@@ -1787,21 +1839,55 @@ export default {
     feedBuddy() {
       this.cancelBuddyActivity();
       this.narrateBuddy('fetch', 'excited');
-      this.buddyActivity = 'fetching';
-      const target = Math.max(20, Math.min(this.buddyX + (this.buddyFacingRight ? 140 : -140), this.buddyViewportWidth - 110));
-      this.buddyAcorn = (this.reduceBuddyMotion() ? this.buddyX : target) + 26;
-      this.buddyFacingRight = target > this.buddyX;
-      if (!this.reduceBuddyMotion()) this.buddyX = target;
-      this.playBuddyFrames(['walk-a', 'walk-b', 'hop', 'walk-a', 'walk-b'], 240, 'sit');
-      this.buddyActivityTimer = setTimeout(() => {
-        this.buddyTreats = Math.min(9999, this.buddyTreats + 1);
-        safeStorage.setItem('soli95-acorns', String(this.buddyTreats));
-        this.buddyAcorn = null;
-        this.narrateBuddy('feed', 'excited');
-        this.animateBuddyActivity('eating', 1800);
-        this.playBuddyFrames(['sit', 'blink', 'sit', 'excited', 'sit'], 280);
-        this.playSound('receive');
-      }, this.reduceBuddyMotion() ? 400 : 1400);
+      this.runBuddyMotion('snack', 145);
+    },
+    jumpBuddy(flip = false, narrate = true) {
+      if (narrate) this.narrateBuddy(flip ? 'flip' : 'jump', 'excited');
+      this.runBuddyMotion(flip ? 'flip' : 'jump', flip ? 130 : 100);
+    },
+    runBuddyMotion(kind, distance) {
+      // Start at the rendered position, not the destination of an unfinished stroll.
+      const element = this.$el.querySelector('.desktop-buddy');
+      const scale = this.$el.getBoundingClientRect().width / this.$el.offsetWidth;
+      const from = element ? element.getBoundingClientRect().left / scale : this.buddyX;
+      this.cancelBuddyActivity();
+      const reduced = this.reduceBuddyMotion();
+      const max = Math.max(20, this.buddyViewportWidth - 90);
+      let direction = this.buddyFacingRight ? 1 : -1;
+      if (from + direction * distance > max || from + direction * distance < 20) direction *= -1;
+      const to = reduced ? from : Math.max(20, Math.min(max, from + direction * distance));
+      this.buddyFacingRight = direction > 0;
+      this.buddyPoked = false;
+      this.buddyMotionActive = true;
+      this.buddyX = from;
+      const started = performance.now();
+      let rewarded = false;
+      let previousPhase = '';
+      const step = (now) => {
+        if (document.hidden) { this.cancelBuddyActivity(); return; }
+        const pose = sampleBuddyMotion(kind, now - started, from, to, reduced);
+        this.buddyPose = pose;
+        this.buddyX = pose.x;
+        this.buddyFrame = pose.frame;
+        this.buddyActivity = pose.activity;
+        this.buddyAcorn = pose.acorn;
+        if (pose.phase === 'nibble' && previousPhase !== 'nibble') this.narrateBuddy('nibble');
+        previousPhase = pose.phase;
+        if (pose.ate && !rewarded) {
+          rewarded = true;
+          this.buddyTreats = Math.min(9999, this.buddyTreats + 1);
+          safeStorage.setItem('soli95-acorns', String(this.buddyTreats));
+          this.narrateBuddy('feed', 'excited');
+          this.playSound('receive');
+        }
+        if (pose.done) {
+          this.cancelBuddyActivity();
+          this.setBuddyFrame(kind === 'snack' ? 'sit' : 'excited', 1000);
+          return;
+        }
+        this.buddyMotionRaf = requestAnimationFrame(step);
+      };
+      step(started);
     },
     recordBuddy(action, message) {
       this.buddyLastSpoke = Date.now();
@@ -1842,7 +1928,8 @@ export default {
     narrateBuddy(key, mood) {
       const lines = [...(BUDDY_REACTIONS[key] || []), ...(EXTRA_BUDDY_REACTIONS[key] || [])];
       if (!lines.length) return;
-      if (!['fetch', 'feed', 'pet', 'dance', 'follow', 'stopFollow'].includes(key)) {
+      if (['codehop', 'spacegame', 'bsod'].includes(key)) this.cancelBuddyActivity();
+      if (!this.buddyMotionActive && !['fetch', 'feed', 'pet', 'dance', 'jump', 'flip', 'follow', 'stopFollow'].includes(key)) {
         this.cancelBuddyActivity();
         this.buddyFollowTarget = null;
       }
@@ -1859,7 +1946,7 @@ export default {
       this.buddyLastSpoke = Date.now();
       this.buddyReactionIndexes[key] = index + 1;
       this.buddyMood = mood || BUDDY_MOODS[key] || 'curious';
-      this.setBuddyFrame(BUDDY_FRAMES[key] || 'curious');
+      if (!this.buddyMotionActive) this.setBuddyFrame(BUDDY_FRAMES[key] || 'curious');
       this.recordBuddy(key, this.buddyMessage);
     },
     onVisitorBoardSigned() {
@@ -1886,13 +1973,15 @@ export default {
       clearTimeout(this.buddyPokeTimer);
       this.buddyPoked = false;
       this.$nextTick(() => {
+        if (this.buddyMotionActive) return;
         this.buddyPoked = true;
         this.buddyPokeTimer = setTimeout(() => {
           this.buddyPoked = false;
         }, 420);
       });
       const reactionFrame = this.buddyPokeCount < 4 ? 'curious' : 'annoyed';
-      this.wanderBuddy(true, reactionFrame);
+      if (this.buddyPokeCount % 3 === 0) this.jumpBuddy(this.buddyPokeCount % 6 === 0, false);
+      else this.wanderBuddy(true, reactionFrame);
       this.recordBuddy(`poke #${this.buddyPokeCount}`, this.buddyMessage);
       this.playSound('nudge');
     },
@@ -1942,7 +2031,16 @@ export default {
       this.buddyMoved = false;
       this.buddyDragScale = scale;
       this.buddyDragStartX = pointerX;
+      this.buddyDragStartY = e.clientY / scale;
       this.buddyDragOffset = pointerX - this.buddyX;
+      clearTimeout(this.buddyLongPressTimer);
+      if (e.pointerType === 'touch') {
+        this.buddyLongPressTimer = setTimeout(() => {
+          this.buddyDragging = false;
+          this.buddyMoved = true;
+          this.openBuddyContextMenu({ currentTarget: buddy, clientX: e.clientX, clientY: e.clientY });
+        }, 500);
+      }
     },
     openBuddyContextMenu(e) {
       const menuWidth = 190;
@@ -1966,7 +2064,12 @@ export default {
           Math.min(pointerY - menuHeight - 76, this.$el.clientHeight - menuHeight - 2),
         ),
       };
-      this.$nextTick(() => this.$el.querySelector('.buddy-context-menu [role="menuitem"]')?.focus({ preventScroll: true }));
+      this.$nextTick(() => {
+        const menu = this.$el.querySelector('.buddy-context-menu');
+        if (!menu) return;
+        this.buddyContext.y = Math.max(2, Math.min(this.buddyContext.y, this.$el.clientHeight - menu.offsetHeight - 36));
+        menu.querySelector('[role="menuitem"]')?.focus({ preventScroll: true });
+      });
       this.playSound('click');
     },
     onBuddyCharacterKeydown(event) {
@@ -1997,6 +2100,7 @@ export default {
       this.$nextTick(() => this.$el.querySelector('.buddy-character')?.focus({ preventScroll: true }));
       if (this.buddySleeping && ['inspect', 'stroll'].includes(action)) this.wakeBuddy('All right, I am up. What are we doing?');
       if (action === 'feed') this.feedBuddy();
+      if (action === 'jump' || action === 'flip') this.jumpBuddy(action === 'flip');
       if (action === 'pet') {
         this.narrateBuddy('pet', 'excited');
         this.animateBuddyActivity('petted', 2200);
@@ -2196,7 +2300,10 @@ export default {
         const width = this.$el ? this.$el.clientWidth : window.innerWidth;
         const pointerX = e.clientX / this.buddyDragScale;
         const nextX = Math.min(Math.max(pointerX - this.buddyDragOffset, 4), width - 58);
-        if (Math.abs(pointerX - this.buddyDragStartX) > 12) this.buddyMoved = true;
+        if (Math.abs(pointerX - this.buddyDragStartX) > 12 || Math.abs(e.clientY / this.buddyDragScale - this.buddyDragStartY) > 12) {
+          this.buddyMoved = true;
+          clearTimeout(this.buddyLongPressTimer);
+        }
         if (nextX !== this.buddyX) this.buddyFacingRight = nextX > this.buddyX;
         this.buddyX = nextX;
       }
@@ -2219,6 +2326,7 @@ export default {
       }
     },
     onPointerUp(e) {
+      clearTimeout(this.buddyLongPressTimer);
       const clickedBuddy = this.buddyDragging && !this.buddyMoved && e.type === 'pointerup';
       const movedBuddy = this.buddyDragging && this.buddyMoved;
       const movedWindow = Boolean(this.dragging && this.movedWindow);
@@ -3409,14 +3517,17 @@ export default {
   width: 78px;
   height: 78px;
   z-index: 10001;
-  transition: left 1.2s steps(7) !important;
+  transition: left 1.1s linear !important;
 }
 
-.win95-desktop .desktop-buddy.dragging {
+.win95-desktop .desktop-buddy.dragging,
+.win95-desktop .desktop-buddy.repositioning,
+.win95-desktop .desktop-buddy.performing {
   transition: none !important;
 }
 
 .buddy-character {
+  position: relative;
   width: 78px;
   height: 78px;
   padding: 0;
@@ -3439,7 +3550,84 @@ export default {
   z-index: 10000;
   image-rendering: pixelated;
   pointer-events: none;
-  animation: buddy-treat 700ms steps(6);
+}
+.buddy-pose,
+.buddy-facing {
+  position: relative;
+  display: block;
+  width: 78px;
+  height: 78px;
+}
+.buddy-pose {
+  transform-origin: 50% 88%;
+  transform: translateY(calc(-1 * var(--buddy-lift))) rotate(var(--buddy-tilt)) scale(var(--buddy-scale-x), var(--buddy-scale-y));
+}
+.desktop-buddy.leftward .buddy-facing {
+  transform: scaleX(-1);
+}
+.buddy-character img.buddy-held-acorn {
+  position: absolute;
+  left: 54px;
+  top: 43px;
+  width: 13px;
+  height: 16px;
+  filter: none;
+  transform-origin: 50% 40%;
+  transform: scale(var(--buddy-bite-scale));
+  animation: buddy-nibble 260ms steps(2) infinite;
+}
+.buddy-ground-shadow {
+  position: absolute;
+  bottom: 2px;
+  left: 18px;
+  width: 45px;
+  height: 3px;
+  background: #005c5c;
+  opacity: 0.65;
+  transform: scaleX(var(--buddy-shadow-scale));
+  pointer-events: none;
+}
+.buddy-crumbs,
+.buddy-dust {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  pointer-events: none;
+}
+.buddy-crumbs { top: 48px; left: 58px; }
+.buddy-dust { bottom: 4px; left: 39px; }
+.buddy-crumbs i,
+.buddy-dust i {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: #d7a25d;
+  animation: buddy-crumb 550ms linear infinite;
+}
+.buddy-crumbs i:nth-child(2) { --crumb-x: 11px; animation-delay: 170ms; background: #8b4e29; }
+.buddy-crumbs i:nth-child(3) { --crumb-x: -7px; animation-delay: 340ms; }
+.buddy-dust i { background: #80b6a9; animation: buddy-dust 350ms ease-out both; }
+.buddy-dust i:nth-child(1) { --dust-x: -28px; }
+.buddy-dust i:nth-child(2) { --dust-x: 28px; }
+.buddy-dust i:nth-child(3) { --dust-x: -18px; animation-delay: 60ms; }
+.buddy-dust i:nth-child(4) { --dust-x: 18px; animation-delay: 60ms; }
+.desktop-buddy.activity-jumping .buddy-bubble,
+.desktop-buddy.activity-flipping .buddy-bubble,
+.desktop-buddy.activity-fetching .buddy-bubble {
+  opacity: 0;
+}
+@keyframes buddy-nibble {
+  50% { transform: translateY(-2px) scale(var(--buddy-bite-scale)); }
+}
+@keyframes buddy-crumb {
+  0% { opacity: 0; transform: translate(0, 0); }
+  20% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--crumb-x, 4px), 18px); }
+}
+@keyframes buddy-dust {
+  0% { opacity: 0.8; transform: translateX(0); }
+  50% { transform: translate(var(--dust-x), -5px); }
+  100% { opacity: 0; transform: translate(var(--dust-x), 0); }
 }
 .buddy-hearts {
   position: absolute;
@@ -3455,12 +3643,6 @@ export default {
   30% { opacity: 1; }
   100% { transform: translateY(-42px) scale(1.1); opacity: 0; }
 }
-@keyframes buddy-treat {
-  0% { transform: translateY(-90px) rotate(-35deg); }
-  65% { transform: translateY(0) rotate(15deg); }
-  82% { transform: translateY(-12px); }
-  100% { transform: translateY(0); }
-}
 @keyframes buddy-dance {
   0%, 100% { transform: translateY(0) rotate(-8deg); }
   25% { transform: translateY(-14px) rotate(8deg); }
@@ -3470,7 +3652,7 @@ export default {
 .win95-desktop .desktop-buddy.activity-dancing .buddy-character {
   animation: buddy-dance 600ms steps(4) 4 !important;
 }
-.win95-desktop .desktop-buddy[data-following="true"] { transition: left 280ms linear !important; }
+.win95-desktop .desktop-buddy[data-following="true"]:not(.performing):not(.repositioning) { transition: left 280ms linear !important; }
 
 .buddy-character:focus {
   outline: 1px dotted #ffffff;
@@ -3482,10 +3664,6 @@ export default {
   object-fit: contain;
   image-rendering: pixelated;
   filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.45));
-}
-
-.desktop-buddy.leftward .buddy-character img {
-  transform: scaleX(-1);
 }
 
 @keyframes buddy-poke {
@@ -3616,7 +3794,10 @@ export default {
   .win95-desktop .desktop-buddy.poked .buddy-character,
   .win95-desktop .desktop-buddy.activity-dancing .buddy-character,
   .buddy-hearts,
-  .buddy-acorn {
+  .buddy-acorn,
+  .buddy-character img.buddy-held-acorn,
+  .buddy-crumbs i,
+  .buddy-dust i {
     animation: none !important;
   }
 }
