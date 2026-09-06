@@ -46,6 +46,7 @@ test('big jumps and flips travel through the air and land inside the desktop', a
     await expect(pet).toHaveAttribute('data-phase', 'airborne');
     await expect.poll(async () => Number(await pet.getAttribute('data-lift'))).toBeGreaterThan(65);
     expect(await page.locator('.buddy-pose').evaluate(el => getComputedStyle(el).transform)).not.toBe('none');
+    await expect(page.locator('.buddy-character')).toHaveCSS('outline-style', 'none');
     await page.waitForFunction(() => document.querySelector('.desktop-buddy')?.dataset.phase === 'landing');
     await expect(page.locator('.buddy-dust')).toBeVisible();
     await expect(pet).toHaveAttribute('data-activity', 'idle');

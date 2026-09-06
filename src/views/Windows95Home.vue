@@ -3655,7 +3655,12 @@ export default {
 .win95-desktop .desktop-buddy[data-following="true"]:not(.performing):not(.repositioning) { transition: left 280ms linear !important; }
 
 .buddy-character:focus {
+  outline: none;
+}
+
+.buddy-character:focus-visible .buddy-pose {
   outline: 1px dotted #ffffff;
+  outline-offset: 1px;
 }
 
 .buddy-character img {
