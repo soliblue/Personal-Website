@@ -2,7 +2,7 @@
 
 > Staff AI Engineer building products people actually use. Egyptian, moved to Germany in 2014 to study computer science. Currently building AI-powered education at Knowunity for 30 million students. Shipping fast, learning faster.
 
-soli.blue is a playful, multi-themed personal site — the same content rendered as a Windows 95 desktop, a terminal, a newspaper, a Wikipedia article, and more — plus an AI chat that answers questions about Soli. Clean, machine-readable Markdown versions of each page are served under `/api/md/` so agents don't have to execute JavaScript.
+soli.blue is a playful personal site built around a Windows 95 desktop, with projects, games, an embedded browser, and an AI chat that answers questions about Soli. Clean, machine-readable Markdown versions of each page are served under `/api/md/` so agents don't have to execute JavaScript.
 
 ## Pages (Markdown for agents)
 

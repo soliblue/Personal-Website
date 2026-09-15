@@ -42,9 +42,7 @@
           <span class="menu-label">Other Homepages</span>
           <a href="/animation" target="_blank" rel="noopener noreferrer" class="menu-item small">Animation</a>
           <a href="/terminal" target="_blank" rel="noopener noreferrer" class="menu-item small">Terminal</a>
-          <a href="/newspaper" target="_blank" rel="noopener noreferrer" class="menu-item small">Newspaper</a>
           <a href="/windows95" target="_blank" rel="noopener noreferrer" class="menu-item small">Windows 95</a>
-          <a href="/wikipedia" target="_blank" rel="noopener noreferrer" class="menu-item small">Wikipedia</a>
           <a href="/code-hop" target="_blank" rel="noopener noreferrer" class="menu-item small">Claude Hops</a>
         </div>
       </div>

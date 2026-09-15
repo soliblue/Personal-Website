@@ -48,15 +48,6 @@
         </svg>
         <span>terminal</span>
       </router-link>
-      <router-link to="/newspaper" class="floating-btn left">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"></path>
-          <path d="M18 14h-8"></path>
-          <path d="M15 18h-5"></path>
-          <path d="M10 6h8v4h-8V6Z"></path>
-        </svg>
-        <span>newspaper</span>
-      </router-link>
       <router-link to="/windows95" class="floating-btn left">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
           <rect x="2" y="2" width="9" height="9" fill="#f65314"/>
@@ -65,13 +56,6 @@
           <rect x="13" y="13" width="9" height="9" fill="#ffbb00"/>
         </svg>
         <span>win95</span>
-      </router-link>
-      <router-link to="/wikipedia" class="floating-btn left">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="10"/>
-          <text x="12" y="16" text-anchor="middle" font-size="12" fill="currentColor" stroke="none">W</text>
-        </svg>
-        <span>wiki</span>
       </router-link>
       <router-link to="/space" class="floating-btn left">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

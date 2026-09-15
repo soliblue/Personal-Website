@@ -8,7 +8,7 @@ export default defineConfig({
     name: 'static-pages-files',
     closeBundle() {
       cpSync('static', 'dist/static', { recursive: true });
-      const routes = ['animation', 'terminal', 'newspaper', 'windows95', 'wikipedia', 'space', 'code-hop', 'home', 'pins', 'resume', 'projects'];
+      const routes = ['animation', 'terminal', 'windows95', 'space', 'code-hop', 'home', 'pins', 'resume', 'projects'];
       for (const app of ['habibi', 'habibis']) {
         for (const page of ['marketing', 'privacy', 'terms']) routes.push(`apps/${app}/${page}`);
       }

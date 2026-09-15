@@ -389,8 +389,6 @@
                 class="url-select"
                 @change="narrateBrowser(win.browserUrl)"
               >
-                <option value="wikipedia">en.wikipedia.org/wiki/Soli</option>
-                <option value="newspaper">thedailysoli.com</option>
                 <option value="machtblick">machtblick.de/votes/</option>
                 <option value="songgpt">songgpt.soli.blue</option>
                 <option value="intelligence">intelligence.soli.blue</option>
@@ -402,8 +400,6 @@
             </button>
           </div>
           <div class="browser-content">
-            <WikipediaHome v-if="win.browserUrl === 'wikipedia'" :embedded="true" />
-            <NewspaperHome v-if="win.browserUrl === 'newspaper'" :embedded="true" />
             <iframe
               v-if="browserPages[win.browserUrl]"
               :key="`${win.browserUrl}-${win.browserRefreshKey}`"
@@ -682,8 +678,6 @@ import { safeStorage, safeSessionStorage } from '@/utils/storage';
 import resume from '@/assets/resume.json';
 import projects from '@/assets/projects.json';
 import TerminalHome from '@/views/TerminalHome';
-import WikipediaHome from '@/views/WikipediaHome';
-import NewspaperHome from '@/views/NewspaperHome';
 import SpaceGameHome from '@/views/SpaceGameHome';
 import CodeHopHome from '@/views/CodeHopHome';
 import MessengerApp from '@/components/win95/MessengerApp';
@@ -820,7 +814,7 @@ const BUDDY_REACTIONS = {
   ],
   browserHome: [
     'Back to the homepage. A classic retreat.',
-    'Wikipedia will know what to do with us.',
+    'Back to the big questions.',
   ],
   browserIntelligence: [
     'Big questions. Small browser window.',
@@ -830,10 +824,6 @@ const BUDDY_REACTIONS = {
     'A little economics between games.',
     'Germany, one question at a time.',
   ],
-  browserNewspaper: [
-    'Fresh news from a deeply suspicious publication.',
-    'Print is not dead. It is embedded in Vue.',
-  ],
   browserMachtblick: [
     'Parliamentary transparency. Suddenly the browser looks responsible.',
     'Votes, speeches, donations. Quite a lot for one little window.',
@@ -841,10 +831,6 @@ const BUDDY_REACTIONS = {
   browserSonggpt: [
     'The browser is composing now. This should be interesting.',
     'An LLM making music inside Internet Explorer. Historically inevitable.',
-  ],
-  browserWikipedia: [
-    'Neutral point of view mode activated.',
-    'Citation needed, probably.',
   ],
   bsod: [
     'We survived. The error report did not.',
@@ -1013,9 +999,7 @@ const BUDDY_FRAMES = {
   browserIntelligence: 'curious',
   browserGermany: 'curious',
   browserMachtblick: 'curious',
-  browserNewspaper: 'curious',
   browserSonggpt: 'excited',
-  browserWikipedia: 'curious',
   bsod: 'annoyed',
   close: 'blink',
   codehop: 'excited',
@@ -1055,8 +1039,6 @@ export default {
   name: 'Windows95Home',
   components: {
     TerminalHome,
-    WikipediaHome,
-    NewspaperHome,
     SpaceGameHome,
     CodeHopHome,
     MessengerApp,
@@ -1358,7 +1340,7 @@ export default {
           zIndex: 10,
           showMenu: false,
           contentClass: 'app-container',
-          browserUrl: 'wikipedia',
+          browserUrl: 'intelligence',
           browserRefreshKey: 0,
         },
         {
@@ -2464,7 +2446,7 @@ export default {
     // --- Misc ---
     goBrowserHome(win) {
       const w = win;
-      w.browserUrl = 'wikipedia';
+      w.browserUrl = 'intelligence';
       this.narrateBuddy('browserHome');
       this.playSound('click');
     },
@@ -2473,9 +2455,7 @@ export default {
         intelligence: 'browserIntelligence',
         germany: 'browserGermany',
         machtblick: 'browserMachtblick',
-        newspaper: 'browserNewspaper',
         songgpt: 'browserSonggpt',
-        wikipedia: 'browserWikipedia',
       };
       this.narrateBuddy(reactions[url]);
     },

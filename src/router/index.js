@@ -6,9 +6,7 @@ const Resume = () => import('@/views/Resume.vue');
 const Projects = () => import('@/views/Projects.vue');
 const BuildHome = () => import('@/views/BuildHome.vue');
 const TerminalHome = () => import('@/views/TerminalHome.vue');
-const NewspaperHome = () => import('@/views/NewspaperHome.vue');
 const Windows95Home = () => import('@/views/Windows95Home.vue');
-const WikipediaHome = () => import('@/views/WikipediaHome.vue');
 const SpaceGameHome = () => import('@/views/SpaceGameHome.vue');
 const CodeHopHome = () => import('@/views/CodeHopHome.vue');
 const AppDoc = () => import('@/views/AppDoc.vue');
@@ -41,12 +39,7 @@ const router = createRouter({
     },
     {
       path: '/newspaper',
-      name: 'NewspaperHome',
-      component: NewspaperHome,
-      beforeEnter: (to, from, next) => {
-        safeStorage.setItem('homeVersion', 'newspaper');
-        next();
-      },
+      redirect: '/windows95',
     },
     {
       path: '/windows95',
@@ -59,12 +52,7 @@ const router = createRouter({
     },
     {
       path: '/wikipedia',
-      name: 'WikipediaHome',
-      component: WikipediaHome,
-      beforeEnter: (to, from, next) => {
-        safeStorage.setItem('homeVersion', 'wikipedia');
-        next();
-      },
+      redirect: '/windows95',
     },
     {
       path: '/space',

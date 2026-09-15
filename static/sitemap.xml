@@ -51,20 +51,6 @@
    </url>
 
    <url>
-      <loc>https://soli.blue/newspaper</loc>
-      <lastmod>2026-07-05</lastmod>
-      <changefreq>monthly</changefreq>
-      <priority>0.5</priority>
-   </url>
-
-   <url>
-      <loc>https://soli.blue/wikipedia</loc>
-      <lastmod>2026-07-05</lastmod>
-      <changefreq>monthly</changefreq>
-      <priority>0.5</priority>
-   </url>
-
-   <url>
       <loc>https://soli.blue/animation</loc>
       <lastmod>2026-07-05</lastmod>
       <changefreq>monthly</changefreq>

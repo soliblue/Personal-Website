@@ -7,7 +7,12 @@ for (const path of routes) {
     page.on('pageerror', error => errors.push(error.message));
     await page.addInitScript(() => sessionStorage.setItem('soli95-booted', 'true'));
     await page.goto(path);
+    if (['/wikipedia', '/newspaper'].includes(path)) {
+      await expect(page).toHaveURL(/\/windows95$/);
+      await expect(page.locator('.desktop-icon').first()).toBeVisible();
+    }
     await expect(page.locator('#app')).not.toBeEmpty();
+    await expect(page.locator('a[href="/wikipedia"], a[href="/newspaper"]')).toHaveCount(0);
     await expect(page.locator('#app')).toContainText(/\w/, { timeout: 8000 });
     await page.waitForTimeout(300);
     expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);

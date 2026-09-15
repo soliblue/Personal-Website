@@ -103,7 +103,7 @@ ${pins.filter(p => p.type === 'book').map(p => `- **${p.title}**${p.subtitle ? `
   };
 
   // Theme homepages all serve the main page markdown
-  if (['windows95', 'terminal', 'newspaper', 'wikipedia', 'animation', 'space', 'code-hop', 'home'].includes(path.replace(/^\//, ''))) {
+  if (['windows95', 'terminal', 'animation', 'space', 'code-hop', 'home'].includes(path.replace(/^\//, ''))) {
     return pages['/'];
   }
 
