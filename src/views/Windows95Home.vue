@@ -389,7 +389,7 @@
                 <option value="songgpt">songgpt.soli.blue</option>
                 <option value="intelligence">intelligence.soli.blue</option>
                 <option value="germany">germany.soli.blue</option>
-                <option value="canvas">canvas.solai.chatgpt.site</option>
+                <option value="canvas">canvas.soli.blue</option>
               </select>
             </div>
             <button class="toolbar-btn" title="Refresh" @click="refreshBrowser(win)">
@@ -406,7 +406,7 @@
               :allow="win.browserUrl === 'songgpt' ? 'autoplay' : undefined"
             ></iframe>
             <div v-if="win.browserUrl === 'machtblick'" class="browser-launch-page">
-              <img src="../assets/win95/globe.svg" alt="">
+              <img src="../assets/win95/internet-orbit.png" alt="">
               <h2>Machtblick</h2>
               <p>
                 Bundestag votes, members, speeches, donations, and party histories in one place.
@@ -576,7 +576,7 @@
       </div>
       <div class="start-menu-items">
         <div class="menu-item-row" @click="openWindow('resume')">
-          <img src="../assets/win95/doc.svg">
+          <img src="../assets/win95/resume-profile.png">
           <span>Resume</span>
         </div>
         <div v-if="!hiddenApps.includes('projects')" class="menu-item-row" @click="openWindow('projects')">
@@ -584,11 +584,11 @@
           <span>Projects</span>
         </div>
         <div class="menu-item-row" @click="openWindow('contact')">
-          <img src="../assets/win95/mail.svg">
+          <img src="../assets/win95/contact-letter.png">
           <span>Contact</span>
         </div>
         <div class="menu-item-row" @click="openWindow('messenger')">
-          <img src="../assets/win95/msn.svg">
+          <img src="../assets/win95/messenger-bubbles.png">
           <span>Messenger</span>
         </div>
         <div class="menu-item-row" @click="openWindow('spacegame')">
@@ -671,14 +671,15 @@ import projectMedia from '@/assets/project-media';
 import codeHopIcon from '@/assets/codehop/claude-hops-icon.svg';
 import aboutIcon from '@/assets/win95/about.svg';
 import docIcon from '@/assets/win95/doc.svg';
+import resumeIcon from '@/assets/win95/resume-profile.png';
 import folderIcon from '@/assets/win95/folder.svg';
 import imageFileIcon from '@/assets/win95/image-file.svg';
 import computerIcon from '@/assets/win95/computer.svg';
-import mailIcon from '@/assets/win95/mail.svg';
+import mailIcon from '@/assets/win95/contact-letter.png';
 import terminalIcon from '@/assets/win95/terminal.svg';
-import globeIcon from '@/assets/win95/globe.svg';
+import globeIcon from '@/assets/win95/internet-orbit.png';
 import recycleIcon from '@/assets/win95/recycle.svg';
-import msnIcon from '@/assets/win95/msn.svg';
+import msnIcon from '@/assets/win95/messenger-bubbles.png';
 import mineIcon from '@/assets/win95/mine.svg';
 import paintIcon from '@/assets/win95/paint.svg';
 import spaceshipIcon from '@/assets/space/codex-flies-ship.png';
@@ -1030,7 +1031,7 @@ export default {
         songgpt: { url: 'https://songgpt.soli.blue/', title: 'SongGPT' },
         intelligence: { url: 'https://intelligence.soli.blue/', title: 'Intelligence' },
         germany: { url: 'https://germany.soli.blue/', title: 'Germany' },
-        canvas: { url: 'https://canvas.solai.chatgpt.site/', title: 'Canvas' },
+        canvas: { url: 'https://canvas.soli.blue/', title: 'Canvas' },
       },
       codeHopIcon,
       spaceshipIcon,
@@ -1106,7 +1107,7 @@ export default {
           imgClass: 'space-icon codex-ship',
         },
         { id: 'codehop', label: 'Claude Hops', img: codeHopIcon, imgClass: 'codehop-icon' },
-        { id: 'resume', label: 'Resume.doc', img: docIcon },
+        { id: 'resume', label: 'Resume.doc', img: resumeIcon },
         { id: 'contact', label: 'Contact', img: mailIcon },
       ],
       // Keep these apps intact so their launchers can be restored later.
@@ -1185,7 +1186,7 @@ export default {
         {
           id: 'resume',
           title: 'Resume.doc - WordPad',
-          icon: docIcon,
+          icon: resumeIcon,
           open: false,
           minimized: false,
           maximized: false,
@@ -1383,6 +1384,9 @@ export default {
     };
   },
   computed: {
+    buddyAirborne() {
+      return this.buddyMotionActive && this.buddyPose.phase === 'airborne' && this.buddyPose.lift > 0;
+    },
     visibleDesktopIcons() {
       return this.desktopIcons.filter(icon => !this.hiddenApps.includes(icon.id));
     },
@@ -1899,6 +1903,7 @@ export default {
       this.recordBuddy(key, this.buddyMessage);
     },
     pokeBuddy() {
+      if (this.buddyAirborne) return;
       this.cancelBuddyActivity();
       this.buddyLastSpoke = Date.now();
       if (this.buddySleeping) {
@@ -1961,6 +1966,7 @@ export default {
       );
     },
     startBuddyDrag(e) {
+      if (this.buddyAirborne) return;
       if (e.button !== 0) return;
       if (this.buddySleeping) { this.wakeBuddy('That was a terrible alarm clock.'); return; }
       this.cancelBuddyActivity();
@@ -1989,6 +1995,7 @@ export default {
       }
     },
     openBuddyContextMenu(e) {
+      if (this.buddyAirborne) return;
       const menuWidth = 190;
       const menuHeight = 300;
       const scale = this.$el && this.$el.offsetWidth

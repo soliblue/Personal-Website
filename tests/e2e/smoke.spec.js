@@ -296,7 +296,7 @@ test.describe('site smoke', () => {
       ['songgpt', 'SongGPT', 'https://songgpt.soli.blue/'],
       ['intelligence', 'Intelligence', 'https://intelligence.soli.blue/'],
       ['germany', 'Germany', 'https://germany.soli.blue/'],
-      ['canvas', 'Canvas', 'https://canvas.solai.chatgpt.site/'],
+      ['canvas', 'Canvas', 'https://canvas.soli.blue/'],
     ];
     for (const [site, , url] of sites) {
       await page.route(url, route => route.fulfill({

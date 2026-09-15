@@ -57,6 +57,34 @@ test('big jumps and flips travel through the air and land inside the desktop', a
   }
 });
 
+test('airborne squirrel ignores mouse, touch, keyboard, and context clicks until landing', async ({ page }) => {
+  await boot(page);
+  const pet = page.locator('.desktop-buddy');
+  const button = page.getByRole('button', { name: 'Talk to the desktop squirrel' });
+  for (const name of ['Big jump', 'Do a flip']) {
+    await action(page, name);
+    await expect(pet).toHaveAttribute('data-phase', 'airborne');
+    const before = await pet.getAttribute('data-pokes');
+    const message = await page.locator('.buddy-bubble').textContent();
+    // Dispatch directly: locator.click waits for movement to stop, missing the regression.
+    await button.evaluate(el => {
+      for (const pointerType of ['mouse', 'touch']) {
+        el.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, button: 0, pointerType }));
+        el.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, button: 0, pointerType }));
+      }
+      el.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 0 }));
+      el.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true }));
+    });
+    await expect(pet).toHaveAttribute('data-pokes', before);
+    await expect(page.locator('.buddy-bubble')).toHaveText(message);
+    await expect(page.locator('.buddy-context-menu')).toHaveCount(0);
+    await expect(pet).toHaveAttribute('data-phase', 'airborne');
+    await page.waitForFunction(() => document.querySelector('.desktop-buddy')?.dataset.phase === 'landing');
+    await button.dispatchEvent('click', { detail: 0 });
+    await expect(pet).toHaveAttribute('data-pokes', String(Number(before) + 1));
+  }
+});
+
 test('desktop actions do not interrupt eating, but sleep cancels it without a reward', async ({ page }) => {
   await boot(page);
   const pet = page.locator('.desktop-buddy');
