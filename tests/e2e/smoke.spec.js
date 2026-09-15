@@ -289,14 +289,16 @@ test.describe('site smoke', () => {
     expect(fontSize).toBeGreaterThanOrEqual(18);
   });
 
-  test('Internet Explorer opens Intelligence and embeds personal sites without retired pages', async ({ page }) => {
+  test('Internet Explorer opens Feed and embeds personal sites without retired pages', async ({ page }) => {
     const errors = collectPageErrors(page);
 
     const sites = [
+      ['feed', 'Feed', 'https://feed.solai.chatgpt.site/'],
       ['songgpt', 'SongGPT', 'https://songgpt.soli.blue/'],
       ['intelligence', 'Intelligence', 'https://intelligence.soli.blue/'],
       ['germany', 'Germany', 'https://germany.soli.blue/'],
       ['canvas', 'Canvas', 'https://canvas.soli.blue/'],
+      ['machtblick', 'Machtblick', 'https://machtblick.de/'],
     ];
     for (const [site, , url] of sites) {
       await page.route(url, route => route.fulfill({
@@ -312,8 +314,8 @@ test.describe('site smoke', () => {
       has: page.locator('.titlebar-text', { hasText: 'Internet Explorer' }),
     });
     const address = browserWindow.locator('.url-select');
-    await expect(address).toHaveValue('intelligence');
-    await expect(page.frameLocator('.browser-frame').locator('main')).toHaveText('intelligence is framed');
+    await expect(address).toHaveValue('feed');
+    await expect(page.frameLocator('.browser-frame').locator('main')).toHaveText('feed is framed');
     await expect(address.locator('option[value="wikipedia"], option[value="newspaper"]')).toHaveCount(0);
     await expect(address.locator('option[value="local"]')).toHaveCount(0);
     await expect(browserWindow).not.toContainText('DO_NOT_OPEN');
@@ -329,13 +331,10 @@ test.describe('site smoke', () => {
       expect(page.context().pages()).toHaveLength(1);
     }
     await browserWindow.getByRole('button', { name: 'Home', exact: true }).click();
-    await expect(address).toHaveValue('intelligence');
-    await expect(page.frameLocator('.browser-frame').locator('main')).toHaveText('intelligence is framed');
+    await expect(address).toHaveValue('feed');
+    await expect(page.frameLocator('.browser-frame').locator('main')).toHaveText('feed is framed');
 
-    await address.selectOption('machtblick');
-    await expect(browserWindow.locator('.browser-launch-page')).toContainText('Machtblick');
-    await expect(browserWindow.getByRole('button', { name: 'Open machtblick.de' })).toBeVisible();
-    await expect(browserWindow.locator('.browser-frame')).toHaveCount(0);
+    await expect(browserWindow.locator('.browser-launch-page')).toHaveCount(0);
     expect(errors).toEqual([]);
   });
 

@@ -385,7 +385,8 @@
                 class="url-select"
                 @change="narrateBrowser(win.browserUrl)"
               >
-                <option value="machtblick">machtblick.de/votes/</option>
+                <option value="feed">feed.solai.chatgpt.site</option>
+                <option value="machtblick">machtblick.de</option>
                 <option value="songgpt">songgpt.soli.blue</option>
                 <option value="intelligence">intelligence.soli.blue</option>
                 <option value="germany">germany.soli.blue</option>
@@ -405,17 +406,6 @@
               :title="browserPages[win.browserUrl].title"
               :allow="win.browserUrl === 'songgpt' ? 'autoplay' : undefined"
             ></iframe>
-            <div v-if="win.browserUrl === 'machtblick'" class="browser-launch-page">
-              <img src="../assets/win95/internet-orbit.png" alt="">
-              <h2>Machtblick</h2>
-              <p>
-                Bundestag votes, members, speeches, donations, and party histories in one place.
-              </p>
-              <button class="win95-btn" @click="openExternalLink('https://machtblick.de/votes/')">
-                Open machtblick.de
-              </button>
-              <small>This website opens in its own window.</small>
-            </div>
           </div>
         </div>
 
@@ -1028,10 +1018,12 @@ export default {
       projects,
       projectMedia,
       browserPages: {
+        feed: { url: 'https://feed.solai.chatgpt.site/', title: 'Feed' },
         songgpt: { url: 'https://songgpt.soli.blue/', title: 'SongGPT' },
         intelligence: { url: 'https://intelligence.soli.blue/', title: 'Intelligence' },
         germany: { url: 'https://germany.soli.blue/', title: 'Germany' },
         canvas: { url: 'https://canvas.soli.blue/', title: 'Canvas' },
+        machtblick: { url: 'https://machtblick.de/', title: 'Machtblick' },
       },
       codeHopIcon,
       spaceshipIcon,
@@ -1302,7 +1294,7 @@ export default {
           zIndex: 10,
           showMenu: false,
           contentClass: 'app-container',
-          browserUrl: 'intelligence',
+          browserUrl: 'feed',
           browserRefreshKey: 0,
         },
         {
@@ -2418,12 +2410,13 @@ export default {
     // --- Misc ---
     goBrowserHome(win) {
       const w = win;
-      w.browserUrl = 'intelligence';
+      w.browserUrl = 'feed';
       this.narrateBuddy('browserHome');
       this.playSound('click');
     },
     narrateBrowser(url) {
       const reactions = {
+        feed: 'browserHome',
         intelligence: 'browserIntelligence',
         germany: 'browserGermany',
         canvas: 'browserCanvas',
@@ -3309,38 +3302,6 @@ export default {
   height: 100%;
   border: 0;
   background: white;
-}
-
-.browser-launch-page {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  padding: 24px;
-  color: #000000;
-  text-align: center;
-}
-
-.browser-launch-page img {
-  width: 48px;
-  height: 48px;
-}
-
-.browser-launch-page h2 {
-  margin: 10px 0 6px;
-  font-size: 20px;
-}
-
-.browser-launch-page p {
-  max-width: 420px;
-  margin: 0 0 16px;
-  line-height: 1.45;
-}
-
-.browser-launch-page small {
-  margin-top: 10px;
-  color: #555555;
 }
 
 /* Mail Window */
