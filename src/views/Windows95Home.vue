@@ -393,6 +393,7 @@
                 <option value="songgpt">songgpt.soli.blue</option>
                 <option value="intelligence">intelligence.soli.blue</option>
                 <option value="germany">germany.soli.blue</option>
+                <option value="canvas">canvas.solai.chatgpt.site</option>
               </select>
             </div>
             <button class="toolbar-btn" title="Refresh" @click="refreshBrowser(win)">
@@ -824,6 +825,10 @@ const BUDDY_REACTIONS = {
     'A little economics between games.',
     'Germany, one question at a time.',
   ],
+  browserCanvas: [
+    'A little room for a big idea.',
+    'Blank canvas. Full imagination.',
+  ],
   browserMachtblick: [
     'Parliamentary transparency. Suddenly the browser looks responsible.',
     'Votes, speeches, donations. Quite a lot for one little window.',
@@ -998,6 +1003,7 @@ const BUDDY_FRAMES = {
   browserHome: 'sit',
   browserIntelligence: 'curious',
   browserGermany: 'curious',
+  browserCanvas: 'curious',
   browserMachtblick: 'curious',
   browserSonggpt: 'excited',
   bsod: 'annoyed',
@@ -1056,6 +1062,7 @@ export default {
         songgpt: { url: 'https://songgpt.soli.blue/', title: 'SongGPT' },
         intelligence: { url: 'https://intelligence.soli.blue/', title: 'Intelligence' },
         germany: { url: 'https://germany.soli.blue/', title: 'Germany' },
+        canvas: { url: 'https://canvas.solai.chatgpt.site/', title: 'Canvas' },
       },
       codeHopIcon,
       spaceshipIcon,
@@ -2454,6 +2461,7 @@ export default {
       const reactions = {
         intelligence: 'browserIntelligence',
         germany: 'browserGermany',
+        canvas: 'browserCanvas',
         machtblick: 'browserMachtblick',
         songgpt: 'browserSonggpt',
       };

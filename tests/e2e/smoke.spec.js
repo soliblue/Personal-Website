@@ -402,8 +402,14 @@ test.describe('site smoke', () => {
   test('Internet Explorer opens Intelligence and embeds personal sites without retired pages', async ({ page }) => {
     const errors = collectPageErrors(page);
 
-    for (const site of ['songgpt', 'intelligence', 'germany']) {
-      await page.route(`https://${site}.soli.blue/`, route => route.fulfill({
+    const sites = [
+      ['songgpt', 'SongGPT', 'https://songgpt.soli.blue/'],
+      ['intelligence', 'Intelligence', 'https://intelligence.soli.blue/'],
+      ['germany', 'Germany', 'https://germany.soli.blue/'],
+      ['canvas', 'Canvas', 'https://canvas.solai.chatgpt.site/'],
+    ];
+    for (const [site, , url] of sites) {
+      await page.route(url, route => route.fulfill({
         contentType: 'text/html',
         body: `<main>${site} is framed</main>`,
       }));
@@ -421,9 +427,9 @@ test.describe('site smoke', () => {
     await expect(address.locator('option[value="wikipedia"], option[value="newspaper"]')).toHaveCount(0);
     await expect(address.locator('option[value="local"]')).toHaveCount(0);
     await expect(browserWindow).not.toContainText('DO_NOT_OPEN');
-    for (const [site, title] of [['songgpt', 'SongGPT'], ['intelligence', 'Intelligence'], ['germany', 'Germany']]) {
+    for (const [site, title, url] of sites) {
       await address.selectOption(site);
-      await expect(browserWindow.locator('.browser-frame')).toHaveAttribute('src', `https://${site}.soli.blue/`);
+      await expect(browserWindow.locator('.browser-frame')).toHaveAttribute('src', url);
       await expect(browserWindow.locator('.browser-frame')).toHaveAttribute('title', title);
       await expect(page.frameLocator('.browser-frame').locator('main')).toHaveText(`${site} is framed`);
       const previousFrame = await browserWindow.locator('.browser-frame').elementHandle();
