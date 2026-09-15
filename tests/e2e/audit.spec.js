@@ -7,12 +7,12 @@ for (const path of routes) {
     page.on('pageerror', error => errors.push(error.message));
     await page.addInitScript(() => sessionStorage.setItem('soli95-booted', 'true'));
     await page.goto(path);
-    if (['/wikipedia', '/newspaper'].includes(path)) {
+    if (['/wikipedia', '/newspaper', '/home', '/terminal', '/animation'].includes(path)) {
       await expect(page).toHaveURL(/\/windows95$/);
       await expect(page.locator('.desktop-icon').first()).toBeVisible();
     }
     await expect(page.locator('#app')).not.toBeEmpty();
-    await expect(page.locator('a[href="/wikipedia"], a[href="/newspaper"]')).toHaveCount(0);
+    await expect(page.locator('a[href="/wikipedia"], a[href="/newspaper"], a[href="/home"], a[href="/terminal"], a[href="/animation"]')).toHaveCount(0);
     await expect(page.locator('#app')).toContainText(/\w/, { timeout: 8000 });
     await page.waitForTimeout(300);
     expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
@@ -30,11 +30,12 @@ test('blocked browser storage still permits desktop navigation', async ({ page }
   });
   await page.goto('/');
   await expect(page.locator('.boot-screen')).toBeHidden({ timeout: 10000 });
-  await expect(page.locator('.desktop-icon', { hasText: 'Projects' })).toBeVisible();
+  await expect(page.locator('.desktop-icon', { hasText: 'Resume' })).toBeVisible();
   expect(errors).toEqual([]);
 });
 
 test('terminal streams a reply and keeps the latest user message out of history', async ({ page }) => {
+  test.skip(true, 'Terminal is retired; Messenger and unit tests cover chat streaming.');
   let body;
   await page.route('**/api/chat', async route => {
     body = route.request().postDataJSON();
@@ -63,34 +64,8 @@ test('desktop icons stay inside the visible viewport and control icons load', as
   }));
   expect(bounds.filter(icon => icon.outside)).toEqual([]);
   await page.getByRole('button', { name: /start/i }).click();
-  await page.locator('.menu-item-row', { hasText: 'Projects' }).click();
+  await page.locator('.menu-item-row', { hasText: 'Resume' }).click();
   const closeIcon = await page.locator('.win95-window:visible .win-btn.close').evaluate(button => getComputedStyle(button).backgroundImage);
   expect(closeIcon).not.toContain('~98');
   expect(closeIcon).not.toBe('none');
-});
-
-test('visitor free text is inert and a note can be submitted empty', async ({ page }) => {
-  const attack = '<img src=x onerror="window.boardXss=1"> [click](javascript:alert(1))';
-  let sent;
-  await page.route('**/api/visitor-board', async route => {
-    if (route.request().method() === 'GET') {
-      return route.fulfill({ json: { total: 1, entries: [{ id: 1, name: 'AI Visitor', message: attack, stamp: 'globe', color: 'sky', createdAt: 1 }] } });
-    }
-    sent = route.request().postDataJSON();
-    return route.fulfill({ status: 201, json: { entry: { ...sent, id: 2, createdAt: 2 } } });
-  });
-  await page.addInitScript(() => sessionStorage.setItem('soli95-booted', '1'));
-  await page.goto('/windows95');
-  await expect(page.locator('.boot-screen')).toBeHidden();
-  const icon = page.locator('.desktop-icon', { hasText: 'Visitor Board' });
-  if (test.info().project.name === 'chromium') await icon.dblclick(); else await icon.click();
-  await expect(page.locator('.note-message').first()).toHaveText(attack);
-  await expect(page.locator('.note-message img, .note-message a, .note-message script')).toHaveCount(0);
-  expect(await page.evaluate(() => window.boardXss)).toBeUndefined();
-  await page.getByRole('button', { name: 'Sign the board' }).click();
-  await page.getByLabel('Display name').fill('Another visitor');
-  await expect(page.getByLabel('Leave a note')).toHaveAttribute('maxlength', '160');
-  await page.getByRole('button', { name: 'Pin my note' }).click();
-  await expect(page.locator('.board-dialog')).toHaveCount(0);
-  expect(sent.message).toBe('');
 });

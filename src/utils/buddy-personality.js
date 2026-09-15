@@ -1,3 +1,6 @@
+// Short excerpt: https://www.brainyquote.com/quotes/aldous_huxley_392818
+export const KINDNESS_QUOTE = '"It is a bit embarrassing ... no more to offer by way of advice than \'try to be a little kinder.\'" - Aldous Huxley';
+
 export const EXTRA_BUDDY_LINES = [
   'Oh. Still you. Good.',
   'My personal space is approximately eight pixels.',
@@ -15,10 +18,12 @@ export const EXTRA_BUDDY_LINES = [
   'Still here? Pull up a pixel.',
   'No thoughts. Just tail.',
   'This is a surprisingly nice place to spend an afternoon.',
+  KINDNESS_QUOTE,
 ];
 
 export const EXTRA_BUDDY_REACTIONS = {
   idle: [
+    KINDNESS_QUOTE,
     'I put an acorn somewhere very sensible. That was my first mistake.',
     'The taskbar is warm. I might stay here.',
     'Sometimes a good idea needs a little staring into space.',
@@ -47,8 +52,6 @@ export const EXTRA_BUDDY_REACTIONS = {
   browserMachtblick: ['Following the votes. Doing the homework.', 'I came for the charts. Stayed for the receipts.'],
   browserSonggpt: ['Finally, something I can dance to.', 'Please consider a very short song about acorns.'],
   contact: ['A little hello can lead to something good.', 'I checked the envelope. No crumbs.'],
-  visitorboard: ['Leave a little proof that our paths crossed.', 'I like seeing who stopped by.'],
-  visitorSigned: ['A new note! I will guard it with unreasonable enthusiasm.', 'You left a little bit of yourself here. Nice.'],
   codehop: ['I practiced that jump. In a different branch.', 'Checkpoints are just little places that believe in you.'],
   spacegame: ['I packed snacks. You handle navigation.', 'Deep space. Very few trees.'],
   minesweeper: ['I believe in you. From a safe distance.', 'That square has a suspicious vibe. So do all the others.'],

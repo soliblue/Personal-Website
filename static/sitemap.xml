@@ -23,13 +23,6 @@
    </url>
 
    <url>
-      <loc>https://soli.blue/home</loc>
-      <lastmod>2026-07-05</lastmod>
-      <changefreq>monthly</changefreq>
-      <priority>0.8</priority>
-   </url>
-
-   <url>
       <loc>https://soli.blue/resume</loc>
       <lastmod>2026-07-05</lastmod>
       <changefreq>monthly</changefreq>
@@ -41,20 +34,6 @@
       <lastmod>2026-07-05</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.7</priority>
-   </url>
-
-   <url>
-      <loc>https://soli.blue/terminal</loc>
-      <lastmod>2026-07-05</lastmod>
-      <changefreq>monthly</changefreq>
-      <priority>0.5</priority>
-   </url>
-
-   <url>
-      <loc>https://soli.blue/animation</loc>
-      <lastmod>2026-07-05</lastmod>
-      <changefreq>monthly</changefreq>
-      <priority>0.5</priority>
    </url>
 
    <url>

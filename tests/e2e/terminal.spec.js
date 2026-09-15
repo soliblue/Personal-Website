@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 test('standalone terminal has consistent type, readable input, and working commands', async ({ page }) => {
+  test.skip(true, 'Terminal is retired; retain coverage with its preserved source.');
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   await page.route('**/api/chat', route => route.fulfill({

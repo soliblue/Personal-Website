@@ -15,7 +15,7 @@ export default {
   methods: {
     goBack() {
       // Go back to the homepage version the user came from
-      const homeVersion = safeStorage.getItem('homeVersion') || 'animation';
+      const homeVersion = safeStorage.getItem('homeVersion') || 'windows95';
       this.$router.push(`/${homeVersion}`);
     },
   },

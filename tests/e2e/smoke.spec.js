@@ -22,8 +22,8 @@ test.describe('site smoke', () => {
     const desktop = page.locator('.desktop-icon');
     await expect(page.locator('.win95-window:visible')).toHaveCount(0);
     expect((await desktop.allTextContents()).slice(0, 4).map(text => text.trim()))
-      .toEqual(['Projects', 'Visitor Board', 'Internet', 'Messenger']);
-    for (const name of ['Paint', 'My Computer', 'About Me', 'GitHub', 'Recycle Bin', 'Terminal', 'Minesweeper']) {
+      .toEqual(['Internet', 'Messenger', 'Codex Cruise', 'Claude Hops']);
+    for (const name of ['Projects', 'Visitor Board', 'Paint', 'My Computer', 'About Me', 'GitHub', 'Recycle Bin', 'Terminal', 'Minesweeper']) {
       await expect(desktop.filter({ hasText: name })).toHaveCount(0);
     }
     await page.reload();
@@ -31,14 +31,15 @@ test.describe('site smoke', () => {
     await expect(page.locator('.boot-screen')).toBeHidden();
     await expect(page.locator('.win95-window:visible')).toHaveCount(0);
     await page.getByRole('button', { name: /start/i }).click();
-    for (const name of ['Paint', 'My Computer', 'About Me', 'GitHub', 'Recycle Bin', 'Terminal', 'Minesweeper']) {
+    for (const name of ['Projects', 'Visitor Board', 'Paint', 'My Computer', 'About Me', 'GitHub', 'Recycle Bin', 'Terminal', 'Minesweeper']) {
       await expect(page.locator('.menu-item-row', { hasText: name })).toHaveCount(0);
     }
-    await page.locator('.menu-item-row', { hasText: 'Projects' }).click();
-    await expect(page.locator('.win95-window:visible .titlebar-text')).toHaveText('Projects');
+    await page.locator('.menu-item-row', { hasText: 'Resume' }).click();
+    await expect(page.locator('.win95-window:visible .titlebar-text')).toHaveText('Resume.doc - WordPad');
   });
 
   test('Windows 95 shell boots and opens Projects from Start', async ({ page }, testInfo) => {
+    test.skip(true, 'Projects is temporarily hidden; retain its restoration coverage.');
     test.skip(testInfo.project.name !== 'chromium', 'Desktop shell flow is covered once.');
     const errors = collectPageErrors(page);
 
@@ -214,117 +215,6 @@ test.describe('site smoke', () => {
     expect(errors).toEqual([]);
   });
 
-  test('Visitor Board previews and pins a short free-text note', async ({ page }, testInfo) => {
-    test.skip(testInfo.project.name !== 'chromium', 'Desktop board flow is covered once.');
-    const errors = collectPageErrors(page);
-    const now = Math.floor(Date.now() / 1000);
-    let requestBody;
-
-    await page.route('**/api/visitor-board', async (route) => {
-      if (route.request().method() === 'GET') {
-        await route.fulfill({
-          contentType: 'application/json',
-          body: JSON.stringify({
-            total: 2,
-            entries: [
-              {
-                id: 2,
-                name: 'Ada',
-                stamp: 'flower',
-                color: 'mint',
-                messageKey: 'tiny-internet',
-                createdAt: now - 120,
-              },
-              {
-                id: 1,
-                name: 'soli',
-                stamp: 'floppy',
-                color: 'sky',
-                messageKey: 'welcome',
-                createdAt: now - 3600,
-              },
-            ],
-          }),
-        });
-        return;
-      }
-
-      requestBody = route.request().postDataJSON();
-      await route.fulfill({
-        status: 201,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          ok: true,
-          entry: {
-            id: 3,
-            name: requestBody.name,
-            stamp: requestBody.stamp,
-            color: requestBody.color,
-            message: requestBody.message,
-            createdAt: now,
-          },
-        }),
-      });
-    });
-
-    await page.addInitScript(() => sessionStorage.setItem('soli95-booted', 'true'));
-    await page.goto('/windows95');
-    await page.locator('.desktop-icon', { hasText: 'Visitor Board' }).dblclick();
-
-    const boardWindow = page.locator('.win95-window').filter({
-      has: page.locator('.titlebar-text', { hasText: 'Visitor Board' }),
-    });
-    await expect(boardWindow).toBeVisible();
-    await expect(boardWindow.locator('.visitor-note')).toHaveCount(2);
-    await expect(boardWindow).toContainText('I like this tiny internet.');
-
-    await boardWindow.getByRole('button', { name: 'Sign the board' }).click();
-    await boardWindow.getByLabel('Display name').fill('Visitor-42');
-    await boardWindow.getByRole('button', { name: 'Rocket' }).click();
-    await boardWindow.getByRole('button', { name: 'Rose pink' }).click();
-    await boardWindow.getByLabel('Leave a note').fill('Keep building weird things.');
-    await expect(boardWindow.locator('.preview-note')).toContainText('Visitor-42');
-    await expect(boardWindow.locator('.preview-note')).toContainText(
-      'Keep building weird things.',
-    );
-    await boardWindow.getByRole('button', { name: 'Pin my note' }).click();
-
-    await expect(boardWindow.locator('.board-dialog')).toHaveCount(0);
-    await expect(boardWindow.locator('.visitor-note')).toHaveCount(3);
-    await expect(boardWindow.locator('.visitor-note').first()).toContainText('Visitor-42');
-    await expect(boardWindow.locator('.visitor-note').first()).toHaveClass(/paper-rose/);
-    await expect(boardWindow.locator('.board-count')).toContainText('3 notes');
-    expect(requestBody).toEqual({
-      name: 'Visitor-42',
-      stamp: 'rocket',
-      color: 'rose',
-      message: 'Keep building weird things.',
-      website: '',
-    });
-    expect(errors).toEqual([]);
-  });
-
-  test('Visitor Board composer stays usable on a phone', async ({ page }, testInfo) => {
-    test.skip(testInfo.project.name !== 'mobile-chrome', 'Mobile board sizing is covered once.');
-
-    await page.route('**/api/visitor-board', route => route.fulfill({
-      contentType: 'application/json',
-      body: JSON.stringify({ total: 0, entries: [] }),
-    }));
-    await page.addInitScript(() => sessionStorage.setItem('soli95-booted', 'true'));
-    await page.goto('/windows95');
-    await page.locator('.desktop-icon', { hasText: 'Visitor Board' }).click();
-    await page.getByRole('button', { name: 'Sign the board' }).click();
-
-    const nameInput = page.getByLabel('Display name');
-    await nameInput.focus();
-    const fontSize = await nameInput.evaluate(el => parseFloat(getComputedStyle(el).fontSize));
-    expect(fontSize).toBeGreaterThanOrEqual(18);
-    const horizontalOverflow = await page.locator('.board-dialog').evaluate(
-      dialog => dialog.scrollWidth - dialog.clientWidth,
-    );
-    expect(horizontalOverflow).toBeLessThanOrEqual(1);
-  });
 
   test('Messenger renders safe Markdown with comfortable composer spacing', async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== 'chromium', 'Desktop messenger flow is covered once.');
@@ -462,7 +352,7 @@ test.describe('site smoke', () => {
     await expect(buddy).toHaveAttribute('data-frame', /idle|curious/);
 
     await page.getByRole('button', { name: /start/i }).click();
-    await page.locator('.menu-item-row', { hasText: 'Projects' }).click();
+    await page.locator('.menu-item-row', { hasText: 'Resume' }).click();
 
     await talkToBuddy.click();
     await expect(page.locator('.buddy-bubble')).toContainText('I was told this was production.');
@@ -548,6 +438,7 @@ test.describe('site smoke', () => {
   });
 
   test('terminal escapes typed HTML while keeping command formatting', async ({ page }) => {
+    test.skip(true, 'Terminal is retired; retain coverage with its preserved source.');
     const errors = collectPageErrors(page);
     await page.route('**/api/chat', route => route.fulfill({
       contentType: 'text/event-stream',
@@ -745,6 +636,7 @@ test.describe('site smoke', () => {
   });
 
   test('Windows 95 project folders reset their scroll position on mobile', async ({ page }) => {
+    test.skip(true, 'Projects is temporarily hidden; retain its restoration coverage.');
     test.skip(test.info().project.name !== 'mobile-chrome', 'Touch flow is covered once.');
     const errors = collectPageErrors(page);
 

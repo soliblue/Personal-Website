@@ -3,7 +3,6 @@ import assert from 'node:assert/strict';
 import { readJson, isAllowedOrigin, checkRateLimit } from '../../functions/_security.js';
 import { onRequestPost as chat } from '../../functions/api/chat.js';
 import { onRequestPost as contact } from '../../functions/api/contact.js';
-import { onRequestPost as board } from '../../functions/api/visitor-board.js';
 const request = (body, headers = {}) => new Request('https://soli.blue/api/chat', {
   method: 'POST', body, headers: { Origin: 'https://soli.blue', 'Content-Type': 'application/json', ...headers },
 });
@@ -25,7 +24,7 @@ test('origins exclude missing headers, foreign sites and localhost on production
 });
 test('all write endpoints reject invalid bodies without contacting upstream', async () => {
   const env = { VISITOR_BOARD_DB: {}, BOARD_HASH_SALT: 'test' };
-  for (const handler of [chat, contact, board]) {
+  for (const handler of [chat, contact]) {
     for (const body of ['null', '[]', '{']) {
       assert.equal((await handler({ request: request(body), env })).status, 400);
     }

@@ -6,6 +6,7 @@ compatibility_date = "2026-06-01"
 pages_build_output_dir = "dist"
 
 [[d1_databases]]
+# Historical binding name; this database now holds shared API rate limits only.
 binding = "VISITOR_BOARD_DB"
 database_name = "soli-visitor-board"
 database_id = "4a9d1f5b-24b0-4b42-bc02-0d9296596d85"
@@ -15,4 +16,4 @@ migrations_dir = "migrations"
 #   npx wrangler pages secret put GOOGLE_AI_API_KEY
 #   npx wrangler pages secret put RESEND_API_KEY
 #   npx wrangler pages secret put BOARD_HASH_SALT
-# Used by functions/api/chat.js, functions/api/contact.js, and functions/api/visitor-board.js.
+# Used by functions/api/chat.js and functions/api/contact.js.

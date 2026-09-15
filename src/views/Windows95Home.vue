@@ -1,9 +1,9 @@
 <template>
-  <div class="win95-desktop" @click="closeMenus" @contextmenu="onDesktopContextMenu">
+  <div v-if="!shuttingDown" class="win95-desktop" @click="closeMenus" @contextmenu="onDesktopContextMenu">
     <!-- Desktop Icons -->
     <div class="desktop-icons" :class="{ refreshing: refreshFlash }">
       <div
-        v-for="icon in desktopIcons"
+        v-for="icon in visibleDesktopIcons"
         :key="icon.id"
         class="desktop-icon"
         role="button"
@@ -424,15 +424,6 @@
           <MessengerApp v-if="win.open" @sound="playSound" />
         </div>
 
-        <!-- Visitor Board Window - stays mounted while minimized to preserve the composer -->
-        <div v-if="win.id === 'visitorboard'" class="app-window">
-          <VisitorBoard
-            v-if="win.open"
-            @sound="playSound"
-            @signed="onVisitorBoardSigned"
-          />
-        </div>
-
         <!-- Minesweeper Window - stays mounted while minimized to keep the game -->
         <div v-if="win.id === 'minesweeper'" class="app-window minesweeper-host">
           <Minesweeper v-if="win.open" @sound="playSound" @resize="win.width = $event.width; win.height = $event.height" />
@@ -445,7 +436,7 @@
 
         <!-- Codex Cruise Window - only mount when open and not minimized -->
         <div v-if="win.id === 'spacegame'" class="app-window">
-          <SpaceGameHome v-if="win.open && !win.minimized" :embedded="true" />
+          <SpaceGameHome v-if="win.open && !win.minimized" :embedded="true" :show-projects="!hiddenApps.includes('projects')" />
         </div>
 
         <!-- Claude Hops Window - only mount when open and not minimized -->
@@ -588,7 +579,7 @@
           <img src="../assets/win95/doc.svg">
           <span>Resume</span>
         </div>
-        <div class="menu-item-row" @click="openWindow('projects')">
+        <div v-if="!hiddenApps.includes('projects')" class="menu-item-row" @click="openWindow('projects')">
           <img src="../assets/win95/folder.svg">
           <span>Projects</span>
         </div>
@@ -599,10 +590,6 @@
         <div class="menu-item-row" @click="openWindow('messenger')">
           <img src="../assets/win95/msn.svg">
           <span>Messenger</span>
-        </div>
-        <div class="menu-item-row" @click="openWindow('visitorboard')">
-          <img src="../assets/win95/visitor-board.svg">
-          <span>Visitor Board</span>
         </div>
         <div class="menu-item-row" @click="openWindow('spacegame')">
           <img :src="spaceshipIcon" class="codex-ship">
@@ -656,12 +643,11 @@
       </div>
     </div>
 
-    <!-- Shutdown Screen -->
-    <div class="shutdown-screen" v-if="shuttingDown">
-      <div class="shutdown-content">
-        <p>It's now safe to turn off your computer.</p>
-        <p class="shutdown-hint">(or click anywhere to go home)</p>
-      </div>
+  </div>
+  <div v-else class="shutdown-screen">
+    <div class="shutdown-content">
+      <p>It's now safe to turn off your computer.</p>
+      <button ref="restartButton" class="win95-btn" @click="restartDesktop">Restart</button>
     </div>
   </div>
 </template>
@@ -678,7 +664,6 @@ import TerminalHome from '@/views/TerminalHome';
 import SpaceGameHome from '@/views/SpaceGameHome';
 import CodeHopHome from '@/views/CodeHopHome';
 import MessengerApp from '@/components/win95/MessengerApp';
-import VisitorBoard from '@/components/win95/VisitorBoard';
 import Minesweeper from '@/components/win95/Minesweeper';
 import PaintApp from '@/components/win95/PaintApp';
 import ProjectExplorer from '@/components/win95/ProjectExplorer';
@@ -694,7 +679,6 @@ import terminalIcon from '@/assets/win95/terminal.svg';
 import globeIcon from '@/assets/win95/globe.svg';
 import recycleIcon from '@/assets/win95/recycle.svg';
 import msnIcon from '@/assets/win95/msn.svg';
-import visitorBoardIcon from '@/assets/win95/visitor-board.svg';
 import mineIcon from '@/assets/win95/mine.svg';
 import paintIcon from '@/assets/win95/paint.svg';
 import spaceshipIcon from '@/assets/space/codex-flies-ship.png';
@@ -851,14 +835,6 @@ const BUDDY_REACTIONS = {
     'A real form. We are getting serious.',
     'Type carefully. This one actually sends.',
   ],
-  visitorboard: [
-    'A public write operation. I reviewed the input constraints.',
-    'Leave a note. Future internet archaeologists will appreciate it.',
-  ],
-  visitorSigned: [
-    'Pinned. You are officially part of the desktop now.',
-    'A tiny note with global distribution. Beautiful.',
-  ],
   control: [
     'Personality settings are managed automatically. Convenient.',
     'Please do not adjust the teal.',
@@ -989,7 +965,6 @@ const BUDDY_MOODS = {
   sendSuccess: 'excited',
   soundOff: 'annoyed',
   spacegame: 'excited',
-  visitorSigned: 'excited',
   windows: 'annoyed',
 };
 
@@ -1032,8 +1007,6 @@ const BUDDY_FRAMES = {
   spacegame: 'excited',
   taskbarFocus: 'curious',
   taskbarHide: 'sit',
-  visitorboard: 'curious',
-  visitorSigned: 'excited',
   windows: 'annoyed',
 };
 
@@ -1044,7 +1017,6 @@ export default {
     SpaceGameHome,
     CodeHopHome,
     MessengerApp,
-    VisitorBoard,
     Minesweeper,
     PaintApp,
     ProjectExplorer,
@@ -1125,7 +1097,6 @@ export default {
       },
       desktopIcons: [
         { id: 'projects', label: 'Projects', img: folderIcon },
-        { id: 'visitorboard', label: 'Visitor Board', img: visitorBoardIcon },
         { id: 'browser', label: 'Internet', img: globeIcon },
         { id: 'messenger', label: 'Messenger', img: msnIcon },
         {
@@ -1138,6 +1109,8 @@ export default {
         { id: 'resume', label: 'Resume.doc', img: docIcon },
         { id: 'contact', label: 'Contact', img: mailIcon },
       ],
+      // Keep these apps intact so their launchers can be restored later.
+      hiddenApps: ['projects'],
       menuBar: [
         {
           name: 'File',
@@ -1285,21 +1258,6 @@ export default {
           contentClass: '',
         },
         {
-          id: 'visitorboard',
-          title: 'Visitor Board',
-          icon: visitorBoardIcon,
-          open: false,
-          minimized: false,
-          maximized: false,
-          x: 115,
-          y: 45,
-          width: 760,
-          height: 560,
-          zIndex: 10,
-          showMenu: false,
-          contentClass: 'app-container',
-        },
-        {
           id: 'recycle',
           title: 'Recycle Bin',
           icon: recycleIcon,
@@ -1425,6 +1383,9 @@ export default {
     };
   },
   computed: {
+    visibleDesktopIcons() {
+      return this.desktopIcons.filter(icon => !this.hiddenApps.includes(icon.id));
+    },
     buddyBubbleOffset() {
       const center = this.buddyX + 39;
       const half = this.isTouch ? 94 : 110;
@@ -1593,10 +1554,13 @@ export default {
     shutdown() {
       this.closeMenus();
       this.playSound('shutdown');
+      this.stopBuddyFollowing();
+      this.cancelBuddyActivity();
       this.shuttingDown = true;
-      document.addEventListener('click', () => {
-        this.$router.push('/home');
-      }, { once: true });
+      this.$nextTick(() => this.$refs.restartButton?.focus());
+    },
+    restartDesktop() {
+      window.location.reload();
     },
     // --- Clock ---
     updateTime() {
@@ -1765,7 +1729,7 @@ export default {
       }
     },
     tickBuddy() {
-      if (document.hidden || this.booting || this.bsod || this.buddySleeping || this.buddyDragging
+      if (document.hidden || this.shuttingDown || this.booting || this.bsod || this.buddySleeping || this.buddyDragging
         || this.buddyContext.open || this.dragging || this.resizing || this.buddyActivity !== 'idle'
         || ['codehop', 'spacegame', 'minesweeper'].includes(this.activeWindow)) return;
       this.buddyIdleTick += 1;
@@ -1933,9 +1897,6 @@ export default {
       this.buddyMood = mood || BUDDY_MOODS[key] || 'curious';
       if (!this.buddyMotionActive) this.setBuddyFrame(BUDDY_FRAMES[key] || 'curious');
       this.recordBuddy(key, this.buddyMessage);
-    },
-    onVisitorBoardSigned() {
-      this.narrateBuddy('visitorSigned');
     },
     pokeBuddy() {
       this.cancelBuddyActivity();
@@ -2330,6 +2291,7 @@ export default {
     },
     // --- BSOD ---
     onKeyDown(e) {
+      if (this.shuttingDown) return;
       if (this.bsod) {
         this.dismissBsod();
         return;
@@ -4096,18 +4058,21 @@ export default {
   align-items: center;
   justify-content: center;
   z-index: 99999;
-  cursor: pointer;
+  cursor: default;
 }
 
 .shutdown-content {
   text-align: center;
   color: #ff8000;
   font-size: 24px;
+  font-family: Tahoma, Arial, sans-serif;
+  padding: 24px;
+  max-width: 600px;
 }
 
-.shutdown-hint {
+.shutdown-content .win95-btn {
   font-size: 14px;
-  color: #808080;
+  color: #000;
   margin-top: 16px;
 }
 

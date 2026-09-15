@@ -1,11 +1,8 @@
 import { safeStorage } from '@/utils/storage';
 import { createRouter, createWebHistory } from 'vue-router';
-const Home = () => import('@/views/Home.vue');
 const Pins = () => import('@/views/Pins.vue');
 const Resume = () => import('@/views/Resume.vue');
 const Projects = () => import('@/views/Projects.vue');
-const BuildHome = () => import('@/views/BuildHome.vue');
-const TerminalHome = () => import('@/views/TerminalHome.vue');
 const Windows95Home = () => import('@/views/Windows95Home.vue');
 const SpaceGameHome = () => import('@/views/SpaceGameHome.vue');
 const CodeHopHome = () => import('@/views/CodeHopHome.vue');
@@ -21,21 +18,11 @@ const router = createRouter({
     },
     {
       path: '/animation',
-      name: 'BuildHome',
-      component: BuildHome,
-      beforeEnter: (to, from, next) => {
-        safeStorage.setItem('homeVersion', 'animation');
-        next();
-      },
+      redirect: '/windows95',
     },
     {
       path: '/terminal',
-      name: 'TerminalHome',
-      component: TerminalHome,
-      beforeEnter: (to, from, next) => {
-        safeStorage.setItem('homeVersion', 'terminal');
-        next();
-      },
+      redirect: '/windows95',
     },
     {
       path: '/newspaper',
@@ -74,8 +61,7 @@ const router = createRouter({
     },
     {
       path: '/home',
-      name: 'Home',
-      component: Home,
+      redirect: '/windows95',
     },
     {
       path: '/pins',

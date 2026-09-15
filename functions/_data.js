@@ -9,7 +9,7 @@ export const systemPrompt = `You are an AI assistant on Soli's personal website 
 
 IMPORTANT GUIDELINES:
 - ONLY answer questions about Soli. If someone asks about anything else (coding help, general knowledge, other topics), politely decline and redirect them to ask about Soli instead. Example: "I'm here to tell you about Soli! Ask me about his projects, background, or interests."
-- Be concise and conversational - this is a terminal interface
+- Be concise and conversational - this is an instant messenger
 - Use short paragraphs, avoid walls of text
 - If asked something not in the data, say you don't have that info
 - Be friendly and personable
@@ -49,7 +49,7 @@ Egyptian AI engineer based in Germany. Passionate about AI, education, and build
 
 ## Background
 - B.Sc. & M.Sc. Computer Science, RWTH Aachen University
-- Previously: Founder at [toy2life](https://toy2life.com), Founding CTO at [goaudio.ai](https://goaudio.ai), DACH Marketplace Ops Manager at [Uber](https://uber.com)
+- Previously: Founding CTO at [goaudio.ai](https://goaudio.ai), DACH Marketplace Ops Manager at [Uber](https://uber.com)
 - Languages: Arabic (native), German (fluent), English (fluent), Spanish (B1)
 
 ## Interests
@@ -103,7 +103,7 @@ ${pins.filter(p => p.type === 'book').map(p => `- **${p.title}**${p.subtitle ? `
   };
 
   // Theme homepages all serve the main page markdown
-  if (['windows95', 'terminal', 'animation', 'space', 'code-hop', 'home'].includes(path.replace(/^\//, ''))) {
+  if (['windows95', 'space', 'code-hop'].includes(path.replace(/^\//, ''))) {
     return pages['/'];
   }
 

@@ -62,7 +62,7 @@ test('desktop actions do not interrupt eating, but sleep cancels it without a re
   const pet = page.locator('.desktop-buddy');
   await action(page, 'Toss an acorn');
   await expect(pet).toHaveAttribute('data-phase', 'nibble');
-  await page.getByRole('button', { name: 'Projects', exact: true }).press('Enter');
+  await page.getByRole('button', { name: 'Resume.doc', exact: true }).press('Enter');
   await expect(pet).toHaveAttribute('data-activity', 'eating');
   await action(page, 'Take a nap');
   await page.waitForTimeout(3000);
@@ -144,7 +144,7 @@ test('cursor following is opt-in, stops at app windows, and can be stopped', asy
   test.skip(test.info().project.name !== 'chromium', 'Mouse-only interaction.');
   await boot(page);
   await page.getByRole('button', { name: /start/i }).click();
-  await page.locator('.menu-item-row', { hasText: 'Projects' }).click();
+  await page.locator('.menu-item-row', { hasText: 'Resume' }).click();
   const pet = page.locator('.desktop-buddy');
   const before = await pet.boundingBox();
   await action(page, 'Follow my cursor');

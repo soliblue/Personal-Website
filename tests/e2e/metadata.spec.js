@@ -24,6 +24,7 @@ test('site and share metadata say soli without changing the resume job title', a
   const resume = page.locator('.resume-content .doc-body');
   await expect(resume.locator('h1, h2')).toHaveCount(0);
   await expect(resume).not.toContainText('Current:');
+  await expect(resume).not.toContainText('toy2life');
   await expect(resume.locator('h3').first()).toHaveText('EXPERIENCE');
   await expect(page.locator('.resume-item', { hasText: 'Knowunity' })).toContainText('Staff AI Engineer');
 });

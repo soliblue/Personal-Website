@@ -35,13 +35,10 @@
         <button @click="restartGame" class="menu-item">New flight</button>
         <div class="menu-divider"></div>
         <button @click="showContent('resume')" class="menu-item">Resume/CV</button>
-        <button @click="showContent('projects')" class="menu-item">Projects</button>
+        <button v-if="showProjects" @click="showContent('projects')" class="menu-item">Projects</button>
         <button @click="showContent('pins')" class="menu-item">Pins</button>
         <div class="menu-divider" v-if="!embedded"></div>
         <div class="menu-submenu" v-if="!embedded">
-          <span class="menu-label">Other Homepages</span>
-          <a href="/animation" target="_blank" rel="noopener noreferrer" class="menu-item small">Animation</a>
-          <a href="/terminal" target="_blank" rel="noopener noreferrer" class="menu-item small">Terminal</a>
           <a href="/windows95" target="_blank" rel="noopener noreferrer" class="menu-item small">Windows 95</a>
           <a href="/code-hop" target="_blank" rel="noopener noreferrer" class="menu-item small">Claude Hops</a>
         </div>
@@ -212,6 +209,10 @@ export default {
   name: 'SpaceGameHome',
 
   props: {
+    showProjects: {
+      type: Boolean,
+      default: false,
+    },
     embedded: {
       type: Boolean,
       default: false,
